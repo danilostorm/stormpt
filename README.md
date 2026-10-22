@@ -33,3 +33,16 @@ O novo [site StormPT](https://stormpt.hoststorm.com.br) está no IIS da VM Windo
 O launcher assinado e seu código-fonte estão em `launcher/`; o portal ASP.NET está em `web/`. O pacote do jogo é servido separadamente pelo próprio site, não pelo GitHub.
 
 **Estado:** site online; cliente instalável pelo launcher, mas **jogo público não homologado** (IP do Game.exe ainda é local e o encaminhamento TCP de produção não foi configurado). Cadastro, login, personagens e progressão aguardam testes completos.
+
+## Atualização da implantação — 22/10/2026
+
+- Portal principal publicado em `https://stormpt.hoststorm.com.br` com o novo visual PHP enviado pelo proprietário.
+- AEROCOOL: PHP 8.4-FPM + Nginx em Docker, contêineres `stormpt-php-fpm` e `stormpt-php-nginx`; origem do proxy na porta 3825.
+- O cadastro, login e painel continuam no IIS/ASP.NET da VM Windows 11, em `/Conta.aspx`, usando `AccountDB` local. Os links de cadastro e painel do portal PHP encaminham para esse sistema.
+- Rankings servidos por uma API restrita à LAN e com consultas de leitura ao SQL do jogo; acesso público à API bloqueado no proxy.
+- Launcher clássico atualizado distribuído como `/releases/launcher.exe`; o pacote do cliente continua sob `/client-files/` com manifesto RSA e SHA-256.
+- Backup do site ASP.NET anterior no Windows: `C:\StormPT-2703\Backups\Site-ASPNET-before-PHP-20261022`.
+- Backup do proxy anterior no AEROCOOL: `/mnt/user/appdata/stormpt-web-bridge/default.conf.backup-before-PHP-20261022-174805`.
+- Source do portal PHP em `/mnt/user/appdata/stormpt-php-staging/site`, do launcher clássico no Windows em `C:\StormPT-2703\LauncherClassic\Launcher`.
+- **A publicação da source integral do jogo e das novas versões no GitHub público está pendente de aprovação final e revisão de segredos/licenças.** O repositório `danilostorm/stormpt` é público, portanto não publicar bases SQL, segredos, chaves RSA privadas ou fontes não revisadas.
+- A abertura pública do **servidor de jogo TCP** segue pendente; a publicação do **site** não significa liberação do login externo do Game.exe.
