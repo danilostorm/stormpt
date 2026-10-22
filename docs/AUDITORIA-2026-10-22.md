@@ -12,8 +12,8 @@ Instalação limpa a partir dos pacotes de 27/03/2026 em uma VM Windows 11. Nenh
 - O SQL TCP 1433 não foi exposto externamente à VM.
 
 ## Bloqueios de funcionamento completo
-1. **18 bases da aplicação estão criadas, mas todas têm zero tabelas e zero procedures**. O World Server carregar não prova funcionamento de cadastro, login, personagens, inventário ou clãs.
-2. Os pacotes de cliente/servidor/source não contêm o conjunto completo de scripts de criação dos bancos. Os backups disponíveis em outro ambiente pertencem a estruturas antigas e não foram importados.
+1. **Atualizado:** 19 bancos de dados do RAR original restaurados com 308 tabelas. O World Server carregar não comprova funcionamento de cadastro, login, personagens, inventário ou clãs; testes funcionais ainda são obrigatórios.
+2. Foi identificado o arquivo `C:\StormPT-2703\sql.rar` na própria VM, contendo os arquivos MDF e LDF completos usados na restauração. Os backups disponíveis em outro ambiente não foram importados.
 3. O arquivo ClanDB_Manual.sql contém SELECTs e exemplos de INSERT, UPDATE e DELETE. Não executar o arquivo inteiro em produção; é um guia manual, não uma migration segura.
 4. Rotinas antigas fazem chamadas HTTP a endpoints de clãs, autenticação e sons; o back-end HTTP/IIS não foi instalado nem adaptado na VM nova.
 5. Cliente configurado com endpoint local de teste. Exposição pública e testes com usuário real ainda pendentes.
@@ -38,8 +38,23 @@ Instalação limpa a partir dos pacotes de 27/03/2026 em uma VM Windows 11. Nenh
 - C:\StormPT-2703\Cliente\Game.exe
 
 ## Próximos passos necessários
-1. Obter esquema SQL específico e compatível com a source de 27/03/2026; validar migrations em banco descartável antes de aplicar nas 18 bases.
+1. **Concluído:** anexar os arquivos de dados da distribuição 27/03/2026, sem usar esquemas antigos. Pendente: validar SQL em login e persistência e higienizar as contas e clãs de teste antes da produção.
 2. Implementar esquema de autenticação/conta com testes reais e conferir persistência de personagem e inventário.
 3. Recompilar as URLs/endpoints HTTP restantes para back-end próprio; reinstalar IIS e integrar site, painel de usuário e clãs.
 4. Homologar exp, drop, progressão, limite de level, itens, mapas e balanceamento.
 5. Preparar cliente/distribuição auditada, testes WAN, regras de firewall mínimas, monitoramento e somente então trocar produção.
+
+## Correção da auditoria: sql.rar localizado e restaurado
+
+Em 22/10/2026 foi localizado `C:\StormPT-2703\sql.rar` (8.944.654 bytes, RAR5). Teste do 7-Zip: íntegro, 39 arquivos MDF/LDF (337.772.544 bytes descompactados).
+
+Procedimento realizado:
+
+1. Extrair para `C:\StormPT-2703\SQL-IMPORT\sql`, preservar o RAR intacto e limitar permissões dos arquivos ao SQL Server.
+2. Anexar provisoriamente AccountDB, ClanDB e ServerDB, validar tabelas e desanexar corretamente.
+3. Desligar o World Server para trocar bancos; criar e verificar backups dos 18 bancos vazios em `...\MSSQL\Backup\StormPT-2703-Empty-PreImport`.
+4. Anexar os 19 bancos do RAR, incluindo `Jobs`, em lugar dos bancos vazios; reaplicar acesso SQL local à conta do jogo.
+5. Verificar 308 tabelas e os 19 bancos no estado ONLINE. `DBCC CHECKDB` com PHYSICAL_ONLY passou nos 19, sem falhas.
+6. Reiniciar o World Server e confirmar listener TCP 1997 pela LAN.
+
+Há um `PristonDB_log.ldf` isolado sem MDF; não foi anexado. O pacote também contém usuários de teste, mestres de jogo e clãs preexistentes: auditar e eliminar/higienizar esses dados de forma controlada antes da publicação. Não subir MDF/LDF ou backup para o GitHub público. Não alterar o domínio ou disponibilizar o jogo publicamente antes de testar cadastro, login, personagem e progressão.
