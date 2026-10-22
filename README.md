@@ -25,3 +25,11 @@ Segurança: o repositório é **público**. Não enviar backups, credenciais, ar
 O arquivo `C:\StormPT-2703\sql.rar` foi identificado na VM e validado com 7-Zip. Os 19 bancos de dados com arquivos MDF/LDF foram anexados ao SQL Server 2022 Express, totalizando 308 tabelas. Todos os 19 passaram em `DBCC CHECKDB ... WITH PHYSICAL_ONLY`. Um arquivo isolado `PristonDB_log.ldf` não possui MDF correspondente e não foi anexado.
 
 Foram criados e verificados backups dos 18 bancos vazios antes da substituição. Os dados legados de teste que acompanham o RAR **não devem ser liberados a público sem auditoria e higienização**. World Server voltou a iniciar e escuta TCP 1997 na LAN. Não houve alteração de domínio nem disponibilização pública.
+
+## Portal e launcher (outubro de 2026)
+
+O novo [site StormPT](https://stormpt.hoststorm.com.br) está no IIS da VM Windows 11 com identidade renovada, rankings e apenas download do launcher. Consulte [o relatório de implantação](docs/PORTAL-LAUNCHER-2026-10-22.md).
+
+O launcher assinado e seu código-fonte estão em `launcher/`; o portal ASP.NET está em `web/`. O pacote do jogo é servido separadamente pelo próprio site, não pelo GitHub.
+
+**Estado:** site online; cliente instalável pelo launcher, mas **jogo público não homologado** (IP do Game.exe ainda é local e o encaminhamento TCP de produção não foi configurado). Cadastro, login, personagens e progressão aguardam testes completos.
