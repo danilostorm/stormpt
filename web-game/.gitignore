@@ -1,0 +1,7 @@
+private/
+site/pilai.bin.gz
+site/manifest.json
+__pycache__/
+*.log
+*.pid
+site/pillai.bin
