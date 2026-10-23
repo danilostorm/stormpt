@@ -15,7 +15,7 @@ Requer Python 3.10+ e um navegador com WebGL 2 e `DecompressionStream('gzip')`.
 
 Comandos de uso: arrastar = orbitar; roda = zoom; WASD = mover foco; Q/E = altura.
 
-O conversor usa o layout do cliente Win32 do StormPT: cabeçalho de 556 bytes, `smSTAGE3D` de 262260 bytes, estruturas `smSTAGE_VERTEX` e `smSTAGE_FACE` de 28 bytes. Valida assinatura, contagens e índices de vértices. O arquivo compactado no diretório site contém triângulos reindexados como `xyz float32 + rgba8`, stride de 16 bytes.
+O conversor usa o layout do cliente Win32 do StormPT: cabeçalho de 556 bytes, `smSTAGE3D` de 262260 bytes, estruturas `smSTAGE_VERTEX` e `smSTAGE_FACE` de 28 bytes. Valida assinatura, contagens e índices de vértices. O arquivo binário no diretório site contém triângulos reindexados como `xyz float32 + rgba8`, stride de 16 bytes. A versão `.bin.gz` é gerada adicionalmente para distribuição futura via HTTPS.
 
 **Não publique recursos do jogo**: arquivos `.smd`, texturas, modelos, bancos de dados ou fontes proprietários. O repositório deve manter apenas o código do visualizador/conversor. O protótipo foi implantado inicialmente em host de laboratório, sem proxy público ou alterações ao serviço StormPT existente.
 
