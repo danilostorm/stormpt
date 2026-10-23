@@ -20,7 +20,7 @@ function renderList(list){
  const title=document.createElement('h2');title.textContent='Seus personagens';panel.append(title);
  if(!list.characters.length){
   const message=document.createElement('p');message.textContent='Sua conta ainda não tem personagens.';
-  panel.append(message);status('Conta autenticada no servidor StormPT.');return;
+  panel.append(message);status('Conta autenticada no servidor StormPT.');
  }
  for(const c of list.characters){
   const button=document.createElement('button');button.className='secondary';
@@ -30,7 +30,23 @@ function renderList(list){
    catch(e){status(e.message);}
   });panel.append(button);
  }
- status('Conta autenticada. Selecione seu personagem.');
+ if(list.characters.length<5){
+  const form=document.createElement('form');form.id='createCharacterForm';
+  const label=document.createElement('label');label.textContent='Novo personagem · Lutador nível 1';
+  const input=document.createElement('input');input.id='newCharacterName';input.name='characterName';
+  input.required=true;input.minLength=3;input.maxLength=16;input.pattern='[A-Za-z][A-Za-z0-9]{2,15}';
+  input.placeholder='Nome do personagem';input.autocomplete='off';label.append(input);
+  const create=document.createElement('button');create.type='submit';create.textContent='Criar personagem';
+  form.append(label,create);panel.append(form);
+  form.addEventListener('submit',event=>{
+   event.preventDefault();
+   if(!form.reportValidity())return;
+   try{session.createCharacter(input.value);create.disabled=true;input.disabled=true;state.phase='creating-character';status('Criando personagem no servidor…');}
+   catch(e){status(e.message);}
+  });
+ }
+ status(list.characters.length?'Conta autenticada. Selecione seu personagem.':'Conta autenticada. Crie seu primeiro personagem.');
+
 }
 $('enterGame').addEventListener('click',async()=>{
  if(busy)return;busy=true;updateButton();status('Conectando ao servidor StormPT…');
@@ -47,14 +63,20 @@ $('enterGame').addEventListener('click',async()=>{
   session=new StormPTBrowserSession({expectedAccount:account,allowNativeWebLogin:true,onEvent:e=>{
    if(e.type==='native-gameserver-authorized')state.phase='authenticated-gameserver';
    if(e.type==='character-list'){state.phase='character-list';renderList(e.list);}
-   if(e.type==='character-record'){state.phase='character-loaded';status('Personagem '+e.identity.name+' carregado do servidor.');}
+   if(e.type==='character-creation-result'){
+    state.phase=e.created?'character-created':'character-creation-denied';
+    status(e.created?'Personagem criado e salvo. Clique em Carregar personagens para atualizar.':'O servidor recusou a criação. Verifique o nome e tente carregar novamente.');
+    session.close();
+   }
+   if(e.type==='character-world-state'){state.world=e.world;}
+   if(e.type==='character-record'){state.phase='character-loaded';status('Personagem '+e.identity.name+' carregado do servidor · nível '+e.identity.level+' · campo '+state.world.field+'. Entrada 3D e movimento em implementação.');}
    if(e.type==='game-login-denied'){
     state.phase='error';
     const messages={'-3':'Esta conta está bloqueada no servidor.','-4':'Sua conta já está conectada ao servidor.'};
     status(messages[e.code]||'O servidor não autorizou a entrada desta conta.');
    }
    if(e.type==='protocol-error'){state.phase='error';status('Falha no protocolo do servidor.');}
-   if(e.type==='transport-closed'&&!['site-login','error'].includes(state.phase)){
+   if(e.type==='transport-closed'&&!['site-login','error','character-created','character-creation-denied'].includes(state.phase)){
     state.phase='disconnected';status('Conexão com o servidor encerrada.');
    }
   }});

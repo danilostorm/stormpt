@@ -1,35 +1,38 @@
-# StormPT Web — piloto de autenticação real
+# StormPT Web
 
-**23/10/2026: 40% de conclusão estimada.** O browser já autentica no GameServer real; criação/seleção de personagem e movimento ainda não estão concluídos.
+**Progresso global estimado: 46% / 100%. Piloto em desenvolvimento, ainda sem movimento jogável.**
+<progress value="46" max="100">46%</progress>
 
-O fluxo público foi validado em Chromium: Conta.aspx real → tickets ASP.NET → WSS → GameServer C++ → lista original de personagens. A conta nova de QA retorna zero personagens. O teste não usa respostas simuladas.
+0% ▰▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱ 100% — **46%**
 
-- Prévia: https://stormpt.hoststorm.com.br/jogar-beta/index.html
-- Relatório: [login real e validações](builds/STATUS_2026-10-23_NATIVE_LOGIN_REAL.md)
-- Progresso: [PROGRESS.json](PROGRESS.json)
-- A emissão de tickets permanece restrita à conta piloto; /jogar ainda não foi publicado.
+A beta pública integra a conta ASP.NET existente ao GameServer C++ original. Chromium confirmou login, criação de Lutador nível 1, persistência após reconexão, lista real, seleção e registro real do personagem, sem mocks. O acesso nativo permanece limitado à conta de QA.
 
-## Código incluído
+- [Beta de conta/personagens](https://stormpt.hoststorm.com.br/jogar-beta/index.html)
+- [Relatório atual](builds/STATUS_2026-10-23_REAL_CHARACTER_RICARTEN.md)
+- [Progresso e critérios](PROGRESS.json)
 
-Transporte WebSocket/TCP e testes, protocolo web explícito, frontend de conta/sessão, handler ASP.NET, verificador Win32 BCrypt e adaptador nativo. As alterações integrais na source proprietária do GameServer estão preservadas na VM do projeto e não são redistribuídas aqui. Não há assets comerciais, bancos, credenciais ou chaves privadas.
+## Estado comprovado
 
-O GameServer foi compilado e implantado no caminho original após backup verificado. A fila de login agora usa eventos para evitar perda de sinal; o caminho web usa a mesma AccountDB e políticas de conta. Tabelas ausentes de bloqueio foram criadas de forma aditiva após backup do SecurityDB.
+Tickets de gateway e GameServer têm chaves/audiências separadas e vínculo à sessão ASP.NET. O GameServer decide autorização e persistência. O browser não fornece senha ao gateway, MAC inventado, checksum de Game.exe, atributos, itens ou posição de criação.
 
-## Testes reproduzíveis do transporte
+Dois personagens de QA persistem na base real. O perfil web aceita os pedidos implementados de login/criação/seleção; gravações arbitrárias de registros, exclusão e combate legado não estão habilitados. Criação inicial suporta somente Lutador. O fluxo Windows foi mantido separado, mas ainda exige regressão com Game.exe real.
 
-    cd browser/transport
-    npm ci
-    npm test
+Ricarten/campo 3 foi convertido de seus arquivos originais: 44226 triângulos e 261 texturas; uma textura referenciada não existe no cliente. Corpo/cabeça do Lutador usam pose base dos 64 ossos originais e o LOD alto do INX. Chromium WebGL2 privado renderizou uma captura real do registro na posição salva. Isso ainda não é uma sessão ativa de mundo nem movimentação. Animação/skinning em tempo real continuam pendentes.
 
-Resultado na infraestrutura do projeto: **54/54** testes do transporte, **17/17** unitários do frontend e **22** verificações criptográficas Win32 da etapa anterior. Chromium público passou sem mocks e sem erros JavaScript.
+## Verificação
 
-O GameServer real rejeitou assinatura adulterada, replay e conta QA bloqueada (opcode 65, WParam -3). O estado original da conta de teste foi restaurado.
+    cd transport && npm test
 
-Os scripts de testes reais dependem do ambiente autorizado e de arquivos privados sob secrets/, que não estão neste repositório. Não use as chaves sintéticas dos testes em produção.
-A entrada native-entry.mjs usa módulos de source. Na implantação IIS, os imports são convertidos para arquivos .js da allowlist; account-screen.mjs é publicado como account-client.js.
+61 testes de transporte; 17 testes unitários de frontend. Testes públicos de Chromium e testes negativos de criação/pertencimento rodam contra a infraestrutura real somente com a conta piloto configurada.
 
-## Limites do piloto
+O código nativo completo foi compilado Win32 e testado na VM. Os utilitários públicos de ABI e integração dependem dos headers e do ambiente privado do StormPT.
 
-Não há personagem real no mapa ou movimento comprovado. Rig/animação, colisão, NPCs, combate, inventário, chat, áudio e benchmark RX 550 continuam pendentes. O cliente Windows real ainda precisa de regressão após a atualização.
+## Próximo marco
 
-Antes de ampliar a whitelist: validar personagens não vazios e pertencimento, revogação, IP original atrás do gateway e replay após reinício/rotação de chaves. O cache de replay atual vive na memória do processo.
+Ligar a cena à sessão ativa e implementar movimento com velocidade, altura, terreno, colisões e confirmação pelo servidor, seguido de persistência e reconexão. Depois: animações, NPCs, monstros, combate, habilidades, inventário, chat, áudio e medição RX 550.
+
+A rota /jogar permanece não publicada até existir personagem realmente controlável.
+
+## Preservação
+
+Backups antes de alterar serviços e dados; nenhuma conta/personagem existente apagado, nenhum acesso ao StormPK. Segredos, dados SQL, backups, binários, assets proprietários e a source C++ integral permanecem fora do GitHub público. Os arquivos publicados neste diretório são os módulos de integração, conversores próprios, testes e documentação.

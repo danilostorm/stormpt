@@ -9,8 +9,8 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 
 /*
- * NOT DEPLOYED. Intended for C:\inetpub\stormpt\BrowserTicket.ashx ONLY
- * after security review and a matching shared secret is configured in IIS.
+ * Deployed pilot handler at C:\inetpub\stormpt\BrowserTicket.ashx.
+ * Keys stay outside the webroot; only the explicitly configured QA account is enabled.
  * Integrates the real game account session used by Conta.aspx:
  * Session["StormPTPlayer"] and Session["StormPTCsrf"].
  *

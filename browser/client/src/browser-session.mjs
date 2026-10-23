@@ -1,12 +1,9 @@
+import {decodeRecordWorld} from '../../transport/src/record-world.mjs';
+import {encodeCharacterCreation,decodeCharacterCreation} from '../../transport/src/character-creation.mjs';
 /**
- * Browser-native observer of real StormPT game packets. This is NOT a login
- * implementation. No credential, fabricated character, or gameplay packet
- * is sent. The server must authenticate the user and authorize the account
- * before this can become a playable client.
- *
- * In production expectedAccount and the WebSocket ticket must be obtained
- * from the SAME trusted, authenticated server session, never from a form
- * or localStorage. The issuer/integration does not exist yet.
+ * Real native GameServer session when explicitly enabled with signed site tickets.
+ * Observer mode is retained for protocol QA. Character creation and selection
+ * require the actual native character list; GameServer owns all persisted state.
  */
 import { CharacterSessionObserver } from '../../transport/src/character-session.mjs';
 import {encodeWebLoginPacket,encodeWebCharacterSelection} from '../../transport/src/web-login.mjs';
@@ -46,7 +43,11 @@ export class StormPTBrowserSession {
       this.phase='native-character-list-ready';
       this.#emit('native-gameserver-authorized',{account:this.account});
     }
-    if(this.nativeLogin && event.type==='character-record')this.phase='native-character-record-ready';
+    if(this.nativeLogin && event.type==='character-record'){
+      const world=decodeRecordWorld(event.record,{expectedAccount:this.account,expectedName:event.identity.name});
+      this.phase='native-character-record-ready';
+      this.#emit('character-world-state',{world});
+    }
     this.#emit(event.type,event);
   }
   async connect({url,ticket,gameTicket}={}) {
@@ -110,6 +111,13 @@ export class StormPTBrowserSession {
             this.#emit('game-login-denied',{code});
             this.close();return;
           }
+          if(this.nativeLogin && opcode===11){
+            if(this.phase!=='awaiting-native-character-creation')throw Error('Unsolicited creation result');
+            const result=decodeCharacterCreation(bytes,{response:true,expectedAccount:this.account,expectedName:this.creatingName});
+            this.phase='native-character-creation-finished';
+            this.#emit('character-creation-result',result);
+            return;
+          }
           this.observer.accept(bytes);
         } catch(err) {
           this.#emit('protocol-error',{message:String(err?.message||err)});
@@ -126,6 +134,14 @@ export class StormPTBrowserSession {
         this.#emit('transport-closed');
       });
     });
+  }
+  createCharacter(name,{job=1}={}) {
+    if(!this.nativeLogin || this.phase!=='native-character-list-ready')throw Error('Native account character list required');
+    const packet=encodeCharacterCreation({account:this.account,name,job});
+    this.creatingName=name;
+    this.phase='awaiting-native-character-creation';
+    this.ws.send(packet);
+    return {requested:name,sent:true};
   }
   selectCharacter(name) {
     if(this.nativeLogin){

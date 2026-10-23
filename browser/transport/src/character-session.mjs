@@ -1,7 +1,7 @@
 /**
  * Read-only protocol observer for one ALREADY-AUTHENTICATED game session.
  * No credentials or login bypass. Caller must prove its expectedAccount
- * using a trusted server-side authentication mechanism not yet implemented.
+ * using the trusted site session and the native GameServer ticket path.
  */
 import { inspectPacket } from './packets.mjs';
 import { decodeCharacterList } from './character-list.mjs';
@@ -33,8 +33,7 @@ export class CharacterSessionObserver {
     this.recordAssembler.reset();
     this.phase='waiting-for-character-record';
     this.onEvent({type:'selection-requested',name});
-    // No game command is sent: the original client selection packet
-    // still needs to be identified and implemented safely.
+    // Observer only. browser-session sends the native selection packet after authorization.
   }
   accept(packet) {
     const buf = packet instanceof Uint8Array ? packet :

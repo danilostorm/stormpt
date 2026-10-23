@@ -1,3 +1,4 @@
+import {decodeCharacterCreation} from './character-creation.mjs';
 /**
  * State-sensitive frame guard for an account-bound StormPT websocket.
  * Layouts are from the original 32-bit Windows C++ client:
@@ -38,6 +39,7 @@ export class GameLoginGuard {
   #state='awaiting-login';
   #names=new Set();
   #selectedName=null;
+  #creatingName=null;
   #now;
   #loginAt=0;
   #nativeEnabled=false;
@@ -92,6 +94,15 @@ export class GameLoginGuard {
     if(opcode===8)throw Error('Second account login is forbidden');
     if(this.#state==='awaiting-character-list')
       throw Error('Game packet before character list received');
+    if(this.#nativeLogin && opcode===11){
+      if(this.#state!=='character-list-received-not-authenticated')throw Error('Creation requires account character list');
+      const request=decodeCharacterCreation(packet,{expectedAccount:this.#account});
+      this.#creatingName=request.name;
+      this.#state='awaiting-character-creation';
+      return;
+    }
+    if(this.#nativeLogin && ![5].includes(opcode))throw Error('Native packet is not implemented');
+    if(this.#nativeLogin && opcode===5 && this.#state!=='character-list-received-not-authenticated')throw Error('Selection already sent or creation pending');
     if(opcode===5){
       if(length!==SELECT_SIZE)throw Error('Invalid character selection size');
       if(this.#nativeLogin){
@@ -109,6 +120,12 @@ export class GameLoginGuard {
   onServer(packet){
     this.checkDeadline();
     const {opcode}=inspectPacket(packet);
+    if(this.#nativeLogin && opcode===11){
+      if(this.#state!=='awaiting-character-creation')throw Error('Unsolicited creation result');
+      decodeCharacterCreation(packet,{response:true,expectedAccount:this.#account,expectedName:this.#creatingName});
+      this.#state='creation-finished-reconnect-required';
+      return;
+    }
     if(opcode!==9)return;
     if(this.#state!=='awaiting-character-list')
       throw Error('Unsolicited or repeated character list');

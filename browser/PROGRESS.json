@@ -1,48 +1,48 @@
 {
   "project": "StormPT Web – cliente jogável em navegador sem launcher, como PWeb",
   "lastUpdateDate": "2026-10-23",
-  "completionEstimatePercent": 40,
+  "completionEstimatePercent": 46,
   "estimateScope": "100% significa jogo Priston Tale utilizável no navegador com login real, personagem, mundo, movimento, monstros, combate, inventário, chat, som, otimização e publicação. Percentual é estimativa subjetiva.",
   "weightedMilestones": [
     {
       "name": "Source real e comunicação de rede",
       "weight": 12,
       "earned": 11,
-      "note": "Gateway WSS/TCP e envelope web explícito integrados ao GameServer real; 54 testes Node e fluxo público Chromium comprovado."
+      "note": "Gateway nativo e criação/seleção vinculadas à conta; 61 testes de transporte."
     },
     {
       "name": "Conversão dos arquivos do cliente",
       "weight": 18,
-      "earned": 10,
-      "note": "AncientW e modelos originais já convertidos; sem avanço em rig/animação nesta etapa."
+      "earned": 12,
+      "note": "Ricarten convertido, 261 texturas; pose base usa 64 ossos reais; animação/skinning em tempo real pendentes."
     },
     {
       "name": "Renderizador Three.js e câmera",
       "weight": 18,
-      "earned": 6,
-      "note": "Renderer QA original preservado; personagem autenticado no mundo ainda pendente."
+      "earned": 7,
+      "note": "Ricarten + personagem a partir de registro real em captura privada WebGL2; corrigido winding; ainda sem cena pública ligada à sessão ativa."
     },
     {
       "name": "Conta, login GameServer e personagem real",
       "weight": 17,
-      "earned": 10,
-      "note": "Cadastro e login reais no ASP.NET, tickets separados, autenticação C++ e lista real opcode 9 vazia em conta QA; criação/seleção pendentes."
+      "earned": 13,
+      "note": "Criação real, persistência após reconexão, lista com dois personagens QA, seleção e registro reais no Chromium público."
     },
     {
       "name": "Mecânicas e sincronização jogável",
       "weight": 25,
       "earned": 0,
-      "note": "Sem movimento e combate reais."
+      "note": "Movimento, combate e demais mecânicas ainda não implementados."
     },
     {
       "name": "Qualidade, áudio, compatibilidade, publicação",
       "weight": 10,
       "earned": 3,
-      "note": "Piloto HTTPS/WSS validado em Chromium sem mocks; segurança real de assinatura, replay e bloqueio de conta; backups verificados."
+      "note": "Chromium público sem mocks, três negativas de criação e recusa de nome ausente da conta; Windows/RX550 pendentes."
     }
   ],
   "verifiedNow": {
-    "transportTests": 54,
+    "transportTests": 61,
     "browserClientUnitTests": 17,
     "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
     "csharpIssuerCompiled": true,
@@ -66,8 +66,8 @@
     "passiveLoginDeadlineEnforced": true,
     "nativeTicketIntegratedInGameServer": true,
     "realGameServerCharacterListReceived": true,
-    "qaAccountCharacterCount": 0,
-    "realGameServerCharacterSelectionTested": false,
+    "qaAccountCharacterCount": 2,
+    "realGameServerCharacterSelectionTested": true,
     "movementSynchronized": false,
     "publicChromiumNativeLoginVerified": true,
     "browserNativeGameLoginMocked": false,
@@ -78,8 +78,27 @@
     "nativePilotWhitelistRequired": true,
     "gameWindowsRegressionTested": false,
     "canonicalEngineSourceUpdated": true,
-    "deployedGameServerSha256": "FA2681D49A1F639A46893BB81E9A3501AEC310EDB1C63F2EBC391857153CAB4F"
+    "deployedGameServerSha256": "66D717B9E42B6F27797E4858AC5A31A1C8898EA7391C0474DD915AAA6371A53D",
+    "realCharacterCreationTested": true,
+    "realCharacterPersistenceAcrossReconnect": true,
+    "realCharacterRecordBytes": 1796,
+    "publicChromiumCharacterCreationVerified": true,
+    "publicChromiumCharacterSelectionVerified": true,
+    "realCharacterField": 3,
+    "realCharacterMap": "Ricarten",
+    "originalBindPoseBoneCount": 64,
+    "ricartenStageTriangles": 44226,
+    "ricartenEmbeddedTextures": 261,
+    "ricartenMissingOriginalTextures": 1,
+    "ricartenRealRecordReplayWebGL2": true,
+    "ricartenReplayLiveSession": false,
+    "nativeRecordAbiVerified": true,
+    "nativeBoneAbiVerified": true,
+    "duplicateCharacterNameDeniedLive": true,
+    "unsupportedClassDeniedLive": true,
+    "pathTraversalNameDeniedLive": true,
+    "unownedCharacterNameDeniedLive": true
   },
-  "nextCriticalMilestone": "Criar/carregar um personagem real, receber registro opcode 4 e entrar no mapa correto com movimento confirmado pelo GameServer.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_NATIVE_LOGIN_REAL.md"
+  "nextCriticalMilestone": "Ligar Ricarten à sessão ativa e implementar posição/altura, intenção de movimento, colisão e confirmação do GameServer, com persistência e reconexão.",
+  "latestWorkReport": "builds/STATUS_2026-10-23_REAL_CHARACTER_RICARTEN.md"
 }

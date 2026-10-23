@@ -1,0 +1,12 @@
+{
+  "name": "stormpt-private-asset-validation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:native": "node validate-native-character-assets.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0",
+    "gltf-validator": "2.0.0-dev.3.10"
+  }
+}
