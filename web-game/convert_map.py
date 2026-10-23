@@ -58,6 +58,7 @@ def main():
             col=(max(0,min(255,r+tint)),max(0,min(255,g+tint//2)),max(0,min(255,bv+tint//3)))
             output+=OUT_STRUCT.pack(x-center[0], y-center[1], z-center[2], *col, 255)
     SITE.mkdir(parents=True,exist_ok=True)
+    (SITE/'pillai.bin').write_bytes(output)
     with gzip.open(SITE/'pillai.bin.gz','wb',compresslevel=6) as f:
         f.write(output)
     meta={
