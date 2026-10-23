@@ -1,3 +1,4 @@
+import {WORLD,encodeWorldJoin,encodeMoveIntent,decodeWorldSnapshot} from '../../transport/src/world-protocol.mjs';
 import {decodeRecordWorld} from '../../transport/src/record-world.mjs';
 import {encodeCharacterCreation,decodeCharacterCreation} from '../../transport/src/character-creation.mjs';
 /**
@@ -45,6 +46,7 @@ export class StormPTBrowserSession {
     }
     if(this.nativeLogin && event.type==='character-record'){
       const world=decodeRecordWorld(event.record,{expectedAccount:this.account,expectedName:event.identity.name});
+      this.worldRecord=world;
       this.phase='native-character-record-ready';
       this.#emit('character-world-state',{world});
     }
@@ -118,6 +120,16 @@ export class StormPTBrowserSession {
             this.#emit('character-creation-result',result);
             return;
           }
+          if(this.nativeLogin && opcode===WORLD.state){
+            if(!['awaiting-native-world','native-world-ready'].includes(this.phase))throw Error('Unsolicited world snapshot');
+            const world=decodeWorldSnapshot(bytes,{expectedSerial:this.worldRecord.identity.serial,expectedName:this.worldRecord.identity.name});
+            if(world.sequence!==this.lastAck+1||world.sequence>this.moveSeq)throw Error('Invalid server acknowledgement sequence');
+            this.lastAck=world.sequence;this.worldState=world;this.phase='native-world-ready';
+            if(!this.heartbeat)this.heartbeat=setInterval(()=>{
+              if(this.phase==='native-world-ready'&&Date.now()-this.lastMoveSent>900)this.sendMove(0);
+            },1000);
+            this.#emit('world-state',{world});return;
+          }
           this.observer.accept(bytes);
         } catch(err) {
           this.#emit('protocol-error',{message:String(err?.message||err)});
@@ -129,11 +141,23 @@ export class StormPTBrowserSession {
         this.#emit('transport-error');
       });
       ws.addEventListener('close',()=>{
+        clearInterval(this.heartbeat);this.heartbeat=null;
         this.phase='closed';this.ws=null;this.observer.reset();
         if(!settled)fail(new Error('WebSocket closed before connection'));
         this.#emit('transport-closed');
       });
     });
+  }
+  enterWorld(){
+    if(!this.nativeLogin||this.phase!=='native-character-record-ready'||!this.worldRecord)throw Error('Verified native character record required');
+    this.moveSeq=0;this.lastAck=-1;this.lastMoveSent=Date.now();this.phase='awaiting-native-world';
+    this.ws.send(encodeWorldJoin({serial:this.worldRecord.identity.serial}));
+  }
+  sendMove(direction){
+    if(this.phase!=='native-world-ready')throw Error('Server world confirmation required');
+    if(this.moveSeq-this.lastAck>=4)return false;
+    const sequence=this.moveSeq+1,packet=encodeMoveIntent({sequence,direction});
+    this.ws.send(packet);this.moveSeq=sequence;this.lastMoveSent=Date.now();return sequence;
   }
   createCharacter(name,{job=1}={}) {
     if(!this.nativeLogin || this.phase!=='native-character-list-ready')throw Error('Native account character list required');
@@ -159,6 +183,7 @@ export class StormPTBrowserSession {
     return {selected:name, sent:false, reason:'Game server web authorization not implemented'};
   }
   close() {
+    clearInterval(this.heartbeat);this.heartbeat=null;
     const ws=this.ws;this.ws=null;
     this.phase='closed';this.observer.reset();
     if(ws && ws.readyState!==this.Socket.CLOSED) ws.close();

@@ -1,56 +1,56 @@
 {
   "project": "StormPT Web – cliente jogável em navegador sem launcher, como PWeb",
   "lastUpdateDate": "2026-10-23",
-  "completionEstimatePercent": 46,
+  "completionEstimatePercent": 57,
   "estimateScope": "100% significa jogo Priston Tale utilizável no navegador com login real, personagem, mundo, movimento, monstros, combate, inventário, chat, som, otimização e publicação. Percentual é estimativa subjetiva.",
   "weightedMilestones": [
     {
       "name": "Source real e comunicação de rede",
       "weight": 12,
-      "earned": 11,
-      "note": "Gateway nativo e criação/seleção vinculadas à conta; 61 testes de transporte."
+      "earned": 12,
+      "note": "Gateway e perfil nativo de mundo vinculados à conta, sequência e confirmação; 67 testes."
     },
     {
       "name": "Conversão dos arquivos do cliente",
       "weight": 18,
       "earned": 12,
-      "note": "Ricarten convertido, 261 texturas; pose base usa 64 ossos reais; animação/skinning em tempo real pendentes."
+      "note": "Ricarten e Lutador originais protegidos por sessão; animação/skinning pendentes."
     },
     {
       "name": "Renderizador Three.js e câmera",
       "weight": 18,
-      "earned": 7,
-      "note": "Ricarten + personagem a partir de registro real em captura privada WebGL2; corrigido winding; ainda sem cena pública ligada à sessão ativa."
+      "earned": 10,
+      "note": "Cena pública WebGL2 ligada à sessão real, câmera, teclado/toque e interpolação confirmada."
     },
     {
       "name": "Conta, login GameServer e personagem real",
       "weight": 17,
-      "earned": 13,
-      "note": "Criação real, persistência após reconexão, lista com dois personagens QA, seleção e registro reais no Chromium público."
+      "earned": 14,
+      "note": "Login, criação, seleção, entrada e reconexão reais no Chromium; piloto QA."
     },
     {
       "name": "Mecânicas e sincronização jogável",
       "weight": 25,
-      "earned": 0,
-      "note": "Movimento, combate e demais mecânicas ainda não implementados."
+      "earned": 5,
+      "note": "Movimento e altura autoritativos, CheckNextMove e persistência; combate e demais sistemas pendentes."
     },
     {
       "name": "Qualidade, áudio, compatibilidade, publicação",
       "weight": 10,
-      "earned": 3,
-      "note": "Chromium público sem mocks, três negativas de criação e recusa de nome ausente da conta; Windows/RX550 pendentes."
+      "earned": 4,
+      "note": "Piloto fechado em /jogar, testes públicos e negativos reais; RX550 e regressão Windows pendentes."
     }
   ],
   "verifiedNow": {
-    "transportTests": 61,
+    "transportTests": 67,
     "browserClientUnitTests": 17,
     "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
     "csharpIssuerCompiled": true,
     "crossLanguageSignedTicketVerified": true,
     "crossLanguageReplayDenied": true,
     "gameServerBrowserLoginFunctional": true,
-    "playable": false,
-    "productionRoutePublished": false,
+    "playable": true,
+    "productionRoutePublished": true,
     "browserGameLoginGuardIntegrated": true,
     "originalWireAccountAndCharacterFlowTestedWithFixture": true,
     "accountFormsEmbeddedInBrowser": true,
@@ -68,7 +68,7 @@
     "realGameServerCharacterListReceived": true,
     "qaAccountCharacterCount": 2,
     "realGameServerCharacterSelectionTested": true,
-    "movementSynchronized": false,
+    "movementSynchronized": true,
     "publicChromiumNativeLoginVerified": true,
     "browserNativeGameLoginMocked": false,
     "nativeTamperedSignatureDeniedLive": true,
@@ -78,7 +78,7 @@
     "nativePilotWhitelistRequired": true,
     "gameWindowsRegressionTested": false,
     "canonicalEngineSourceUpdated": true,
-    "deployedGameServerSha256": "66D717B9E42B6F27797E4858AC5A31A1C8898EA7391C0474DD915AAA6371A53D",
+    "deployedGameServerSha256": "3E557B1BB350856CA2B82B89ED53970712EBCB8C4A22C2DCC605891B0DEC712F",
     "realCharacterCreationTested": true,
     "realCharacterPersistenceAcrossReconnect": true,
     "realCharacterRecordBytes": 1796,
@@ -91,14 +91,25 @@
     "ricartenEmbeddedTextures": 261,
     "ricartenMissingOriginalTextures": 1,
     "ricartenRealRecordReplayWebGL2": true,
-    "ricartenReplayLiveSession": false,
+    "ricartenReplayLiveSession": true,
     "nativeRecordAbiVerified": true,
     "nativeBoneAbiVerified": true,
     "duplicateCharacterNameDeniedLive": true,
     "unsupportedClassDeniedLive": true,
     "pathTraversalNameDeniedLive": true,
-    "unownedCharacterNameDeniedLive": true
+    "unownedCharacterNameDeniedLive": true,
+    "playableScope": "Piloto fechado de caminhada em Ricarten com Lutador QA; não jogo completo",
+    "generalAccessEnabled": false,
+    "pilotOnly": true,
+    "realKeyboardMovement": true,
+    "movementPersistedAcrossReconnect": true,
+    "worldHeartbeatOver65Seconds": true,
+    "worldNegativeTestsPassed": 6,
+    "publicPlayUrl": "https://stormpt.hoststorm.com.br/jogar",
+    "authenticatedAssetDelivery": true,
+    "animatedWalking": false,
+    "wallCollisionDedicatedTestPassed": false
   },
-  "nextCriticalMilestone": "Ligar Ricarten à sessão ativa e implementar posição/altura, intenção de movimento, colisão e confirmação do GameServer, com persistência e reconexão.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_REAL_CHARACTER_RICARTEN.md"
+  "nextCriticalMilestone": "Validar segurança para abertura além da conta QA, regressão Windows e colisões; implementar animação e replicação de entidades reais.",
+  "latestWorkReport": "builds/STATUS_2026-10-23_REAL_WORLD_MOVEMENT.md"
 }

@@ -1,0 +1,33 @@
+<!doctype html><html lang="pt-BR"><head>
+<base href="/jogar-beta/">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>StormPT Web — Conta integrada (QA)</title><link rel="stylesheet" href="./account-style.css"/>
+</head><body>
+<header><strong>✦ STORM<span>PT</span> WEB</strong><small>PILOTO FECHADO · CAMINHADA QA</small></header>
+<main class="stage"><section class="panel" id="entryPanel">
+<section id="loggedOut"><h1>BEM-VINDO</h1><div class="ornament">─ ✧ ─</div>
+<form id="loginForm">
+<label for="loginUser">Conta</label><input id="loginUser" autocomplete="username" maxlength="16" required placeholder="Seu nome de usuário">
+<label for="loginPassword">Senha</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Sua senha">
+<div class="remember"><input id="rememberUser" type="checkbox"><label for="rememberUser">Lembrar apenas o nome da conta</label></div>
+<button class="primary" id="loginSubmit" type="submit">Entrar</button></form>
+<div class="actions"><button type="button" id="openSignup">CRIAR CONTA</button><button type="button" id="forgotPassword">ESQUECI A SENHA</button></div></section>
+<section id="loggedIn" hidden><h1>CONTA CONECTADA</h1><div class="ornament">─ ✧ ─</div>
+<p>Conta do site: <strong id="accountName"></strong></p>
+<p class="small">Conecte-se ao servidor para carregar seus personagens.</p>
+<button class="primary" id="enterGame" type="button" disabled>Entrar no mundo</button>
+<button class="secondary" id="logout" type="button">Sair da conta</button></section>
+<p class="status" id="accountStatus" role="status" aria-live="polite"></p>
+<hr><p class="small">Cadastro original do StormPT. Qualquer conta criada nesta prévia será real e poderá ser usada no servidor.</p>
+</section></main>
+<div class="modal" id="signupModal" role="dialog" aria-modal="true" aria-label="Criar conta" aria-hidden="true">
+<section class="panel"><button class="close" id="closeSignup" aria-label="Fechar">×</button>
+<h1>CRIAR CONTA</h1><div class="ornament">─ ✧ ─</div><form id="signupForm">
+<label for="signupUser">Conta</label><input id="signupUser" minlength="4" maxlength="16" pattern="[A-Za-z][A-Za-z0-9_]{3,15}" required placeholder="4 a 16 letras ou números">
+<label for="signupEmail">E-mail</label><input id="signupEmail" type="email" maxlength="160" autocomplete="email" required placeholder="voce@exemplo.com">
+<label for="signupPassword">Senha</label><input id="signupPassword" type="password" autocomplete="new-password" minlength="8" maxlength="24" required placeholder="8 a 24 caracteres">
+<label for="signupConfirm">Confirmar senha</label><input id="signupConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="24" required placeholder="Repita a senha">
+<div class="two"><button class="primary" id="signupSubmit" type="submit">Criar conta</button><button class="secondary" id="cancelSignup" type="button">Cancelar</button></div></form>
+<p class="status" id="signupStatus" role="status" aria-live="polite"></p></section></div>
+<script type="importmap">{"imports":{"three":"/jogar-beta/vendor/three.module.js","three/addons/loaders/GLTFLoader.js":"/jogar-beta/vendor/GLTFLoader.js"}}</script>
+<script type="module" src="./native-entry.js"></script></body></html>

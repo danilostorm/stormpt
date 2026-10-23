@@ -1,3 +1,6 @@
+import {WORLD,decodeWorldJoin,decodeMoveIntent,decodeWorldSnapshot} from './world-protocol.mjs';
+import {RecordAssembler} from './record-fragments.mjs';
+import {decodeRecordWorld} from './record-world.mjs';
 import {decodeCharacterCreation} from './character-creation.mjs';
 /**
  * State-sensitive frame guard for an account-bound StormPT websocket.
@@ -40,6 +43,10 @@ export class GameLoginGuard {
   #names=new Set();
   #selectedName=null;
   #creatingName=null;
+  #recordAssembler=new RecordAssembler();
+  #serial=0;
+  #sentSequence=0;
+  #ackSequence=-1;
   #now;
   #loginAt=0;
   #nativeEnabled=false;
@@ -101,6 +108,17 @@ export class GameLoginGuard {
       this.#state='awaiting-character-creation';
       return;
     }
+    if(this.#nativeLogin && opcode===WORLD.join){
+      if(this.#state!=='native-record-received')throw Error('Real selected record required before world join');
+      decodeWorldJoin(packet,{expectedSerial:this.#serial});
+      this.#state='awaiting-native-world';return;
+    }
+    if(this.#nativeLogin && opcode===WORLD.move){
+      if(this.#state!=='native-world-active')throw Error('World confirmation required before movement');
+      const q=decodeMoveIntent(packet);
+      if(q.sequence!==this.#sentSequence+1||this.#sentSequence-this.#ackSequence>=4)throw Error('Movement sequence/backpressure violation');
+      this.#sentSequence=q.sequence;return;
+    }
     if(this.#nativeLogin && ![5].includes(opcode))throw Error('Native packet is not implemented');
     if(this.#nativeLogin && opcode===5 && this.#state!=='character-list-received-not-authenticated')throw Error('Selection already sent or creation pending');
     if(opcode===5){
@@ -120,6 +138,21 @@ export class GameLoginGuard {
   onServer(packet){
     this.checkDeadline();
     const {opcode}=inspectPacket(packet);
+    if(this.#nativeLogin && opcode===4){
+      if(this.#state!=='character-selected-awaiting-record')throw Error('Unsolicited native record');
+      const record=this.#recordAssembler.feed(packet);
+      if(record){
+        const decoded=decodeRecordWorld(record,{expectedAccount:this.#account,expectedName:this.#selectedName});
+        this.#serial=decoded.identity.serial;this.#state='native-record-received';
+      }
+      return;
+    }
+    if(this.#nativeLogin && opcode===WORLD.state){
+      if(!['awaiting-native-world','native-world-active'].includes(this.#state))throw Error('Unsolicited world confirmation');
+      const result=decodeWorldSnapshot(packet,{expectedSerial:this.#serial,expectedName:this.#selectedName});
+      if(result.sequence!==this.#ackSequence+1||result.sequence>this.#sentSequence)throw Error('Unexpected movement acknowledgement');
+      this.#ackSequence=result.sequence;this.#state='native-world-active';return;
+    }
     if(this.#nativeLogin && opcode===11){
       if(this.#state!=='awaiting-character-creation')throw Error('Unsolicited creation result');
       decodeCharacterCreation(packet,{response:true,expectedAccount:this.#account,expectedName:this.#creatingName});

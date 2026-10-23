@@ -1,38 +1,29 @@
 # StormPT Web
 
-**Progresso global estimado: 46% / 100%. Piloto em desenvolvimento, ainda sem movimento jogável.**
-<progress value="46" max="100">46%</progress>
+**Progresso global estimado: 57% / 100%. Primeiro piloto fechado de caminhada real.**
 
-0% ▰▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱ 100% — **46%**
+<progress value="57" max="100">57%</progress>
 
-A beta pública integra a conta ASP.NET existente ao GameServer C++ original. Chromium confirmou login, criação de Lutador nível 1, persistência após reconexão, lista real, seleção e registro real do personagem, sem mocks. O acesso nativo permanece limitado à conta de QA.
+O Chromium público confirmou login no ASP.NET existente, personagem e registro reais, entrada em Ricarten 3D, movimento pelo teclado confirmado pelo GameServer e reconexão na posição salva. Acesso ainda restrito à conta de QA; não é liberação geral nem jogo completo.
 
-- [Beta de conta/personagens](https://stormpt.hoststorm.com.br/jogar-beta/index.html)
-- [Relatório atual](builds/STATUS_2026-10-23_REAL_CHARACTER_RICARTEN.md)
-- [Progresso e critérios](PROGRESS.json)
+- [Piloto fechado](https://stormpt.hoststorm.com.br/jogar)
+- [Relatório e testes](builds/STATUS_2026-10-23_REAL_WORLD_MOVEMENT.md)
+- [Progresso ponderado](PROGRESS.json)
 
-## Estado comprovado
+## Implementação
+GameServer C++ determina posição, velocidade e altura com terreno e CheckNextMove originais. O browser envia direção e sequência; nunca coordenadas. Persistência usa o registro existente. Gateway vincula identidade e confirmações, com limite de comandos pendentes. O perfil Windows mantém suas verificações específicas.
 
-Tickets de gateway e GameServer têm chaves/audiências separadas e vínculo à sessão ASP.NET. O GameServer decide autorização e persistência. O browser não fornece senha ao gateway, MAC inventado, checksum de Game.exe, atributos, itens ou posição de criação.
+Three.js/WebGL2 carrega mapa, corpo e cabeça originais por handler autenticado fora do webroot. WASD/setas, toque, câmera e interpolação de estados confirmados. Personagem ainda em pose base; animação pendente.
 
-Dois personagens de QA persistem na base real. O perfil web aceita os pedidos implementados de login/criação/seleção; gravações arbitrárias de registros, exclusão e combate legado não estão habilitados. Criação inicial suporta somente Lutador. O fluxo Windows foi mantido separado, mas ainda exige regressão com Game.exe real.
+Tickets de gateway e GameServer têm chaves/audiências separadas e vínculo à sessão ASP.NET. Conta, cadastro e login usam o sistema existente; recuperação de senha ainda pendente.
 
-Ricarten/campo 3 foi convertido de seus arquivos originais: 44226 triângulos e 261 texturas; uma textura referenciada não existe no cliente. Corpo/cabeça do Lutador usam pose base dos 64 ossos originais e o LOD alto do INX. Chromium WebGL2 privado renderizou uma captura real do registro na posição salva. Isso ainda não é uma sessão ativa de mundo nem movimentação. Animação/skinning em tempo real continuam pendentes.
+## Validação
+67 testes de transporte e 17 de frontend passaram. Testes reais TCP e Chromium confirmaram movimento, heartbeat superior a 65 segundos e persistência. Seis negativas de mundo passaram, incluindo replay e limite de frequência. Assets anônimos retornam 401; caminhos inválidos, 404.
 
-## Verificação
+Compilação Win32 instalada e fonte canônica sincronizada. Teste Chromium usa SwiftShader; desempenho na RX 550 não foi medido. Falta prova dedicada contra paredes e regressão com Game.exe.
 
-    cd transport && npm test
-
-61 testes de transporte; 17 testes unitários de frontend. Testes públicos de Chromium e testes negativos de criação/pertencimento rodam contra a infraestrutura real somente com a conta piloto configurada.
-
-O código nativo completo foi compilado Win32 e testado na VM. Os utilitários públicos de ABI e integração dependem dos headers e do ambiente privado do StormPT.
-
-## Próximo marco
-
-Ligar a cena à sessão ativa e implementar movimento com velocidade, altura, terreno, colisões e confirmação pelo servidor, seguido de persistência e reconexão. Depois: animações, NPCs, monstros, combate, habilidades, inventário, chat, áudio e medição RX 550.
-
-A rota /jogar permanece não publicada até existir personagem realmente controlável.
+## Trabalho restante
+Segurança para outras contas e mapas, animação/skinning, entidades reais, combate, habilidades, inventário, chat, áudio, recuperação de senha e otimização em hardware real.
 
 ## Preservação
-
-Backups antes de alterar serviços e dados; nenhuma conta/personagem existente apagado, nenhum acesso ao StormPK. Segredos, dados SQL, backups, binários, assets proprietários e a source C++ integral permanecem fora do GitHub público. Os arquivos publicados neste diretório são os módulos de integração, conversores próprios, testes e documentação.
+Backups anteriores às alterações. SQL, contas, personagens e StormPK preservados. Segredos, binários, backups, assets proprietários e source integral não entram no GitHub público. Este diretório publica somente integração própria, conversores, testes e documentação.

@@ -3,7 +3,23 @@ import {StormPTAccountTicket} from './account-ticket.mjs';
 import {StormPTBrowserSession} from './browser-session.mjs';
 const $=id=>document.getElementById(id);
 const state={phase:'site-login',characters:[],selected:null};
-let session=null,busy=false;
+let session=null,busy=false,worldView=null,worldLoading=false;
+function clearWorld(){worldView?.dispose();worldView=null;worldLoading=false;}
+async function presentWorld(first){
+ worldLoading=true;state.phase="loading-world";status("Carregando Ricarten…");
+ const active=session;
+ try{
+  const {NativeWorldView}=await import("./native-world-view.mjs");
+  if(session!==active||active.phase!=="native-world-ready")return;
+  worldView=new NativeWorldView({record:state.world,initial:active.worldState||first,
+   onDirection:direction=>{if(session===active&&active.phase==="native-world-ready"){const n=active.sendMove(direction);if(n)state.movementRequests=(state.movementRequests||0)+1;}},
+   onExit:()=>{clearWorld();active.close();status("Você saiu do mundo. Carregue os personagens para entrar novamente.");},
+   onReady:details=>{if(session===active){state.render=details;state.phase="in-world";status("Conectado em Ricarten.");}},
+   onError:e=>{clearWorld();active.close();state.phase="error";status(e.message);}
+  });
+ }catch(e){worldLoading=false;state.phase="error";status(e.message);active.close();}
+}
+
 const panel=document.createElement('section');panel.id='nativeCharacters';
 panel.setAttribute('aria-live','polite');
 $('loggedIn').append(panel);
@@ -12,7 +28,7 @@ function updateButton(){
  const signedIn=!$('loggedIn').hidden;
  $('enterGame').disabled=!signedIn||busy;
  $('enterGame').textContent='Carregar personagens';
- if(!signedIn){session?.close();session=null;panel.replaceChildren();state.phase='site-login';}
+ if(!signedIn){clearWorld();session?.close();session=null;panel.replaceChildren();state.phase='site-login';}
 }
 function renderList(list){
  state.characters=list.characters;
@@ -50,7 +66,7 @@ function renderList(list){
 }
 $('enterGame').addEventListener('click',async()=>{
  if(busy)return;busy=true;updateButton();status('Conectando ao servidor StormPT…');
- session?.close();session=null;
+ clearWorld();session?.close();session=null;
  try{
   const response=await fetch('/Conta.aspx?view=painel',{credentials:'same-origin',cache:'no-store'});
   if(!response.ok)throw Error('Não foi possível verificar sua sessão.');
@@ -69,13 +85,19 @@ $('enterGame').addEventListener('click',async()=>{
     session.close();
    }
    if(e.type==='character-world-state'){state.world=e.world;}
-   if(e.type==='character-record'){state.phase='character-loaded';status('Personagem '+e.identity.name+' carregado do servidor · nível '+e.identity.level+' · campo '+state.world.field+'. Entrada 3D e movimento em implementação.');}
+   if(e.type==='character-record'){state.characterLoaded=true;state.phase='joining-world';status('Entrando em Ricarten…');session.enterWorld();}
+   if(e.type==='world-state'){
+    state.worldLive=e.world;state.serverAcknowledgements=(state.serverAcknowledgements||0)+1;
+    if(worldView)worldView.applySnapshot(e.world);
+    else if(!worldLoading)void presentWorld(e.world);
+   }
    if(e.type==='game-login-denied'){
     state.phase='error';
     const messages={'-3':'Esta conta está bloqueada no servidor.','-4':'Sua conta já está conectada ao servidor.'};
     status(messages[e.code]||'O servidor não autorizou a entrada desta conta.');
    }
    if(e.type==='protocol-error'){state.phase='error';status('Falha no protocolo do servidor.');}
+   if(e.type==='transport-closed')clearWorld();
    if(e.type==='transport-closed'&&!['site-login','error','character-created','character-creation-denied'].includes(state.phase)){
     state.phase='disconnected';status('Conexão com o servidor encerrada.');
    }

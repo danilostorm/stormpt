@@ -25,7 +25,7 @@ try{
   await page.waitForFunction(()=>window.__stormptNativeQA.snapshot().phase==='character-list',{timeout:25000});
  }
  await page.getByRole('button',{name:'StormWebQA1 · Nível 1',exact:true}).click();
- await page.waitForFunction(()=>window.__stormptNativeQA.snapshot().phase==='character-loaded',{timeout:25000});
+ await page.waitForFunction(()=>window.__stormptNativeQA.snapshot().characterLoaded===true,{timeout:25000});
  const state=await page.evaluate(()=>window.__stormptNativeQA.snapshot());
  assert.equal(state.world.identity.name,'StormWebQA1');assert.equal(state.world.field,3);
  assert.equal(state.world.masterAccount,qa.account);assert.equal(state.world.itemCount,0);

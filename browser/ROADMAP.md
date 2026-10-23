@@ -152,3 +152,16 @@ Relatório: `builds/STATUS_2026-10-23_0700.md`.
 - [x] Winding Direct3D/WebGL corrigido e captura privada do registro real renderizada; três GLBs sem erros/avisos Khronos.
 - [ ] Ligar cena à sessão ativa; movimento confirmado pelo servidor, colisão, persistência da posição e animação.
 - Progresso global estimado: 46%. Relatório: builds/STATUS_2026-10-23_REAL_CHARACTER_RICARTEN.md.
+
+## Marco verificado — 23/10/2026: caminhada real (57%)
+
+<progress value="57" max="100">57%</progress>
+
+- [x] Sessão ativa em Ricarten, personagem original e câmera pública WebGL2.
+- [x] Intenção de direção com confirmação e posição autoritativa do C++ original.
+- [x] Altura e CheckNextMove originais, persistência e reconexão real.
+- [x] Piloto fechado QA em /jogar, sem liberar outras contas.
+- [ ] Teste dedicado de paredes, regressão Windows e segurança para acesso geral.
+- [ ] Animação, entidades, combate, inventário, chat e áudio.
+
+Ver builds/STATUS_2026-10-23_REAL_WORLD_MOVEMENT.md; os itens anteriores incompletos que abrangem sistemas adicionais continuam pendentes.
