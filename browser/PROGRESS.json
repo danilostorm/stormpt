@@ -1,0 +1,85 @@
+{
+  "project": "StormPT Web – cliente jogável em navegador sem launcher, como PWeb",
+  "lastUpdateDate": "2026-10-23",
+  "completionEstimatePercent": 40,
+  "estimateScope": "100% significa jogo Priston Tale utilizável no navegador com login real, personagem, mundo, movimento, monstros, combate, inventário, chat, som, otimização e publicação. Percentual é estimativa subjetiva.",
+  "weightedMilestones": [
+    {
+      "name": "Source real e comunicação de rede",
+      "weight": 12,
+      "earned": 11,
+      "note": "Gateway WSS/TCP e envelope web explícito integrados ao GameServer real; 54 testes Node e fluxo público Chromium comprovado."
+    },
+    {
+      "name": "Conversão dos arquivos do cliente",
+      "weight": 18,
+      "earned": 10,
+      "note": "AncientW e modelos originais já convertidos; sem avanço em rig/animação nesta etapa."
+    },
+    {
+      "name": "Renderizador Three.js e câmera",
+      "weight": 18,
+      "earned": 6,
+      "note": "Renderer QA original preservado; personagem autenticado no mundo ainda pendente."
+    },
+    {
+      "name": "Conta, login GameServer e personagem real",
+      "weight": 17,
+      "earned": 10,
+      "note": "Cadastro e login reais no ASP.NET, tickets separados, autenticação C++ e lista real opcode 9 vazia em conta QA; criação/seleção pendentes."
+    },
+    {
+      "name": "Mecânicas e sincronização jogável",
+      "weight": 25,
+      "earned": 0,
+      "note": "Sem movimento e combate reais."
+    },
+    {
+      "name": "Qualidade, áudio, compatibilidade, publicação",
+      "weight": 10,
+      "earned": 3,
+      "note": "Piloto HTTPS/WSS validado em Chromium sem mocks; segurança real de assinatura, replay e bloqueio de conta; backups verificados."
+    }
+  ],
+  "verifiedNow": {
+    "transportTests": 54,
+    "browserClientUnitTests": 17,
+    "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
+    "csharpIssuerCompiled": true,
+    "crossLanguageSignedTicketVerified": true,
+    "crossLanguageReplayDenied": true,
+    "gameServerBrowserLoginFunctional": true,
+    "playable": false,
+    "productionRoutePublished": false,
+    "browserGameLoginGuardIntegrated": true,
+    "originalWireAccountAndCharacterFlowTestedWithFixture": true,
+    "accountFormsEmbeddedInBrowser": true,
+    "siteFormContractReadOnlyChecked": true,
+    "mockBrowserRegistrationAndLoginPassed": true,
+    "publicBetaUIUrl": "https://stormpt.hoststorm.com.br/jogar-beta/index.html",
+    "liveBrowserAnonymousReadOnlyCheck": true,
+    "realAccountRegistrationTested": true,
+    "realAccountLoginTested": true,
+    "nativeTicketValidatorCompiledWin32": true,
+    "nativeTicketValidatorChecks": 22,
+    "nativeCSharpTicketInteropVerified": true,
+    "passiveLoginDeadlineEnforced": true,
+    "nativeTicketIntegratedInGameServer": true,
+    "realGameServerCharacterListReceived": true,
+    "qaAccountCharacterCount": 0,
+    "realGameServerCharacterSelectionTested": false,
+    "movementSynchronized": false,
+    "publicChromiumNativeLoginVerified": true,
+    "browserNativeGameLoginMocked": false,
+    "nativeTamperedSignatureDeniedLive": true,
+    "nativeReplayDeniedLive": true,
+    "blockedAccountDeniedLive": true,
+    "qaAccountFlagsRestored": true,
+    "nativePilotWhitelistRequired": true,
+    "gameWindowsRegressionTested": false,
+    "canonicalEngineSourceUpdated": true,
+    "deployedGameServerSha256": "FA2681D49A1F639A46893BB81E9A3501AEC310EDB1C63F2EBC391857153CAB4F"
+  },
+  "nextCriticalMilestone": "Criar/carregar um personagem real, receber registro opcode 4 e entrar no mapa correto com movimento confirmado pelo GameServer.",
+  "latestWorkReport": "builds/STATUS_2026-10-23_NATIVE_LOGIN_REAL.md"
+}

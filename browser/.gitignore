@@ -1,0 +1,14 @@
+secrets/
+assets/source/
+assets/converted/
+node_modules/
+*.hmac
+*.exe
+*.dll
+*.pdb
+*.obj
+*.bak
+.env*
+client/qa/*.png
+builds/*result.json
+builds/real-*.json

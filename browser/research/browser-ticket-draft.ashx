@@ -1,6 +1,7 @@
 <%@ WebHandler Language="C#" Class="StormPTBrowserTicket" %>
-<%@ Assembly Name="System.Web" %>
+
 using System;
+using System.IO;
 using System.Web;
 using System.Web.SessionState;
 using System.Text;
@@ -18,6 +19,12 @@ using System.Security.Cryptography;
  */
 public sealed class StormPTBrowserTicket : IHttpHandler, IReadOnlySessionState
 {
+    private static string LoadKey(string variable,string filename) {
+        string value=Environment.GetEnvironmentVariable(variable);
+        if(!String.IsNullOrEmpty(value))return value;
+        try { return File.ReadAllText(@"C:\StormPT-2703\BrowserSecrets\"+filename).Trim(); }
+        catch { return null; }
+    }
     public bool IsReusable { get { return false; } }
     private const string Origin = "https://stormpt.hoststorm.com.br";
     private static string Base64Url(byte[] data) {
@@ -60,9 +67,16 @@ public sealed class StormPTBrowserTicket : IHttpHandler, IReadOnlySessionState
            csrf==null || !Equal(csrf,c.Request.Headers["X-StormPT-Csrf"])) {
             Fail(c,401);return;
         }
+        // Pilot: only the explicitly configured test account may request tickets.
+        string allowed=null;
+        try { allowed=File.ReadAllText(@"C:\StormPT-2703\BrowserSecrets\qa-account.txt").Trim(); }
+        catch { Fail(c,503);return; }
+        if(!Equal(account,allowed)) { Fail(c,403);return; }
+        if(c.Request.UserHostAddress!="192.168.30.10" ||
+           c.Request.Headers["X-Forwarded-Proto"]!="https") { Fail(c,403);return; }
         // Never hardcode this secret in a source file, GitHub, or web.config.
-        string secret=Environment.GetEnvironmentVariable("STORMPT_BROWSER_HMAC");
-        string gameSecret=Environment.GetEnvironmentVariable("STORMPT_GAMESERVER_HMAC");
+        string secret=LoadKey("STORMPT_BROWSER_HMAC","gateway.hmac");
+        string gameSecret=LoadKey("STORMPT_GAMESERVER_HMAC","gameserver.hmac");
         if(String.IsNullOrEmpty(secret)||secret.Length<32 ||
            String.IsNullOrEmpty(gameSecret)||gameSecret.Length<32 || Equal(secret,gameSecret)) {
             Fail(c,503);return;

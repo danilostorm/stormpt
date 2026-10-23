@@ -1,32 +1,35 @@
-# StormPT Web — autenticação nativa em desenvolvimento
+# StormPT Web — piloto de autenticação real
 
-Estado: 23/10/2026. O cliente web ainda não autentica no GameServer e não é jogável.
-Este diretório reúne código novo revisado para publicação; não contém source original do jogo, assets, SQL ou segredos.
+**23/10/2026: 40% de conclusão estimada.** O browser já autentica no GameServer real; criação/seleção de personagem e movimento ainda não estão concluídos.
 
-## Validado na VM Windows 11
+O fluxo público foi validado em Chromium: Conta.aspx real → tickets ASP.NET → WSS → GameServer C++ → lista original de personagens. A conta nova de QA retorna zero personagens. O teste não usa respostas simuladas.
 
-- MSVC v143, Win32, C++17 e BCrypt do Windows.
-- 22 verificações nativas: HMAC Node/C# → C++, expiração, audiência, formato estrito, replay e concorrência de 16 threads.
-- Handler ASP.NET compilado em QA; não implantado no IIS.
-- Gateway no AEROCOOL: 49/49 testes após correção de prazo passivo de autenticação.
-- Frontend existente: 17/17 testes de unidade.
-- /jogar-beta/index.html HTTP 200; /jogar HTTP 404.
+- Prévia: https://stormpt.hoststorm.com.br/jogar-beta/index.html
+- Relatório: [login real e validações](builds/STATUS_2026-10-23_NATIVE_LOGIN_REAL.md)
+- Progresso: [PROGRESS.json](PROGRESS.json)
+- A emissão de tickets permanece restrita à conta piloto; /jogar ainda não foi publicado.
 
-## Reproduzir os testes nativos no ambiente existente
+## Código incluído
 
-No AEROCOOL, a partir de /mnt/user/appdata/stormpt-browser:
+Transporte WebSocket/TCP e testes, protocolo web explícito, frontend de conta/sessão, handler ASP.NET, verificador Win32 BCrypt e adaptador nativo. As alterações integrais na source proprietária do GameServer estão preservadas na VM do projeto e não são redistribuídas aqui. Não há assets comerciais, bancos, credenciais ou chaves privadas.
 
-    node native-auth/generate-qa.mjs
-    python3 native-auth/run-vm-qa.py
+O GameServer foi compilado e implantado no caminho original após backup verificado. A fila de login agora usa eventos para evitar perda de sinal; o caminho web usa a mesma AccountDB e políticas de conta. Tabelas ausentes de bloqueio foram criadas de forma aditiva após backup do SecurityDB.
 
-O runner copia somente os arquivos de QA para C:\StormPT-2703\BrowserQA\NativeAuth, compila C# e C++ e retorna PID do QEMU guest agent. Consultar guest-exec-status até encerrar; sucesso exige exitcode 0.
-Os vetores usam somente uma chave sintética pública de testes. Nunca usar essa chave em produção.
+## Testes reproduzíveis do transporte
 
-## Contrato e limites
+    cd browser/transport
+    npm ci
+    npm test
 
-O rascunho ASP.NET mantém StormPTPlayer/StormPTCsrf, Origin e POST. Exige STORMPT_BROWSER_HMAC e STORMPT_GAMESERVER_HMAC distintos. O ticket de transporte tem aud=stormpt-browser-tcp; o nativo tem aud=stormpt-gameserver. Ambos duram 45s.
-O verificador aceita apenas JSON canônico na ordem aud/account/exp/nonce/sid, HMAC-SHA256 e base64url canônico, com replay em memória limitado a 10.000 nonces.
-É preciso manter uma instância por processo; não criar um verificador por pedido. O cache atual não sobrevive a reinícios.
+Resultado na infraestrutura do projeto: **54/54** testes do transporte, **17/17** unitários do frontend e **22** verificações criptográficas Win32 da etapa anterior. Chromium público passou sem mocks e sem erros JavaScript.
 
-Falta conectar o verificador a uma entrada web explícita do GameServer, preservar verificações de conta bloqueada/excluída/em uso, manutenção, IP, sessão duplicada e seleção de personagens. Falta o protocolo de entrada web e o vínculo entre autorização, socket e conta.
-O rascunho de emissão e os testes isolados não representam login real. Não enviar tokens a logs, URLs ou GitHub.
+O GameServer real rejeitou assinatura adulterada, replay e conta QA bloqueada (opcode 65, WParam -3). O estado original da conta de teste foi restaurado.
+
+Os scripts de testes reais dependem do ambiente autorizado e de arquivos privados sob secrets/, que não estão neste repositório. Não use as chaves sintéticas dos testes em produção.
+A entrada native-entry.mjs usa módulos de source. Na implantação IIS, os imports são convertidos para arquivos .js da allowlist; account-screen.mjs é publicado como account-client.js.
+
+## Limites do piloto
+
+Não há personagem real no mapa ou movimento comprovado. Rig/animação, colisão, NPCs, combate, inventário, chat, áudio e benchmark RX 550 continuam pendentes. O cliente Windows real ainda precisa de regressão após a atualização.
+
+Antes de ampliar a whitelist: validar personagens não vazios e pertencimento, revogação, IP original atrás do gateway e replay após reinício/rotação de chaves. O cache de replay atual vive na memória do processo.
