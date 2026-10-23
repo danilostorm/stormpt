@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {resolveEntityAsset} from '../src/entity-assets.mjs';
+test('only the exact supported original NPC path resolves',()=>{assert.equal(resolveEntityAsset({kind:1,bodyModel:'Char\\Npc\\TN-004\\TN-004.ini'}).key,'npc-blacksmith');assert.equal(resolveEntityAsset({kind:1,bodyModel:'CHAR/NPC/TN-004/TN-004.INI'}).key,'npc-blacksmith');});
+test('unsupported entities never receive replacement models',()=>{for(const e of [null,{kind:2,bodyModel:'char/npc/tn-004/tn-004.ini'},{kind:3,bodyModel:'char/npc/tn-004/tn-004.ini'},{kind:1,bodyModel:'char/npc/unknown.ini'},{kind:1,bodyModel:'char/npc/../tn-004/tn-004.ini'},{kind:1,bodyModel:'/char/npc/tn-004/tn-004.ini'}])assert.equal(resolveEntityAsset(e),null);});

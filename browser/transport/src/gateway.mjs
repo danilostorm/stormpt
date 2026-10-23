@@ -93,7 +93,7 @@ export function createGateway({
     tcp.on('error', dispose);
     tcp.on('end', dispose);
     tcp.on('data', chunk => {
-      try { decoder.feed(chunk); } catch { dispose(); }
+      try { decoder.feed(chunk); } catch (error) { console.warn('Native server packet rejected:', error.name, error.message); dispose(); }
     });
     ws.on('message', (data, isBinary) => {
       if (!isBinary || closed || tcp.destroyed) return dispose();

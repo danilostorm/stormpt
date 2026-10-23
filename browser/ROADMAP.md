@@ -176,3 +176,9 @@ Ver builds/STATUS_2026-10-23_REAL_WORLD_MOVEMENT.md; os itens anteriores incompl
 - [ ] Outras classes/equipamentos, animações de combate, entidades e segurança para abertura geral.
 
 Ver builds/STATUS_2026-10-23_ANIMATED_WALKING.md.
+
+## Atualização — entidades e GPU — 23/10/2026
+
+Progresso global estimado: **64%**. <progress value="64" max="100">64%</progress>
+
+Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferreiro Gus, pose estática) integrados. GTX 1650 confirmou ~56 FPS em 1080p. Ver relatório builds/STATUS_2026-10-23_ENTITIES_GPU.md para validações e limitações. NPCs animados/interativos, combate, demais sistemas, RX550, regressão Windows e segurança para acesso geral seguem pendentes.

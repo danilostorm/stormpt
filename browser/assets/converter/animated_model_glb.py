@@ -15,8 +15,12 @@ def quaternion(q):
  2*(x*y+w*z),1-2*(x*x+z*z),2*(y*z-w*x),0,
  2*(x*z-w*y),2*(y*z+w*x),1-2*(x*x+y*y),0,0,0,0,1]
 def text(b,o,n=32):return b[o:o+n].split(b'\0')[0].decode('ascii')
-def bones():
- b=(ROOT/'source/m1.smb').read_bytes();info=inspect_model(b);out=[]
+def bones(source_name="m1.smb",allow_trailing=False):
+ b=(ROOT/'source'/source_name).read_bytes()
+ logical=b
+ if allow_trailing:
+  n=unpack('i',b,24)[0];length,offset=unpack('2i',b,556+(n-1)*40+32);logical=b[:offset+length]
+ info=inspect_model(logical);out=[]
  for obj in info['objects']:
   o=obj['offset'];nr,np,ns=unpack('3i',b,o+684);p=obj['to']+obj['texLinks']*32
   rot=[unpack('i4f',b,p+i*20) for i in range(nr)];p+=nr*20

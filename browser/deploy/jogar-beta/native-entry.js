@@ -4,7 +4,7 @@ import {StormPTBrowserSession} from './browser-session.js';
 const $=id=>document.getElementById(id);
 const state={phase:'site-login',characters:[],selected:null};
 let session=null,busy=false,worldView=null,worldLoading=false;
-function clearWorld(){worldView?.dispose();worldView=null;worldLoading=false;}
+function clearWorld(){worldView?.dispose();worldView=null;worldLoading=false;state.entities=null;}
 async function presentWorld(first){
  worldLoading=true;state.phase="loading-world";status("Carregando Ricarten…");
  const active=session;
@@ -17,6 +17,7 @@ async function presentWorld(first){
    onReady:details=>{if(session===active){state.render=details;state.phase="in-world";status("Conectado em Ricarten.");}},
    onError:e=>{clearWorld();active.close();state.phase="error";status(e.message);}
   });
+  if(active.entityState)worldView.applyEntities(active.entityState);
  }catch(e){worldLoading=false;state.phase="error";status(e.message);active.close();}
 }
 
@@ -86,6 +87,7 @@ $('enterGame').addEventListener('click',async()=>{
    }
    if(e.type==='character-world-state'){state.world=e.world;}
    if(e.type==='character-record'){state.characterLoaded=true;state.phase='joining-world';status('Entrando em Ricarten…');session.enterWorld();}
+   if(e.type==='world-entities'){state.entities=e.snapshot;if(worldView)worldView.applyEntities(e.snapshot);}
    if(e.type==='world-state'){
     state.worldLive=e.world;state.serverAcknowledgements=(state.serverAcknowledgements||0)+1;
     if(worldView)worldView.applySnapshot(e.world);
@@ -109,4 +111,4 @@ $('enterGame').addEventListener('click',async()=>{
 });
 new MutationObserver(updateButton).observe($('loggedIn'),{attributes:true,attributeFilter:['hidden']});
 updateButton();
-window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe()})),close:()=>session?.close()};
+window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe(),entityModels:worldView?.entityProbe()})),performance:()=>worldView?.performanceProbe(),resetPerformance:()=>worldView?.resetPerformance(),close:()=>session?.close()};

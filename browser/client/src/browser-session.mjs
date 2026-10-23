@@ -1,3 +1,4 @@
+import {ENTITIES,decodeEntitySnapshot} from '../../transport/src/entity-protocol.mjs';
 import {WORLD,encodeWorldJoin,encodeMoveIntent,decodeWorldSnapshot} from '../../transport/src/world-protocol.mjs';
 import {decodeRecordWorld} from '../../transport/src/record-world.mjs';
 import {encodeCharacterCreation,decodeCharacterCreation} from '../../transport/src/character-creation.mjs';
@@ -120,6 +121,12 @@ export class StormPTBrowserSession {
             this.#emit('character-creation-result',result);
             return;
           }
+          if(this.nativeLogin && opcode===ENTITIES.opcode){
+            if(this.phase!=='native-world-ready')throw Error('Unsolicited entity snapshot');
+            const snapshot=decodeEntitySnapshot(bytes,{expectedObserver:this.worldRecord.identity.serial});
+            if(snapshot.sequence!==this.entitySequence+1)throw Error('Invalid entity snapshot sequence');
+            this.entitySequence=snapshot.sequence;this.entityState=snapshot;this.#emit('world-entities',{snapshot});return;
+          }
           if(this.nativeLogin && opcode===WORLD.state){
             if(!['awaiting-native-world','native-world-ready'].includes(this.phase))throw Error('Unsolicited world snapshot');
             const world=decodeWorldSnapshot(bytes,{expectedSerial:this.worldRecord.identity.serial,expectedName:this.worldRecord.identity.name});
@@ -150,7 +157,7 @@ export class StormPTBrowserSession {
   }
   enterWorld(){
     if(!this.nativeLogin||this.phase!=='native-character-record-ready'||!this.worldRecord)throw Error('Verified native character record required');
-    this.moveSeq=0;this.lastAck=-1;this.lastMoveSent=Date.now();this.phase='awaiting-native-world';
+    this.entitySequence=0;this.entityState=null;this.moveSeq=0;this.lastAck=-1;this.lastMoveSent=Date.now();this.phase='awaiting-native-world';
     this.ws.send(encodeWorldJoin({serial:this.worldRecord.identity.serial}));
   }
   sendMove(direction){

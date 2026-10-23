@@ -1,0 +1,17 @@
+--- a/Database/Database.cpp
+
++++ b/Database/Database.cpp
+
+@@ -141 +141,10 @@
+
+-	SQLDriverConnectA(hConnection, NULL, strconn, SQL_NTS, retconstring, 1024, NULL, SQL_DRIVER_NOPROMPT);
++	SQLRETURN connectionResult=SQLDriverConnectA(hConnection, NULL, strconn, SQL_NTS, retconstring, 1024, NULL, SQL_DRIVER_NOPROMPT);
++    if(!SQL_SUCCEEDED(connectionResult)){
++        SQLCHAR state[6]={0},message[512]={0};SQLINTEGER native=0;SQLSMALLINT length=0;
++        SQLGetDiagRecA(SQL_HANDLE_DBC,hConnection,1,state,&native,message,sizeof(message),&length);
++        char diagnostic[192]={0};
++        sprintf_s(diagnostic,sizeof(diagnostic),"Database connection failed: database=%s state=%.5s code=%ld",szDatabaseName,(const char*)state,(long)native);
++        Utils_Log(LOG_SQL,diagnostic);
++        SQLFreeHandle(SQL_HANDLE_DBC,hConnection);SQLFreeHandle(SQL_HANDLE_ENV,hEnv);
++        return false;
++    }

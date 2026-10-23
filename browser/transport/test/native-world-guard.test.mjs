@@ -40,3 +40,8 @@ test('world backpressure allows four intents and resumes only on server acknowle
  g.onServer(state(1));g.onClient(encodeMoveIntent({sequence:5,direction:3}));
  g.close();assert.throws(()=>g.onClient(encodeMoveIntent({sequence:6,direction:3})),/closed/);
 });
+
+import {ENTITIES} from '../src/entity-protocol.mjs';
+function entities(sequence=1,observer=1234){const b=Buffer.alloc(32);for(const[o,v]of [[0,32],[4,ENTITIES.opcode],[8,1],[12,observer],[16,sequence],[20,1000],[24,3]])b.writeUInt32LE(v,o);return b;}
+test('entities require confirmed world and cannot be sent by the client',()=>{const g=selected();assert.throws(()=>g.onServer(entities()),/confirmation/);const h=active();assert.throws(()=>h.onClient(entities()),/not implemented/);});
+test('entity stream enforces observer identity and independent monotonic sequence',()=>{const g=active();assert.throws(()=>g.onServer(entities(1,99)),/identity/);assert.throws(()=>g.onServer(entities(2)),/sequence/);g.onServer(entities());assert.throws(()=>g.onServer(entities()),/sequence/);g.onServer(entities(2));g.close();assert.throws(()=>g.onServer(entities(3)),/closed/);});

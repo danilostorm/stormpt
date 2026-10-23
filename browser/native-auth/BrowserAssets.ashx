@@ -26,6 +26,7 @@ public sealed class StormPTBrowserAssets : IHttpHandler, IReadOnlySessionState {
    case "fighter-body-animated":filename="tmbB01.skinned.textured.glb";break;
    case "fighter-head-animated":filename="tmh-B01.skinned.textured.glb";break;
    case "fighter-motion":filename="fighter-motion.ptan";break;
+   case "npc-blacksmith":filename="TN-004.idle.textured.glb";break;
    default:Fail(c,404);return;
   }
   string path=Path.Combine(@"C:\StormPT-2703\BrowserAssets",filename);

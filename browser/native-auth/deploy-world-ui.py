@@ -1,8 +1,8 @@
 from pathlib import Path
 from qga_dev import write
 r=Path('/mnt/user/appdata/stormpt-browser')
-sources=['client/src/'+n+'.mjs' for n in ['native-entry','browser-session','account-ticket','native-world-view','world-scene','native-motion']]
-sources+=['transport/src/'+n+'.mjs' for n in ['packets','web-login','character-session','character-list','record-fragments','record-identity','character-creation','record-world','world-protocol']]
+sources=['client/src/'+n+'.mjs' for n in ['native-entry','browser-session','account-ticket','native-world-view','world-scene','native-motion','frame-metrics','native-radar','native-entity-view','entity-assets']]
+sources+=['transport/src/'+n+'.mjs' for n in ['packets','web-login','character-session','character-list','record-fragments','record-identity','character-creation','record-world','world-protocol','entity-protocol']]
 for src in sources:
  p=r/src;name=p.stem+'.js'
  s=p.read_text().replace('../../transport/src/','./').replace('.mjs','.js').replace('./account-screen.js','./account-client.js')

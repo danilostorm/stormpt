@@ -1,3 +1,4 @@
+import {ENTITIES,decodeEntitySnapshot} from './entity-protocol.mjs';
 import {WORLD,decodeWorldJoin,decodeMoveIntent,decodeWorldSnapshot} from './world-protocol.mjs';
 import {RecordAssembler} from './record-fragments.mjs';
 import {decodeRecordWorld} from './record-world.mjs';
@@ -47,6 +48,7 @@ export class GameLoginGuard {
   #serial=0;
   #sentSequence=0;
   #ackSequence=-1;
+  #entitySequence=0;
   #now;
   #loginAt=0;
   #nativeEnabled=false;
@@ -146,6 +148,12 @@ export class GameLoginGuard {
         this.#serial=decoded.identity.serial;this.#state='native-record-received';
       }
       return;
+    }
+    if(this.#nativeLogin && opcode===ENTITIES.opcode){
+      if(this.#state!=='native-world-active')throw Error('World confirmation required before entities');
+      const snapshot=decodeEntitySnapshot(packet,{expectedObserver:this.#serial});
+      if(snapshot.sequence!==this.#entitySequence+1)throw Error('Invalid entity sequence');
+      this.#entitySequence=snapshot.sequence;return;
     }
     if(this.#nativeLogin && opcode===WORLD.state){
       if(!['awaiting-native-world','native-world-active'].includes(this.#state))throw Error('Unsolicited world confirmation');
