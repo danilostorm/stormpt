@@ -165,3 +165,14 @@ Relatório: `builds/STATUS_2026-10-23_0700.md`.
 - [ ] Animação, entidades, combate, inventário, chat e áudio.
 
 Ver builds/STATUS_2026-10-23_REAL_WORLD_MOVEMENT.md; os itens anteriores incompletos que abrangem sistemas adicionais continuam pendentes.
+
+## Marco verificado — 23/10/2026: animação e colisão (60%)
+
+<progress value="60" max="100">60%</progress>
+
+- [x] Lutador: 64 ossos originais, espera/caminhada e skinning GPU no piloto público.
+- [x] Comparação com rotinas C++: 46080 componentes, diferença máxima de uma unidade de ponto fixo.
+- [x] Colisão real: quatro bloqueios sem deslocamento e recuo autorizado; cobertura de todos os obstáculos pendente.
+- [ ] Outras classes/equipamentos, animações de combate, entidades e segurança para abertura geral.
+
+Ver builds/STATUS_2026-10-23_ANIMATED_WALKING.md.

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {decodeNativeMotion,NativeMotionPlayer} from './native-motion.mjs';
 import {StormPTWorldScene} from './world-scene.mjs';
 /** Presentation of confirmed native snapshots only; no local movement simulation. */
 export class NativeWorldView {
@@ -41,6 +42,7 @@ export class NativeWorldView {
  }
  applySnapshot(s){
   if(s.serial!==this.record.identity.serial||s.name!==this.record.identity.name||s.field!==3)throw Error('Estado de outro personagem.');
+  if(this.motion){const moved=s.status===0&&(s.position[0]!==this.latest.position[0]||s.position[2]!==this.latest.position[2]);this.motion.setMoving(moved,performance.now());}
   this.latest=s;
   if(this.root){this.from=this.root.position.clone();this.to=new THREE.Vector3(...s.position.map(v=>v/256));this.received=performance.now();}
  }
@@ -49,7 +51,10 @@ export class NativeWorldView {
    this.world=new StormPTWorldScene(this.canvas,{pixelRatioLimit:1,antialias:false});
    const stage=await this.world.loadStage('/BrowserAssets.ashx?asset=ricarten',{signal:this.abort.signal});
    const loader=new GLTFLoader();
-   const models=await Promise.all([loader.loadAsync('/BrowserAssets.ashx?asset=fighter-body'),loader.loadAsync('/BrowserAssets.ashx?asset=fighter-head')]);
+   const motionResponse=await fetch('/BrowserAssets.ashx?asset=fighter-motion',{credentials:'same-origin',cache:'no-store',signal:this.abort.signal});
+   if(!motionResponse.ok)throw Error('Animação original indisponível.');
+   const motion=decodeNativeMotion(await motionResponse.arrayBuffer());
+   const models=await Promise.all([loader.loadAsync('/BrowserAssets.ashx?asset=fighter-body-animated'),loader.loadAsync('/BrowserAssets.ashx?asset=fighter-head-animated')]);
    if(this.disposed)return;
    this.root=new THREE.Group();let meshes=0;
    for(let i=0;i<models.length;++i){
@@ -58,11 +63,13 @@ export class NativeWorldView {
     this.root.add(models[i].scene);
    }
    if(meshes!==4)throw Error('Modelo original incompleto.');
+   this.motion=new NativeMotionPlayer(motion,models.map(m=>m.scene));
    this.root.position.set(...this.latest.position.map(v=>v/256));this.world.scene.add(this.root);this.applySnapshot(this.latest);
    this.world.camera.near=.2;this.world.camera.far=5000;this.world.camera.updateProjectionMatrix();
    const frame=now=>{
     if(this.disposed)return;
     if(this.to)this.root.position.lerpVectors(this.from,this.to,Math.min(1,Math.max(0,(now-this.received)/80)));
+    this.motion.update(now);
     this.root.rotation.y=this.latest.heading*Math.PI*2/4096;
     const target=this.root.position.clone().add(new THREE.Vector3(0,22,0));
     const horizontal=Math.cos(this.pitch)*this.distance;
@@ -71,9 +78,10 @@ export class NativeWorldView {
     this.raf=requestAnimationFrame(frame);
    };
    this.raf=requestAnimationFrame(frame);this.timer=setInterval(()=>this.direction(),50);this.canvas.focus();
-   onReady({stageMeshes:stage.meshes,stageTriangles:stage.geometryTriangles,characterMeshes:meshes});
+   onReady({stageMeshes:stage.meshes,stageTriangles:stage.geometryTriangles,characterMeshes:meshes,animated:true,bones:motion.bones});
   }catch(e){if(!this.disposed)this.onError(e);}
  }
+ animationProbe(){return this.motion?.probe()||null;}
  dispose(){
   if(this.disposed)return;this.disposed=true;clearInterval(this.timer);cancelAnimationFrame(this.raf);this.abort.abort();
   if(this.root){this.world?.scene.remove(this.root);this.world?.disposeStage(this.root);}

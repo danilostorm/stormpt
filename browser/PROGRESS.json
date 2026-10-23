@@ -1,7 +1,7 @@
 {
   "project": "StormPT Web – cliente jogável em navegador sem launcher, como PWeb",
   "lastUpdateDate": "2026-10-23",
-  "completionEstimatePercent": 57,
+  "completionEstimatePercent": 60,
   "estimateScope": "100% significa jogo Priston Tale utilizável no navegador com login real, personagem, mundo, movimento, monstros, combate, inventário, chat, som, otimização e publicação. Percentual é estimativa subjetiva.",
   "weightedMilestones": [
     {
@@ -13,14 +13,14 @@
     {
       "name": "Conversão dos arquivos do cliente",
       "weight": 18,
-      "earned": 12,
-      "note": "Ricarten e Lutador originais protegidos por sessão; animação/skinning pendentes."
+      "earned": 14,
+      "note": "Lutador com Physique original, 64 ossos e espera/caminhada em skinning GPU; comparação com C++ e modelos glTF validados."
     },
     {
       "name": "Renderizador Three.js e câmera",
       "weight": 18,
-      "earned": 10,
-      "note": "Cena pública WebGL2 ligada à sessão real, câmera, teclado/toque e interpolação confirmada."
+      "earned": 11,
+      "note": "Cena pública em Ricarten com skinning GPU e ciclos ligados à posição confirmada."
     },
     {
       "name": "Conta, login GameServer e personagem real",
@@ -43,7 +43,7 @@
   ],
   "verifiedNow": {
     "transportTests": 67,
-    "browserClientUnitTests": 17,
+    "browserClientUnitTests": 19,
     "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
     "csharpIssuerCompiled": true,
     "crossLanguageSignedTicketVerified": true,
@@ -107,9 +107,19 @@
     "worldNegativeTestsPassed": 6,
     "publicPlayUrl": "https://stormpt.hoststorm.com.br/jogar",
     "authenticatedAssetDelivery": true,
-    "animatedWalking": false,
-    "wallCollisionDedicatedTestPassed": false
+    "animatedWalking": true,
+    "wallCollisionDedicatedTestPassed": false,
+    "animatedIdle": true,
+    "animationDrivenByServerSnapshots": true,
+    "originalMotionBoneCount": 64,
+    "nativeMotionComponentsCompared": 46080,
+    "nativeMotionMaxFixedPointDifference": 1,
+    "animatedModelSpecErrors": 0,
+    "animatedModelSpecWarnings": 0,
+    "terrainCollisionRejectedLive": true,
+    "terrainBlockedRetries": 4,
+    "terrainCollisionTestSnapshots": 91
   },
-  "nextCriticalMilestone": "Validar segurança para abertura além da conta QA, regressão Windows e colisões; implementar animação e replicação de entidades reais.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_REAL_WORLD_MOVEMENT.md"
+  "nextCriticalMilestone": "Ampliar segurança de sessão e regressão Windows antes de outras contas; replicar entidades reais e expandir modelos/equipamentos e animações.",
+  "latestWorkReport": "builds/STATUS_2026-10-23_ANIMATED_WALKING.md"
 }

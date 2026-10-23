@@ -23,11 +23,14 @@ public sealed class StormPTBrowserAssets : IHttpHandler, IReadOnlySessionState {
    case "ricarten":filename="Ricarten.textured.glb";break;
    case "fighter-body":filename="tmbB01.bind.textured.glb";break;
    case "fighter-head":filename="tmh-B01.bind.textured.glb";break;
+   case "fighter-body-animated":filename="tmbB01.skinned.textured.glb";break;
+   case "fighter-head-animated":filename="tmh-B01.skinned.textured.glb";break;
+   case "fighter-motion":filename="fighter-motion.ptan";break;
    default:Fail(c,404);return;
   }
   string path=Path.Combine(@"C:\StormPT-2703\BrowserAssets",filename);
   if(!File.Exists(path)){Fail(c,503);return;}
-  c.Response.ContentType="model/gltf-binary";
+  c.Response.ContentType=filename.EndsWith(".ptan",StringComparison.Ordinal)?"application/octet-stream":"model/gltf-binary";
   c.Response.AddHeader("Content-Length",new FileInfo(path).Length.ToString());
   if(c.Request.HttpMethod=="GET")c.Response.TransmitFile(path);
  }

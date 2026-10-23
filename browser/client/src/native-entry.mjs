@@ -109,4 +109,4 @@ $('enterGame').addEventListener('click',async()=>{
 });
 new MutationObserver(updateButton).observe($('loggedIn'),{attributes:true,attributeFilter:['hidden']});
 updateButton();
-window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify(state)),close:()=>session?.close()};
+window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe()})),close:()=>session?.close()};

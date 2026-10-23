@@ -24,3 +24,9 @@ research/client-*
 builds/*result.json
 builds/real-*.json
 client/private-test/real-character-*
+
+research/animation/
+*.ptan
+*.glb
+*.smb
+*.smd

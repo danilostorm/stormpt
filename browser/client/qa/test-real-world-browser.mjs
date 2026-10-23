@@ -23,9 +23,14 @@ try{
  const invalidAssetStatus=await page.evaluate(async()=>{const r=await fetch('/BrowserAssets.ashx?asset=../secrets/gateway.hmac');return r.status;});assert.equal(invalidAssetStatus,404);
  const initial=await enter();assert.equal(initial.worldLive.field,3);assert.equal(initial.render.characterMeshes,4);
  const canvas=page.locator('#stormptWorld canvas');await canvas.focus();
- await page.keyboard.down('d');await page.waitForTimeout(900);await page.keyboard.up('d');
+ assert.equal(initial.render.animated,true);assert.equal(initial.animation.clip,'idle');
+ await page.keyboard.down('d');await page.waitForTimeout(450);const walkingA=await snapshot();
+ await page.waitForTimeout(450);const walkingB=await snapshot();
+ assert.equal(walkingA.animation.clip,'walk');assert.equal(walkingB.animation.clip,'walk');
+ assert.ok(walkingA.animation.matrix.some((v,i)=>Math.abs(v-walkingB.animation.matrix[i])>.0001),'Original bone matrices must animate while server confirms movement');
+ await page.screenshot({path:'/work/client/qa/real-world-animated-walking.png'});await page.keyboard.up('d');
  await page.waitForTimeout(1800);
- const moved=await snapshot();
+ const moved=await snapshot();assert.equal(moved.animation.clip,'idle');
  const a=initial.worldLive.position,b=moved.worldLive.position;
  assert.ok(Math.hypot(b[0]-a[0],b[2]-a[2])>0,'Real keyboard movement must receive changed server coordinates');
  assert.ok(moved.movementRequests>0);assert.ok(moved.worldLive.sequence>initial.worldLive.sequence);
@@ -38,7 +43,7 @@ try{
  assert.equal(reconnected.world.position.x,b[0]);assert.equal(reconnected.world.position.z,b[2]);
  assert.deepEqual(errors,[]);
  const result={at:new Date().toISOString(),realBrowser:'Chromium WebGL2 SwiftShader',url:page.url(),mockedRoutes:false,
-  anonymousAssetsDenied:true,pathTraversalAssetsDenied:true,realKeyboardMovement:true,persistedAcrossReconnect:true,
+  anonymousAssetsDenied:true,pathTraversalAssetsDenied:true,realKeyboardMovement:true,persistedAcrossReconnect:true,animatedWalking:true,animatedIdle:true,animationDrivenByServerSnapshots:true,originalBones:walkingB.animation.bones,
   heartbeatOver65Seconds:true,initialPosition:a,movedPosition:b,reconnectedPosition:reconnected.worldLive.position,
   render:reconnected.render,assetResponses,errors,pilotOnly:true,fullGameComplete:false};
  writeFileSync('/work/builds/real-world-browser-result.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
