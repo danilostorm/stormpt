@@ -78,10 +78,9 @@ document.getElementById('btn').onclick=()=>{target=[0,0,0];dist=10000;az=2.1;el=
 try{
 setup();
 const info=await fetch('manifest.json',{cache:'no-store'}).then(r=>r.json());
-if(!('DecompressionStream'in window))throw Error('Precisa de navegador compatível com gzip.');
-const res=await fetch('pillai.bin.gz');
+const res=await fetch('pillai.bin');
 if(!res.ok)throw Error('Mapa não encontrado');
-const raw=await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+const raw=await res.arrayBuffer();
 if(raw.byteLength%16)throw Error('Arquivo de malha inválido');
 count=raw.byteLength/16;
 if(count!==info.triangle_vertices)throw Error('Malha incompleta');
