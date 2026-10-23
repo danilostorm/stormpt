@@ -1,0 +1,9 @@
+StormPT Launcher Clássico — recursos visuais
+
+As ilustrações, logotipos, personagens e outros elementos de Priston Tale
+podem estar sujeitos aos direitos de seus titulares. Este pacote reproduz
+os arquivos de recursos utilizados no launcher StormPT para permitir
+compilar o aplicativo com o mesmo visual.
+
+A presença dos recursos neste pacote não concede licença adicional para
+exploração comercial de propriedade intelectual de terceiros.

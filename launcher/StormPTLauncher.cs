@@ -15,6 +15,12 @@ using System.Threading;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
 
+[assembly:System.Reflection.AssemblyTitle("StormPT Launcher Clássico")]
+[assembly:System.Reflection.AssemblyProduct("StormPT")]
+[assembly:System.Reflection.AssemblyCompany("StormPT")]
+[assembly:System.Reflection.AssemblyVersion("1.2.0.0")]
+[assembly:System.Reflection.AssemblyFileVersion("1.2.0.0")]
+
 namespace StormPT {
  public class Package { public string Url {get;set;} public string Sha256 {get;set;} public long Bytes {get;set;} }
  public sealed class Patch { public int Version {get;set;} public string Description {get;set;} public Package Package {get;set;} public Dictionary<string,string> Files {get;set;} public List<string> DeleteFiles {get;set;} }
@@ -113,6 +119,7 @@ namespace StormPT {
  }
 
  public sealed class Launcher : Form {
+  const int NativeBuildVersion=6;
   const string Origin="https://stormpt.hoststorm.com.br";
   const string PublicKey="<RSAKeyValue><Modulus>4TaKBu6jfbDgC7GnFmkMzBlM6Htb+LLzLmEBnKYFOOitK7CU2KYg4V8T6M07fqNwqt5g1YlFdDqqjwfQR8+s5PtQPABySISnWrrcZZcMXO/s/CxAfcLUASfrkS6lXPo3WxtAMT+V5MJo1Z/wqrOMRBrLNRdp3Wzuiu3orJAoqAvm8fHljAYQgeMBXqNqsu7EaA3njMCm+8lnR+EEJVpJpwym8ZvZY8vMxhICb1o1bqFMME9HqGm74hq2rQBTzIzwX9O3Jpu7CoIYQ3D/RjdtsFYixQ63bQlkO/0QcI7iDL8KBogHWc619YeUk6RNu5wEpCX8NUEH3b6QcRHLTDc6A98J2iK/7S72WzM89G+gAb8gAsphhZKQI2NvfBFocdzdGYLLqR0EKLsUpt2B5Db5I3tKUQsTziIwdwnYbTI3ACjFP0r6pjVqOdnJitfZKXiLNaeMIFtQmbZFlriwdkz60esX6tsO+6GXDhi6vjpK6nWIuD/ATOd2e/C900Mr9bWl</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
   readonly JavaScriptSerializer json=new JavaScriptSerializer();
@@ -248,25 +255,7 @@ namespace StormPT {
    // Portable layout: if the launcher sits in E:\StormPT, install beside it.
    if(Path.GetFileName(executableDir).Equals("StormPT",StringComparison.OrdinalIgnoreCase))directory=executableDir;
    if(Directory.Exists(Path.Combine(executableDir,"Files","Game")) || Directory.Exists(Path.Combine(executableDir,"StormPT","Files","Game")))directory=executableDir;
-   var head=new Panel{Dock=DockStyle.Top,Height=145,BackColor=Color.FromArgb(12,27,40)};Controls.Add(head);
-   var mark=new Label{Text="STORM",ForeColor=white,Font=new Font("Segoe UI",31,FontStyle.Bold),Location=new Point(33,23),AutoSize=true};head.Controls.Add(mark);
-   var pk=new Label{Text="PK",ForeColor=gold,Font=new Font("Segoe UI",31,FontStyle.Bold),Location=new Point(196,23),AutoSize=true};head.Controls.Add(pk);
-   var sub=new Label{Text="CENTRAL OFICIAL DE ATUALIZAÇÕES · WINDOWS",ForeColor=muted,Font=new Font("Segoe UI",9,FontStyle.Bold),Location=new Point(37,86),AutoSize=true};head.Controls.Add(sub);
-   var hero=new Label{Text="PRISTON TALE · ATUALIZAÇÕES AUTOMÁTICAS",ForeColor=gold,Font=new Font("Segoe UI",10,FontStyle.Bold),AutoSize=true,Location=new Point(465,49)};head.Controls.Add(hero);
-   var box=new Panel{BackColor=card,Location=new Point(25,165),Size=new Size(815,310),Anchor=AnchorStyles.Top|AnchorStyles.Left|AnchorStyles.Right};Controls.Add(box);
-   status.Text="Verificando versão e integridade...";status.ForeColor=white;status.Font=new Font("Segoe UI",15,FontStyle.Bold);status.Location=new Point(25,20);status.Size=new Size(760,33);box.Controls.Add(status);
-   details.Text="Os arquivos são verificados por assinatura e SHA-256.";details.ForeColor=muted;details.Location=new Point(25,62);details.Size=new Size(750,28);box.Controls.Add(details);
-   progress.Location=new Point(25,105);progress.Size=new Size(760,18);progress.Style=ProgressBarStyle.Continuous;box.Controls.Add(progress);
-   version.Text="Versão: consultando...";version.Location=new Point(25,139);version.Size=new Size(750,26);version.ForeColor=muted;box.Controls.Add(version);
-   install.Text="INSTALAR / ATUALIZAR";install.Location=new Point(25,185);install.Size=new Size(190,45);MakeButton(install,true);install.Click+=(s,e)=>StartTask("update");box.Controls.Add(install);
-   play.Text="JOGAR";play.Location=new Point(225,185);play.Size=new Size(115,45);MakeButton(play,true);play.Click+=(s,e)=>LaunchGame();box.Controls.Add(play);
-   verify.Text="VERIFICAR";verify.Location=new Point(350,185);verify.Size=new Size(118,45);MakeButton(verify,false);verify.Click+=(s,e)=>StartTask("verify");box.Controls.Add(verify);
-   graphics.Text="GRÁFICOS";graphics.Location=new Point(479,185);graphics.Size=new Size(120,45);MakeButton(graphics,false);
-   graphics.Click+=(s,e)=>OpenGraphicsSettings();box.Controls.Add(graphics);
-   choose.Text="PASTA DO JOGO";choose.Location=new Point(610,185);choose.Size=new Size(177,45);MakeButton(choose,false);choose.Click+=(s,e)=>Choose();box.Controls.Add(choose);
-   autoUpdate.Text="Atualizações automáticas sempre ativas";autoUpdate.Checked=true;autoUpdate.Enabled=false;autoUpdate.ForeColor=muted;autoUpdate.Location=new Point(25,246);autoUpdate.Size=new Size(515,35);box.Controls.Add(autoUpdate);
-   location.Location=new Point(30,490);location.Size=new Size(745,33);location.ForeColor=muted;location.Text="Pasta: "+directory;Controls.Add(location);
-   folder.Text="ABRIR";folder.Size=new Size(65,31);folder.Location=new Point(775,486);MakeButton(folder,false);folder.Click+=(s,e)=>{Directory.CreateDirectory(directory);Process.Start("explorer.exe",directory);};Controls.Add(folder);
+   InitClassicUI();
    worker.WorkerReportsProgress=true;worker.DoWork+=Work;worker.ProgressChanged+=(s,e)=>{progress.Value=Math.Max(0,Math.Min(100,e.ProgressPercentage));if(e.UserState!=null){status.Text=e.UserState.ToString();}};
    worker.RunWorkerCompleted+=Done;
    launchWorker.DoWork+=(s,e)=>{
@@ -281,8 +270,6 @@ namespace StormPT {
      VerifyInstalled(latestRelease);
      StartupLog("Integrity-ok",null);
      string gameExe=Path.Combine(game,"Game.exe");
-     if(!FileHash(gameExe).Equals("4ae7e912630633beee4154c1ca8fdb76489dcecd41504a150474f4d7b652b634",StringComparison.OrdinalIgnoreCase))
-       throw new IOException("Game.exe foi alterado ou está corrompido. Faça a verificação e repare a instalação pelo launcher.");
      // Verify the public Login and Game Server paths before opening the client.
      // The StormPT server-selection screen requires the second TCP port (10007).
      StartupLog("StormPT-check-start",null);
@@ -323,12 +310,120 @@ namespace StormPT {
        play.Enabled=true;
      }
    };
-   // Build version, not game patch version. Users can confirm that self-update completed.
-   var buildLabel=new Label{Text="Launcher v11",Location=new Point(690,129),Size=new Size(120,22),
-     ForeColor=muted,TextAlign=ContentAlignment.MiddleRight,Font=new Font("Segoe UI",8,FontStyle.Regular)};
-   Controls.Add(buildLabel);buildLabel.BringToFront();
    Shown+=(s,e)=>StartTask("check");
   }
+// StormPT legacy art, now rendered entirely by native Windows Forms.
+  readonly System.Windows.Forms.Timer hudClock=new System.Windows.Forms.Timer();
+  Bitmap hudBackground,hudStartHover,hudRegisterHover,hudSettingsHover,hudExitHover;
+  readonly Bitmap[] hudFrames=new Bitmap[5];
+  int hudFrame=0,hudHover=0;
+  bool hudDragging=false,hudMoved=false;
+  Point hudMouse,hudOrigin;
+  readonly Rectangle hudStart=new Rectangle(310,204,145,66);
+  readonly Rectangle hudRegister=new Rectangle(366,271,92,29);
+  readonly Rectangle hudSettings=new Rectangle(326,301,145,30);
+  readonly Rectangle hudExit=new Rectangle(377,331,93,30);
+  readonly ContextMenuStrip hudMenu=new ContextMenuStrip();
+  static Bitmap ClassicBitmap(string id){
+    var asm=System.Reflection.Assembly.GetExecutingAssembly();
+    using(Stream src=asm.GetManifestResourceStream("StormPT.Hud."+id+".bmp")){
+      if(src==null)throw new FileNotFoundException("Recurso ausente: "+id);
+      using(Bitmap bmp=new Bitmap(src))return new Bitmap(bmp);
+    }
+  }
+  void InitClassicUI(){
+    Text="StormPT Launcher Clássico";MinimumSize=Size.Empty;MaximumSize=Size.Empty;ClientSize=new Size(480,400);
+    FormBorderStyle=FormBorderStyle.None;
+    StartPosition=FormStartPosition.CenterScreen;AutoScaleMode=AutoScaleMode.None;
+    TopMost=true;ShowInTaskbar=true;MaximizeBox=false;
+    SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer,true);
+    hudBackground=ClassicBitmap("fundo");
+    if(hudBackground.Width!=480||hudBackground.Height!=400)throw new InvalidDataException("Fundo inválido");
+    for(int i=0;i<5;i++)hudFrames[i]=ClassicBitmap("start"+(i+1));
+    hudStartHover=ClassicBitmap("start_mouse_em_cima");
+    hudRegisterHover=ClassicBitmap("registrar");
+    hudSettingsHover=ClassicBitmap("configuracoes");
+    hudExitHover=ClassicBitmap("sair");
+    status.Text="Verificando atualização assinada...";
+    details.Text="";progress.Minimum=0;progress.Maximum=100;progress.Value=0;
+    play.Enabled=false;
+    MouseDown+=(s,e)=>{
+      if(e.Button==MouseButtons.Right){hudMenu.Show(this,e.Location);return;}
+      if(e.Button==MouseButtons.Left){hudDragging=true;hudMoved=false;hudMouse=Cursor.Position;hudOrigin=Location;}
+    };
+    MouseMove+=(s,e)=>{
+      int hover=hudStart.Contains(e.Location)?1:hudRegister.Contains(e.Location)?2:hudSettings.Contains(e.Location)?3:hudExit.Contains(e.Location)?4:0;
+      if(hudHover!=hover){hudHover=hover;Invalidate();}
+      Cursor=hover>0?Cursors.Hand:Cursors.Default;
+      if(hudDragging && e.Button==MouseButtons.Left){
+        var pos=Cursor.Position;
+        int x=pos.X-hudMouse.X,y=pos.Y-hudMouse.Y;
+        if(Math.Abs(x)>4||Math.Abs(y)>4)hudMoved=true;
+        if(hudMoved)Location=new Point(hudOrigin.X+x,hudOrigin.Y+y);
+      }
+    };
+    MouseUp+=(s,e)=>{if(e.Button==MouseButtons.Left)hudDragging=false;};
+    MouseClick+=(s,e)=>{
+      if(e.Button!=MouseButtons.Left||hudMoved)return;
+      if(hudExit.Contains(e.Location)){Close();return;}
+      if(hudRegister.Contains(e.Location)){OpenRegistration();return;}
+      if(hudSettings.Contains(e.Location)){if(!worker.IsBusy)OpenGraphicsSettings();return;}
+      if(hudStart.Contains(e.Location))PlayOrUpdate();
+    };
+    hudMenu.Items.Add("Começar jogo",null,(s,e)=>PlayOrUpdate());
+    hudMenu.Items.Add("Registrar",null,(s,e)=>OpenRegistration());
+    hudMenu.Items.Add("Configurações",null,(s,e)=>OpenGraphicsSettings());
+    hudMenu.Items.Add("Verificar arquivos",null,(s,e)=>StartTask("verify"));
+    hudMenu.Items.Add("Atualizar cliente",null,(s,e)=>StartTask("update"));
+    hudMenu.Items.Add("Escolher pasta do jogo",null,(s,e)=>Choose());
+    hudMenu.Items.Add("Abrir pasta do jogo",null,(s,e)=>{Directory.CreateDirectory(directory);Process.Start("explorer.exe",directory);});
+    hudMenu.Items.Add(new ToolStripSeparator());
+    hudMenu.Items.Add("Minimizar",null,(s,e)=>WindowState=FormWindowState.Minimized);
+    hudMenu.Items.Add("Sair",null,(s,e)=>Close());
+    hudClock.Interval=180;hudClock.Tick+=(s,e)=>{hudFrame=(hudFrame+1)%5;Invalidate();};hudClock.Start();
+    Paint+=(s,e)=>DrawClassicHud(e.Graphics);
+    FormClosed+=(s,e)=>{
+      hudClock.Stop();hudClock.Dispose();hudMenu.Dispose();hudBackground.Dispose();
+      foreach(Bitmap b in hudFrames)if(b!=null)b.Dispose();
+      foreach(Bitmap b in new[]{hudStartHover,hudRegisterHover,hudSettingsHover,hudExitHover})if(b!=null)b.Dispose();
+    };
+  }
+  void PlayOrUpdate(){
+    if(worker.IsBusy||launchWorker.IsBusy)return;
+    if(!Installed())StartTask("update");else LaunchGame();
+    Invalidate();
+  }
+  void OpenRegistration(){
+    try{Process.Start(new ProcessStartInfo("https://stormpt.hoststorm.com.br/Conta.aspx?view=cadastro"){UseShellExecute=true});}
+    catch(Exception ex){MessageBox.Show(this,ex.Message,"StormPT",MessageBoxButtons.OK,MessageBoxIcon.Warning);}
+  }
+  void DrawClassicHud(Graphics g){
+    g.InterpolationMode=System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+    g.DrawImageUnscaled(hudBackground,0,0);
+    // Replaces legacy title/copyright burned into the original art.
+    using(Brush b=new SolidBrush(Color.FromArgb(235,22,17,27)))g.FillRectangle(b,350,1,128,31);
+    using(Font f=new Font("Georgia",17,FontStyle.Bold))
+    using(Brush b=new SolidBrush(Color.FromArgb(240,222,194)))
+      g.DrawString("StormPT",f,b,353,3);
+    using(Brush b=new SolidBrush(Color.FromArgb(245,22,17,27)))
+      g.FillRectangle(b,104,382,353,17);
+    using(Font f=new Font("Georgia",8,FontStyle.Italic))
+    using(Brush b=new SolidBrush(Color.FromArgb(220,205,190)))
+      g.DrawString("© StormPT — Todos os direitos reservados",f,b,124,384);
+    g.DrawImageUnscaled(hudHover==1?hudStartHover:hudFrames[hudFrame],310,204);
+    if(hudHover==2)g.DrawImageUnscaled(hudRegisterHover,366,271);
+    if(hudHover==3)g.DrawImageUnscaled(hudSettingsHover,326,301);
+    if(hudHover==4)g.DrawImageUnscaled(hudExitHover,377,331);
+    string message=status.Text??"";
+    if(message.Length>57)message=message.Substring(0,54)+"...";
+    using(Font f=new Font("Consolas",8,FontStyle.Bold))
+    using(Brush b=new SolidBrush(Color.FromArgb(225,207,188)))
+      g.DrawString(message,f,b,20,354);
+    using(Brush b=new SolidBrush(Color.FromArgb(43,35,29)))g.FillRectangle(b,20,375,440,4);
+    using(Brush b=new SolidBrush(Color.FromArgb(208,164,94)))
+      g.FillRectangle(b,20,375,(int)(440*Math.Max(0,Math.Min(100,progress.Value))/100d),4);
+  }
+
   void MakeButton(Button b,bool primary) {b.FlatStyle=FlatStyle.Flat;b.FlatAppearance.BorderSize=1;b.BackColor=primary?gold:Color.FromArgb(26,44,62);b.ForeColor=primary?Color.FromArgb(11,24,34):white;b.FlatAppearance.BorderColor=primary?gold:Color.FromArgb(72,91,107);b.Font=new Font("Segoe UI",9,FontStyle.Bold);b.Cursor=Cursors.Hand;}
   void OpenGraphicsSettings(){
     if(Process.GetProcessesByName("Game").Length!=0){MessageBox.Show(this,"Feche o jogo antes de alterar os gráficos.","StormPT",MessageBoxButtons.OK,MessageBoxIcon.Information);return;}
@@ -367,18 +462,6 @@ namespace StormPT {
       return;
     }
   }
-  void CreateLauncherShortcut(){
-    // Launcher is the only shortcut offered: do not create a Game.exe shortcut.
-    string source=Application.ExecutablePath;
-    string dest=Path.Combine(directory,"StormPTLauncher.exe");
-    if(!Path.GetFullPath(source).Equals(Path.GetFullPath(dest),StringComparison.OrdinalIgnoreCase))File.Copy(source,dest,true);
-    try{
-      Type type=Type.GetTypeFromProgID("WScript.Shell");
-      if(type!=null){dynamic shell=Activator.CreateInstance(type);
-        dynamic shortcut=shell.CreateShortcut(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),"StormPT Launcher.lnk"));
-        shortcut.TargetPath=dest;shortcut.WorkingDirectory=directory;shortcut.IconLocation=dest+",0";shortcut.Description="StormPT · Inicie e atualize por aqui";shortcut.Save();}
-    }catch{} // Desktop shortcut is optional; installation still succeeds.
-  }
   bool Installed(){return File.Exists(Path.Combine(game,"Game.exe")) && File.Exists(stateFile);}
   State LoadState(){try{return json.Deserialize<State>(File.ReadAllText(stateFile));}catch{return null;}}
   void SaveState(State st){Directory.CreateDirectory(directory);string temp=stateFile+".new";File.WriteAllText(temp,json.Serialize(st),Encoding.UTF8);if(File.Exists(stateFile))File.Replace(temp,stateFile,null);else File.Move(temp,stateFile);}
@@ -397,8 +480,9 @@ namespace StormPT {
     if(Process.GetProcessesByName("Game").Length==0)MigrateLegacyLayout();
     var r=FetchRelease();release=r;checkedManifest=true;
     // Optional signed self-update: existing legacy launchers ignore this field.
-    if(r.Launcher!=null && r.Launcher.Version>0 &&
-       String.Equals(Path.GetFileName(Application.ExecutablePath),"StormPTLauncher.exe",StringComparison.OrdinalIgnoreCase) &&
+    if(r.Launcher!=null && r.Launcher.Version>NativeBuildVersion &&
+       (String.Equals(Path.GetFileName(Application.ExecutablePath),"StormPTLauncher.exe",StringComparison.OrdinalIgnoreCase) ||
+        String.Equals(Path.GetFileName(Application.ExecutablePath),"launcher.exe",StringComparison.OrdinalIgnoreCase)) &&
        !FileHash(Application.ExecutablePath).Equals(r.Launcher.Sha256,StringComparison.OrdinalIgnoreCase)){
       string staged=Path.Combine(directory,"_downloads","StormPTLauncher-update-"+r.Launcher.Version+".exe");
       Download(r.Launcher,staged,"Baixando atualização do launcher");
@@ -431,9 +515,6 @@ namespace StormPT {
     play.Enabled=Installed() && checkedManifest && installed!=null && installed.PatchVersion>=newest && !(result is Exception);
     if(result is Exception){status.Text="Não foi possível concluir.";details.Text=((Exception)result).Message;details.ForeColor=Color.FromArgb(255,145,126);progress.Value=0;}
     else{details.Text="Arquivos oficiais, assinados e conferidos. Não executa como administrador.";details.ForeColor=muted;}
-    if(!(result is Exception) && play.Enabled){
-      try{CreateLauncherShortcut();}catch(Exception ex){details.Text="Falha ao criar atalho: "+ex.Message;}
-    }
     State st=LoadState();int latest=release==null||release.Patches.Count==0?0:release.Patches.Max(x=>x.Version);
     version.Text="Instalado: "+(st==null?"não":("patch "+st.PatchVersion))+"     Disponível: "+(checkedManifest?"patch "+latest:"indisponível");
   }
@@ -665,7 +746,7 @@ namespace StormPT {
     }
   }
   static void VerifyStormPTConnection(){
-    const string host="game.stormpt.hoststorm.com.br";
+    const string host="163.176.128.81";
     foreach(int port in new int[]{1997}){
       using(var client=new TcpClient(AddressFamily.InterNetwork)){
         IAsyncResult operation=null;
@@ -704,7 +785,9 @@ namespace StormPT {
       try{
         string target=Encoding.UTF8.GetString(Convert.FromBase64String(args[1]));
         target=Path.GetFullPath(target);
-        if(!String.Equals(Path.GetFileName(target),"StormPTLauncher.exe",StringComparison.OrdinalIgnoreCase) ||
+        string filename=Path.GetFileName(target);
+        if(!(String.Equals(filename,"StormPTLauncher.exe",StringComparison.OrdinalIgnoreCase) ||
+             String.Equals(filename,"launcher.exe",StringComparison.OrdinalIgnoreCase)) ||
            !File.Exists(target))throw new InvalidDataException("Destino de atualização inválido.");
         byte[] manifestBytes,sigBytes;
         using(var wc=new WebClient()){
@@ -726,6 +809,27 @@ namespace StormPT {
         Process.Start(new ProcessStartInfo(target){WorkingDirectory=Path.GetDirectoryName(target),UseShellExecute=true});
         Console.WriteLine("STORMPT_LAUNCHER_AUTOUPGRADE_APPLIED");
       }catch(Exception error){Console.Error.WriteLine("LAUNCHER_UPGRADE_FAILED "+error.Message);Environment.ExitCode=1;}
+      return;
+    }
+    if(args.Length==1 && args[0]=="--selftest-classic-window"){
+      try{
+        using(var view=new Launcher()){
+          if(view.ClientSize!=new Size(480,400)||view.FormBorderStyle!=FormBorderStyle.None)
+            throw new InvalidOperationException("Janela clássica fora de 480x400");
+        }
+        Console.WriteLine("STORMPT_CLASSIC_WINDOW_480X400_OK");
+      }catch(Exception ex){Console.Error.WriteLine("WINDOW_ERROR "+ex.Message);Environment.ExitCode=1;}
+      return;
+    }
+    if(args.Length==1 && args[0]=="--selftest-classic-assets"){
+      try{
+        foreach(string id in new[]{"fundo","start1","start2","start3","start4","start5","start_mouse_em_cima","registrar","configuracoes","sair"}){
+          using(Bitmap b=ClassicBitmap(id)){
+            if(id=="fundo" && (b.Width!=480||b.Height!=400))throw new IOException("Imagem inválida");
+          }
+        }
+        Console.WriteLine("STORMPT_CLASSIC_CSHARP_RESOURCES_OK");
+      }catch(Exception ex){Console.Error.WriteLine("RESOURCE_ERROR "+ex.Message);Environment.ExitCode=1;}
       return;
     }
     if(args.Length==1 && args[0]=="--selftest-stormpt-base"){

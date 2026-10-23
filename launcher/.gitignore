@@ -1,0 +1,8 @@
+launcher.exe
+*.pdb
+*.obj
+bin/
+obj/
+.vs/
+*.user
+*.suo
