@@ -1,7 +1,7 @@
 {
   "project": "StormPT Web – cliente jogável em navegador sem launcher, como PWeb",
   "lastUpdateDate": "2026-10-23",
-  "completionEstimatePercent": 64,
+  "completionEstimatePercent": 65,
   "estimateScope": "100% significa jogo Priston Tale utilizável no navegador com login real, personagem, mundo, movimento, monstros, combate, inventário, chat, som, otimização e publicação. Percentual é estimativa subjetiva.",
   "weightedMilestones": [
     {
@@ -31,8 +31,8 @@
     {
       "name": "Mecânicas e sincronização jogável",
       "weight": 25,
-      "earned": 6,
-      "note": "Movimento e colisão autoritativos, persistência e snapshots de NPCs; interações e combate pendentes."
+      "earned": 7,
+      "note": "Movimento, colisão e posição persistentes; entidades reais e primeira conversa de NPC confirmada no GameServer e Chromium público. Transações e combate pendentes."
     },
     {
       "name": "Qualidade, áudio, compatibilidade, publicação",
@@ -42,8 +42,8 @@
     }
   ],
   "verifiedNow": {
-    "transportTests": 72,
-    "browserClientUnitTests": 28,
+    "transportTests": 77,
+    "browserClientUnitTests": 27,
     "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
     "csharpIssuerCompiled": true,
     "crossLanguageSignedTicketVerified": true,
@@ -78,7 +78,7 @@
     "nativePilotWhitelistRequired": true,
     "gameWindowsRegressionTested": false,
     "canonicalEngineSourceUpdated": true,
-    "deployedGameServerSha256": "CC652D9A79A65EFC88E6C3907E2FFB578C22DC96BA8AC485F2B492E46CC3E757",
+    "deployedGameServerSha256": "81C3E0DCA141541EB199E4352F07C7E1798B0B2CBF140E9AF7B9765DEDBFB2DC",
     "realCharacterCreationTested": true,
     "realCharacterPersistenceAcrossReconnect": true,
     "realCharacterRecordBytes": 1796,
@@ -122,7 +122,7 @@
     "realEntitySnapshots": true,
     "realNpcSnapshotCount": 8,
     "originalNpcModelsRendered": 1,
-    "npcInteraction": false,
+    "npcInteraction": true,
     "npcAnimated": false,
     "originalBlacksmithTriangles": 1069,
     "nativeBlacksmithComponentsCompared": 832,
@@ -137,8 +137,24 @@
     "softwareRendererReconnectIssueObserved": true,
     "publicEntityBrowserIntegrationPassed": true,
     "publicEntityBrowserSoftwareViewport": "640x400",
-    "canvasFocusLossStopsMovement": true
+    "canvasFocusLossStopsMovement": true,
+    "originalOpeningStage": true,
+    "originalOpeningCameraPath": true,
+    "openingPauseTested": true,
+    "openingAnonymousBrowserTested": true,
+    "openingTriangles": 40487,
+    "openingTextures": 115,
+    "npcTransactions": false,
+    "originalNpcDialoguePublicBrowser": true,
+    "npcLivePositiveTestName": "Enzo, o Restaurador de Itens",
+    "npcDistantRequestDenied": true,
+    "npcUnknownTargetDenied": true,
+    "npcRateLimitDenied": true,
+    "unauthenticatedNpcDataNotDisclosed": true,
+    "movementAfterNpcDialoguePublicBrowser": true,
+    "nativeNpcMaximumRangeUnits": 160,
+    "accountFormWaitsForInitialSession": true
   },
-  "nextCriticalMilestone": "Resolver pausas gráficas/reconexão em software, validar Game.exe e segurança de outras contas; expandir NPCs originais, interações e combate.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_ENTITIES_GPU.md"
+  "nextCriticalMilestone": "Inventário autoritativo, combate básico, chat e áudio; regressão Windows e segurança de outras contas antes de ampliar o acesso.",
+  "latestWorkReport": "builds/STATUS_2026-10-23_NPC_DIALOGUE.md"
 }

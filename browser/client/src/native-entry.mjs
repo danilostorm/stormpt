@@ -13,6 +13,7 @@ async function presentWorld(first){
   if(session!==active||active.phase!=="native-world-ready")return;
   worldView=new NativeWorldView({record:state.world,initial:active.worldState||first,
    onDirection:direction=>{if(session===active&&active.phase==="native-world-ready"){const n=active.sendMove(direction);if(n)state.movementRequests=(state.movementRequests||0)+1;}},
+   onNpc:target=>active.requestNpc(target),
    onExit:()=>{clearWorld();active.close();status("Você saiu do mundo. Carregue os personagens para entrar novamente.");},
    onReady:details=>{if(session===active){state.render=details;state.phase="in-world";status("Conectado em Ricarten.");}},
    onError:e=>{clearWorld();active.close();state.phase="error";status(e.message);}
@@ -87,6 +88,7 @@ $('enterGame').addEventListener('click',async()=>{
    }
    if(e.type==='character-world-state'){state.world=e.world;}
    if(e.type==='character-record'){state.characterLoaded=true;state.phase='joining-world';status('Entrando em Ricarten…');session.enterWorld();}
+   if(e.type==='npc-reply'){state.npcReply=e.reply;worldView?.applyNpc(e.reply);}
    if(e.type==='world-entities'){state.entities=e.snapshot;if(worldView)worldView.applyEntities(e.snapshot);}
    if(e.type==='world-state'){
     state.worldLive=e.world;state.serverAcknowledgements=(state.serverAcknowledgements||0)+1;

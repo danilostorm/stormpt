@@ -13,12 +13,13 @@ struct WorldSnapshot {
 };
 static_assert(sizeof(WorldJoinRequest)==20 && sizeof(WorldMoveRequest)==24 && sizeof(WorldSnapshot)==80,"Native world ABI");
 struct NativeWorld {
- DWORD connection,serial,sequence,lastStep,lastInput,lastSave; int heading; std::string account,name;DWORD lastEntities=0,entitySequence=0;
+ DWORD connection,serial,sequence,lastStep,lastInput,lastSave; int heading; std::string account,name;DWORD lastEntities=0,entitySequence=0,lastNpc=0,npcSequence=0;
 };
 static std::map<rsPLAYINFO*,NativeWorld> worlds;
 static std::mutex worldMutex;
 } // namespace stormpt_web
 #include "browser_entities.hpp"
+#include "browser_npc.hpp"
 namespace stormpt_web {
 inline bool WorldHealthy(rsPLAYINFO* p,DWORD now) {
  if(!Match(p,true)) return false;
@@ -70,6 +71,11 @@ inline bool DispatchWorld(rsPLAYINFO* p,const char* bytes,DWORD size,DWORD code,
   p->Position.Area=3;p->Position.x=x;p->Position.y=y;p->Position.z=z;
   worlds[p]={p->dwConnectCount,p->dwObjectSerial,0,now,now,now,0,p->getAccount(),p->getName()};
   return SendWorld(p,worlds[p],now,0)&&SendEntities(p,worlds[p],now,true);
+ }
+ if(code==kNpcRequest){
+  auto it=worlds.find(p);if(it==worlds.end())return false;auto& w=it->second;
+  if(w.connection!=p->dwConnectCount||w.serial!=p->dwObjectSerial||w.account!=p->getAccount()||w.name!=p->getName())return false;
+  return DispatchNpc(p,w,bytes,size,now);
  }
  if(code!=kWorldMove||size!=sizeof(WorldMoveRequest))return false;
  WorldMoveRequest q;memcpy(&q,bytes,sizeof(q));

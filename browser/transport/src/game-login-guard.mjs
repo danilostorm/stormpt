@@ -1,3 +1,4 @@
+import {NPC,decodeNpcRequest,decodeNpcReply} from './npc-protocol.mjs';
 import {ENTITIES,decodeEntitySnapshot} from './entity-protocol.mjs';
 import {WORLD,decodeWorldJoin,decodeMoveIntent,decodeWorldSnapshot} from './world-protocol.mjs';
 import {RecordAssembler} from './record-fragments.mjs';
@@ -39,6 +40,7 @@ function cstrName(packet,offset,length){
   return new TextDecoder('windows-1252').decode(text);
 }
 export class GameLoginGuard {
+  #npcSequence=0;#npcPending=null;
   #account;
   #state='awaiting-login';
   #names=new Set();
@@ -121,6 +123,11 @@ export class GameLoginGuard {
       if(q.sequence!==this.#sentSequence+1||this.#sentSequence-this.#ackSequence>=4)throw Error('Movement sequence/backpressure violation');
       this.#sentSequence=q.sequence;return;
     }
+    if(this.#nativeLogin && opcode===NPC.request){
+      if(this.#state!=='native-world-active'||this.#npcPending)throw Error('NPC interaction requires active world without pending request');
+      const q=decodeNpcRequest(packet);if(q.sequence!==this.#npcSequence+1)throw Error('Invalid NPC request sequence');
+      this.#npcSequence=q.sequence;this.#npcPending=q;return;
+    }
     if(this.#nativeLogin && ![5].includes(opcode))throw Error('Native packet is not implemented');
     if(this.#nativeLogin && opcode===5 && this.#state!=='character-list-received-not-authenticated')throw Error('Selection already sent or creation pending');
     if(opcode===5){
@@ -154,6 +161,11 @@ export class GameLoginGuard {
       const snapshot=decodeEntitySnapshot(packet,{expectedObserver:this.#serial});
       if(snapshot.sequence!==this.#entitySequence+1)throw Error('Invalid entity sequence');
       this.#entitySequence=snapshot.sequence;return;
+    }
+    if(this.#nativeLogin && opcode===NPC.reply){
+      if(this.#state!=='native-world-active'||!this.#npcPending)throw Error('Unsolicited NPC reply');
+      decodeNpcReply(packet,{expectedObserver:this.#serial,expectedSequence:this.#npcPending.sequence,expectedTarget:this.#npcPending.target});
+      this.#npcPending=null;return;
     }
     if(this.#nativeLogin && opcode===WORLD.state){
       if(!['awaiting-native-world','native-world-active'].includes(this.#state))throw Error('Unsolicited world confirmation');

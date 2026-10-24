@@ -66,11 +66,15 @@ try{
   $('loginUser').value=username;$('rememberUser').checked=true;
  }
 }catch{}
+// Establish the original ASP.NET session before allowing any form submission.
+busy(true);
+feedback($('accountStatus'),'Verificando sessão…');
 try{
  const state=await api.status();
  if(state.authenticatedToSite)loggedIn(state.account,'Sessão do site reconhecida.');
  else loggedOut();
 }catch(err){feedback($('accountStatus'),err.message,'error')}
+finally{busy(false)}
 window.__stormptAccountQA={
  uiReady:true,
  isAccountConnected:()=>!$('loggedIn').hidden,

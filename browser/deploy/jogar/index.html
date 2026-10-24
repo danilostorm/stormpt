@@ -1,8 +1,11 @@
 <!doctype html><html lang="pt-BR"><head>
 <base href="/jogar-beta/">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>StormPT Web — Conta integrada (QA)</title><link rel="stylesheet" href="./account-style.css"/>
+<title>StormPT — Jogar no navegador</title><link rel="stylesheet" href="./account-style.css"/>
 </head><body>
+<div id="openingLoading" role="status" aria-live="polite" aria-busy="true"><strong>STORM<span>PT</span></strong><p>Preparando a abertura…</p><progress id="openingProgress" max="100" value="0" aria-label="Carregando cenário"></progress></div>
+<style>#openingLoading{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#25303c,#090d14 75%);color:#ead9b7;font:14px Georgia,serif}#openingLoading[hidden]{display:none}#openingLoading strong{font-size:46px;letter-spacing:6px;color:#f3e2b9;text-shadow:0 2px 20px #be8c4a66}#openingLoading strong span{color:#c39a5d}#openingLoading p{margin:25px 0 16px}#openingProgress{width:min(260px,70vw);height:5px;accent-color:#bd9658}#openingProgress::-webkit-progress-bar{background:#31343d;border-radius:5px}#openingProgress::-webkit-progress-value{background:#bd9658;border-radius:5px}</style>
+<script>setTimeout(()=>{const e=document.getElementById('openingLoading');if(e){e.hidden=true;e.setAttribute('aria-busy','false')}},12000)</script><noscript><style>#openingLoading{display:none}</style></noscript>
 <header><strong>✦ STORM<span>PT</span> WEB</strong><small>PILOTO FECHADO · CAMINHADA QA</small></header>
 <main class="stage"><section class="panel" id="entryPanel">
 <section id="loggedOut"><h1>BEM-VINDO</h1><div class="ornament">─ ✧ ─</div>
@@ -10,13 +13,13 @@
 <label for="loginUser">Conta</label><input id="loginUser" autocomplete="username" maxlength="16" required placeholder="Seu nome de usuário">
 <label for="loginPassword">Senha</label><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Sua senha">
 <div class="remember"><input id="rememberUser" type="checkbox"><label for="rememberUser">Lembrar apenas o nome da conta</label></div>
-<button class="primary" id="loginSubmit" type="submit">Entrar</button></form>
+<button class="primary" id="loginSubmit" type="submit" disabled>Entrar</button></form>
 <div class="actions"><button type="button" id="openSignup">CRIAR CONTA</button><button type="button" id="forgotPassword">ESQUECI A SENHA</button></div></section>
 <section id="loggedIn" hidden><h1>CONTA CONECTADA</h1><div class="ornament">─ ✧ ─</div>
 <p>Conta do site: <strong id="accountName"></strong></p>
-<p class="small">Conecte-se ao servidor para carregar seus personagens.</p>
+<p class="small">O mundo está em teste fechado. Contas autorizadas podem carregar personagens para caminhar em Ricarten.</p>
 <button class="primary" id="enterGame" type="button" disabled>Entrar no mundo</button>
-<button class="secondary" id="logout" type="button">Sair da conta</button></section>
+<button class="secondary" id="logout" type="button" disabled>Sair da conta</button></section>
 <p class="status" id="accountStatus" role="status" aria-live="polite"></p>
 <hr><p class="small">Cadastro original do StormPT. Qualquer conta criada nesta prévia será real e poderá ser usada no servidor.</p>
 </section></main>
@@ -27,7 +30,8 @@
 <label for="signupEmail">E-mail</label><input id="signupEmail" type="email" maxlength="160" autocomplete="email" required placeholder="voce@exemplo.com">
 <label for="signupPassword">Senha</label><input id="signupPassword" type="password" autocomplete="new-password" minlength="8" maxlength="24" required placeholder="8 a 24 caracteres">
 <label for="signupConfirm">Confirmar senha</label><input id="signupConfirm" type="password" autocomplete="new-password" minlength="8" maxlength="24" required placeholder="Repita a senha">
-<div class="two"><button class="primary" id="signupSubmit" type="submit">Criar conta</button><button class="secondary" id="cancelSignup" type="button">Cancelar</button></div></form>
+<div class="two"><button class="primary" id="signupSubmit" type="submit" disabled>Criar conta</button><button class="secondary" id="cancelSignup" type="button">Cancelar</button></div></form>
 <p class="status" id="signupStatus" role="status" aria-live="polite"></p></section></div>
 <script type="importmap">{"imports":{"three":"/jogar-beta/vendor/three.module.js","three/addons/loaders/GLTFLoader.js":"/jogar-beta/vendor/GLTFLoader.js"}}</script>
+<script type="module" src="./opening-background.js?v=20261023-autoplay2"></script>
 <script type="module" src="./native-entry.js"></script></body></html>
