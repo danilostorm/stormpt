@@ -37,6 +37,46 @@ int main(){try{
  CHECK(run(2200,true)==Preflight::ReadyForNativeCombatRules);
  CHECK(accepted&&gate.lastSequence==1&&calls==4);
  gate.Revoke();CHECK(gate.lastSequence==0&&gate.lastAttackAt==0);
+ // Reentrancy cannot run native rules twice on the same connection.
+ gate.BindAuthenticated(7);a.connection=7;a.expectedConnection=7;
+ w.sequence=1;t.observedAt=2250;
+ int nestedCalls=0;
+ CHECK(TryBasicAttack(gate,&w,sizeof(w),a,t,2300,[&](){
+  bool innerAccepted=true;
+  const auto nested=TryBasicAttack(gate,&w,sizeof(w),a,t,2300,
+    [&](){++nestedCalls;return true;},innerAccepted);
+  CHECK(nested==Preflight::SessionInvalid);
+  CHECK(!innerAccepted&&nestedCalls==0);
+  return false;
+ },accepted)==Preflight::ReadyForNativeCombatRules);
+ CHECK(!accepted&&!gate.inFlight&&gate.lastSequence==0);
+ // Revoke inside callback must not revive or advance a stale session.
+ t.observedAt=2350;
+ CHECK(TryBasicAttack(gate,&w,sizeof(w),a,t,2400,[&](){
+  gate.Revoke();return true;
+ },accepted)==Preflight::SessionInvalid);
+ CHECK(!accepted&&!gate.authenticated&&gate.lastSequence==0);
+ // Rebinding to the SAME connection still invalidates the old generation.
+ gate.BindAuthenticated(7);t.observedAt=2450;
+ const auto oldGeneration=gate.generation;
+ CHECK(TryBasicAttack(gate,&w,sizeof(w),a,t,2500,[&](){
+  gate.BindAuthenticated(7);return true;
+ },accepted)==Preflight::SessionInvalid);
+ CHECK(!accepted&&gate.generation>oldGeneration&&gate.lastSequence==0);
+ // Exceptions leave the gate reusable, without consuming the sequence.
+ t.observedAt=2550;
+ try {
+  TryBasicAttack(gate,&w,sizeof(w),a,t,2600,[&]()->bool{
+   throw std::runtime_error("native callback failed");
+  },accepted);
+  CHECK(false);
+ }catch(const std::runtime_error& e){CHECK(std::string(e.what())=="native callback failed");}
+ CHECK(!accepted&&!gate.inFlight&&gate.lastSequence==0);
+ CHECK(TryBasicAttack(gate,&w,sizeof(w),a,t,2600,[&](){
+  return true;
+ },accepted)==Preflight::ReadyForNativeCombatRules);
+ CHECK(accepted&&gate.lastSequence==1&&gate.lastAttackAt==2600);
+ gate.Revoke();CHECK(!gate.inFlight&&!gate.authenticated);
  std::cout<<"combat-session-gate-checks="<<n<<" passed\n";
  return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<"\n";return 1;}}
