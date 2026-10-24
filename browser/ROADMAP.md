@@ -312,3 +312,12 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] Gateway reiniciado isoladamente sem conexões ativas; GameServer, SQL, personagens e StormPK não alterados.
 - [ ] Combate, dano, EXP, loot, monstro QA real e chat entre duas contas ainda não demonstrados; progresso global sem percentual.
 - Relatório: builds/STATUS_2026-10-24_1300_NATIVE_LOGIN_LOCKDOWN.md.
+
+## 24/10/2026 14h — primeiro modelo original para monstro confirmado pelo servidor (QA fechado)
+- [x] Resolver visual aceita D-Meca para entidade `kind=2` SOMENTE no caminho original `char/monster/d_meca/dmeca.ini`; nenhum spawn ou dano sintético.
+- [x] GLB original `dmeca.idle.textured.glb` passou Khronos glTF Validator com 0 erros/avisos. AEROCOOL: frontend selecionado 17/17, transporte 109/109. SUPERFRAME: 5/5 com hashes idênticos.
+- [x] Publicado apenas `entity-assets.js` no IIS QA após backup/comparação de fonte. Chromium QA real entrou em Ricarten, renderizou 14 NPCs, sem erros JS.
+- [ ] Nenhum monstro real observado no QA: renderização de monstro vivo e combate NÃO demonstrados. ZIEL VM IA/GTX 1650 ativa, mas Edge headless WebGL2 inconclusivo (exit 1002); ORACLE bloqueada por autenticação Tailscale.
+- [x] Server33.exe SHA-256 preservado; QA fechado; backup/manifesto SHA-256 verificados no AEROCOOL.
+- [ ] Combate, dano, EXP, loot, animação de monstro, chat entre duas contas e paridade desktop pendentes. Sem percentual global auditado.
+- Relatório: builds/STATUS_2026-10-24_1400_ORIGINAL_MONSTER_MODEL_QA.md.
