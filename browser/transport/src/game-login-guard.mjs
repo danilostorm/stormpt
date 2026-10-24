@@ -18,6 +18,7 @@ import {decodeCharacterCreation} from './character-creation.mjs';
 import {decodeWebLoginPacket,WEB_LOGIN} from './web-login.mjs';
 import {inspectPacket} from './packets.mjs';
 import {decodeCharacterList} from './character-list.mjs';
+import {CHAT_OPCODE,validateClientChatFrame,ChatSendThrottle} from './chat-protocol.mjs';
 
 const LOGIN_SIZE=400;
 const SELECT_SIZE=52;
@@ -41,6 +42,7 @@ function cstrName(packet,offset,length){
 }
 export class GameLoginGuard {
   #npcSequence=0;#npcPending=null;
+  #chatThrottle;
   #account;
   #state='awaiting-login';
   #names=new Set();
@@ -69,6 +71,7 @@ export class GameLoginGuard {
     this.#now=now;
     this.#loginTimeoutMs=loginTimeoutMs;
     this.#loginAt=this.#now();
+    this.#chatThrottle=new ChatSendThrottle({now:this.#now});
   }
   get phase(){return this.#state}
   get boundAccount(){return this.#account}
@@ -127,6 +130,12 @@ export class GameLoginGuard {
       if(this.#state!=='native-world-active'||this.#npcPending)throw Error('NPC interaction requires active world without pending request');
       const q=decodeNpcRequest(packet);if(q.sequence!==this.#npcSequence+1)throw Error('Invalid NPC request sequence');
       this.#npcSequence=q.sequence;this.#npcPending=q;return;
+    }
+    if(this.#nativeLogin && opcode===CHAT_OPCODE){
+      if(this.#state!=='native-world-active')throw Error('Chat requires a confirmed GameServer world session');
+      validateClientChatFrame(packet);
+      if(!this.#chatThrottle.allow())throw Error('Chat rate limit');
+      return;
     }
     if(this.#nativeLogin && ![5].includes(opcode))throw Error('Native packet is not implemented');
     if(this.#nativeLogin && opcode===5 && this.#state!=='character-list-received-not-authenticated')throw Error('Selection already sent or creation pending');
