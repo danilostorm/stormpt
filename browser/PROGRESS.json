@@ -148,7 +148,7 @@
     "publicNpcModelIntegrationPassed": true,
     "npcUnsupportedObserved": 2,
     "assetPipelineImplemented": true,
-    "assetPipelineTests": 7,
+    "assetPipelineTests": 15,
     "assetPipelineRealIntegrationPassed": true,
     "assetPipelineCacheAndCorruptionRecoveryPassed": true,
     "assetPipelineStagingHashVerified": true,
@@ -164,10 +164,18 @@
     "distributedWorkers": 4,
     "distributedRealConversionVerified": true,
     "distributedCleanupConfigured": true,
-    "distributedCleanupVerified": false
+    "distributedCleanupVerified": false,
+    "oracleAccessRenewed": true,
+    "oracleCleanupWatcherRunning": true,
+    "assetPipelineCoreTests": 7,
+    "assetRepairTests": 5,
+    "legacyModelTests": 3,
+    "nativeConfigurationBindingsIndexed": 549,
+    "originalModelBindingRepairIntegrationPassed": true,
+    "legacyNormalHeaderIntegrationPassed": true
   },
   "nextCriticalMilestone": "Concluir NPCs pendentes/animações e implementar ações autoritativas de itens e combate; referência integral em DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_PIPELINE.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_REPAIR_PASS.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {

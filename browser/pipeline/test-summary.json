@@ -19,5 +19,19 @@
       "pipeline/test_pipeline.py"
     ],
     "exitCode": 0
+  },
+  {
+    "command": [
+      "python3",
+      "pipeline/test_repair_plan.py"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "python3",
+      "pipeline/test_legacy_normal_compat.py"
+    ],
+    "exitCode": 0
   }
 ]

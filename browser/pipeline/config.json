@@ -22,6 +22,14 @@
     [
       "python3",
       "pipeline/test_pipeline.py"
+    ],
+    [
+      "python3",
+      "pipeline/test_repair_plan.py"
+    ],
+    [
+      "python3",
+      "pipeline/test_legacy_normal_compat.py"
     ]
   ],
   "catalogFullHash": false

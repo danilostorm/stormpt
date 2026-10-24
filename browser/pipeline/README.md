@@ -56,3 +56,9 @@ A comunicação usa fila autenticada. O Ziel usa uma rota HTTPS temporária porq
 Ao terminar, a fila fecha, os contêineres saem e os bootstraps removem pastas e imagens da execução. `make_cleanup_watchers.py` gera uma segunda verificação por servidor, com limpeza limitada ao identificador desta execução e comprovante devolvido à principal. `finish_cluster.py` sinaliza o encerramento e reúne esses comprovantes. `cleanup_cluster.py` remove a rota temporária e encerra o coordenador. Artefatos e relatórios definitivos continuam no AEROCOOL. Falta de acesso SSH ou de comprovante deve aparecer como pendência de verificação, nunca como limpeza comprovada.
 
 O plano de implantação, os identificadores das tarefas remotas e as credenciais ficam em `private/`. `distributed-summary.json` é um retrato do processamento, não um relatório de jogo concluído.
+
+## Segunda passada de recuperação
+
+`index_bindings.ps1` lê referências de modelo/esqueleto dos INX/INF originais. `plan_repairs.py` agrupa falhas e identifica somente vínculos únicos. `repair_candidates.py` espera a primeira conversão terminar e usa cache separado para reprocessar candidatos selecionados, com dois processos locais e sem reabrir os auxiliares. O suporte à variante antiga de normais é aplicado somente nessa passada, em memória; a estrutura continua passando pelo parser existente. Cabeçalhos desconhecidos e configurações ambíguas não são aceitos automaticamente.
+
+Testes: `test_repair_plan.py` e `test_legacy_normal_compat.py`. As integrações privadas de modelo e item têm resumos próprios. A publicação dos recuperados gera outro manifesto de preparação; o jogo ativo continua exigindo integração e testes conectados.

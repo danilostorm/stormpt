@@ -1,0 +1,17 @@
+{
+  "processed": 3412,
+  "total": 3775,
+  "nativeBindingsIndexed": 549,
+  "categories": {
+    "object_format_variant": 551,
+    "inspect_converter_error": 164,
+    "unsupported_format": 10,
+    "trailing_data_variant": 56,
+    "native_binding_not_found": 1161,
+    "unambiguous_native_binding": 76,
+    "invalid_or_empty_native_reference": 204,
+    "transient_cache_retry": 38,
+    "ambiguous_native_binding": 3
+  },
+  "batchComplete": false
+}
