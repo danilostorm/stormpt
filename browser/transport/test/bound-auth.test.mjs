@@ -79,3 +79,21 @@ test('C# ASP.NET ticket JSON/HMAC wire shape is accepted by Node verifier',()=>{
  const ticket=encoded+'.'+hmac(encoded);
  assert.equal(consumeBoundTicket({token:ticket,secret,usedNonces:new Map()}).account,'TestUser');
 });
+
+test('native-only gateway never forwards a legacy desktop login to TCP',async t=>{
+ let bytesReceived=0;
+ const tcp=net.createServer(sock=>sock.on('data',data=>{bytesReceived+=data.length;}));
+ tcp.listen(0,'127.0.0.1');await once(tcp,'listening');
+ const gateway=createGateway({secret,requireBoundTicket:true,allowNativeWebLogin:true,
+  listenHost:'127.0.0.1',listenPort:0,gameHost:'127.0.0.1',gamePort:tcp.address().port});
+ await gateway.start();
+ t.after(async()=>{await gateway.stop();await new Promise(r=>tcp.close(r));});
+ const ws=new WebSocket('ws://127.0.0.1:'+gateway.server.address().port+'/game',
+  ['stormpt-binary-v1','ticket.'+createTicket()],{origin:'https://stormpt.hoststorm.com.br'});
+ await once(ws,'open');
+ const closed=once(ws,'close');
+ ws.send(encodeOriginalLoginPacket({account:'TestUser',password:'test-only',clientHash:'a'.repeat(32)}));
+ await Promise.race([closed,new Promise((_,reject)=>setTimeout(()=>reject(Error('Legacy login not rejected')),2500))]);
+ assert.equal(bytesReceived,0);
+ assert.equal(gateway.sessions.size,0);
+});
