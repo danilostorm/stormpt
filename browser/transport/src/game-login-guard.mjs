@@ -96,6 +96,11 @@ export class GameLoginGuard {
         this.#loginAt=this.#now();
         return;
       }
+      // Native QA sessions MUST NOT fall back to the desktop login path:
+      // the legacy branch allows arbitrary post-login native opcodes.
+      // A signed browser ticket is not authorization to use that protocol.
+      if(this.#nativeEnabled)
+        throw Error('Legacy desktop login disabled for native browser pilot');
       if(opcode!==8||length!==LOGIN_SIZE)
         throw Error('Original GameServer login must be first');
       if(cstrAscii(packet,8,21)!==this.#account)
