@@ -30,3 +30,7 @@ research/animation/
 *.glb
 *.smb
 *.smd
+
+pipeline/private/
+pipeline/catalog-pid-private.txt
+**/__pycache__/

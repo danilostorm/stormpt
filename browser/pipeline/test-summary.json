@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "python3",
+      "pipeline/run_transport_tests.py"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "python3",
+      "pipeline/run_frontend_tests.py"
+    ],
+    "exitCode": 0
+  },
+  {
+    "command": [
+      "python3",
+      "pipeline/test_pipeline.py"
+    ],
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "primaryRoot": "C:/StormPT-2703/Cliente",
+  "catalogRoots": [
+    "C:/StormPT-2703/Cliente",
+    "C:/Users/danil/Downloads/Priston"
+  ],
+  "workers": 2,
+  "jobTimeoutSeconds": 240,
+  "maxSourceBytes": 134217728,
+  "validationTimeoutSeconds": 90,
+  "guestReleaseRoot": "C:/StormPT-2703/BrowserAssets/Batch",
+  "testCommands": [
+    [
+      "python3",
+      "pipeline/run_transport_tests.py"
+    ],
+    [
+      "python3",
+      "pipeline/run_frontend_tests.py"
+    ],
+    [
+      "python3",
+      "pipeline/test_pipeline.py"
+    ]
+  ],
+  "catalogFullHash": false
+}

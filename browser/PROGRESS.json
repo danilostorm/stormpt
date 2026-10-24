@@ -146,10 +146,28 @@
       "char/npc/bt03/battleportal.INI"
     ],
     "publicNpcModelIntegrationPassed": true,
-    "npcUnsupportedObserved": 2
+    "npcUnsupportedObserved": 2,
+    "assetPipelineImplemented": true,
+    "assetPipelineTests": 7,
+    "assetPipelineRealIntegrationPassed": true,
+    "assetPipelineCacheAndCorruptionRecoveryPassed": true,
+    "assetPipelineStagingHashVerified": true,
+    "assetPipelineActivatesGameContent": false,
+    "assetPipelineFilesCataloged": 64049,
+    "assetPipelinePrimarySmdFiles": 3775,
+    "distributedAssetPipeline": true,
+    "distributedAuxiliaryServers": [
+      "ziel",
+      "superframe",
+      "oracle"
+    ],
+    "distributedWorkers": 4,
+    "distributedRealConversionVerified": true,
+    "distributedCleanupConfigured": true,
+    "distributedCleanupVerified": false
   },
   "nextCriticalMilestone": "Concluir NPCs pendentes/animações e implementar ações autoritativas de itens e combate; referência integral em DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_NPC_MODELS.md",
+  "latestWorkReport": "builds/STATUS_2026-10-23_PIPELINE.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {

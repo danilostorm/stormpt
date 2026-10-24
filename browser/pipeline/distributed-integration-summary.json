@@ -1,0 +1,8 @@
+{
+  "status": "validated_candidate",
+  "worker": "ziel-1",
+  "validationErrors": 0,
+  "sha256": "a833a990e7fedbc20744a5e5661ccfd036b56b7f4dd147fffce33659389181c0",
+  "returnedToPrimary": true,
+  "activeInGame": false
+}
