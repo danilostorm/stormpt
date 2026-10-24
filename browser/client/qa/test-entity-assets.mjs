@@ -25,5 +25,17 @@ test("additional original Ricarten NPC models resolve without replacing monsters
  assert.equal(resolveEntityAsset({kind:1,bodyModel:"char/npc/stella/stella.inx"}).key,"npc-stella");
  assert.equal(resolveEntityAsset({kind:2,bodyModel:"char/npc/stella/stella.inx"}),null);
  assert.equal(resolveEntityAsset({kind:1,bodyModel:"char/monster/d_meca/dmeca.ini"}).key,"npc-dmeca");
- assert.equal(resolveEntityAsset({kind:2,bodyModel:"char/monster/d_meca/dmeca.ini"}),null);
+ assert.equal(resolveEntityAsset({kind:2,bodyModel:"char/monster/d_meca/dmeca.ini"}).key,"npc-dmeca");
+});
+
+test("monster uses original model only for exact server-confirmed type and path",()=>{
+ assert.equal(resolveEntityAsset({kind:2,bodyModel:"CHAR/MONSTER/D_MECA/DMECA.INI"}).key,"npc-dmeca");
+ for(const e of [
+  {kind:2,bodyModel:"char/npc/enzo/enzo.ini"},
+  {kind:2,bodyModel:"char/monster/d_meca/../d_meca/dmeca.ini"},
+  {kind:2,bodyModel:"/char/monster/d_meca/dmeca.ini"},
+  {kind:2,bodyModel:"char/monster/d_meca/dmeca.inx"},
+  {kind:3,bodyModel:"char/monster/d_meca/dmeca.ini"},
+  {kind:2,bodyModel:null}
+ ])assert.equal(resolveEntityAsset(e),null);
 });
