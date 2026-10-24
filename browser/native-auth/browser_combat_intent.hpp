@@ -14,7 +14,7 @@ static_assert(sizeof(AttackWire)==28,"Combat intent ABI must be 28 bytes");
 struct ActorContext {
  std::uint32_t serial,connection,expectedConnection,lastSequence,lastAttackAt;
  std::int32_t field,x,y,z,life;
- bool sessionActive;
+ bool sessionActive,combatAreaAllowed;
 };
 struct TargetContext {
  std::uint32_t serial,kind,observedAt;
@@ -36,7 +36,8 @@ inline Preflight CheckBasicAttackIntent(const void* raw,std::size_t length,
  if(q.size!=sizeof(q)||q.code!=kBasicAttackOpcode||q.version!=1||
     q.action!=1||q.reserved||!q.sequence||!q.target)return Preflight::Malformed;
  if(!actor.sessionActive||!actor.serial||!actor.connection||
-    actor.connection!=actor.expectedConnection||actor.field!=3||actor.life<=0||
+    actor.connection!=actor.expectedConnection||!actor.combatAreaAllowed||
+    actor.field<0||actor.field>255||actor.life<=0||
     !PositionBounded(actor.x)||!PositionBounded(actor.y)||!PositionBounded(actor.z))
   return Preflight::SessionInvalid;
  if(actor.lastSequence==0xffffffffu||q.sequence!=actor.lastSequence+1)

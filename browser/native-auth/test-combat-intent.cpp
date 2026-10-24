@@ -8,8 +8,8 @@ static int checks=0;
 int main(){
  try {
  AttackWire w={28,kBasicAttackOpcode,1,1,99,1,0};
- ActorContext a={11,7,7,0,0,3,0,0,0,100,true};
- TargetContext t={99,2,950,3,100*256,0,0,20,true};
+ ActorContext a={11,7,7,0,0,4,0,0,0,100,true,true};
+ TargetContext t={99,2,950,4,100*256,0,0,20,true};
  const auto evaluate=[&](){return CheckBasicAttackIntent(&w,sizeof(w),a,t,1000);};
  CHECK(evaluate()==Preflight::ReadyForNativeCombatRules);
  CHECK(CheckBasicAttackIntent(nullptr,sizeof(w),a,t,1000)==Preflight::Malformed);
@@ -23,14 +23,18 @@ int main(){
  a.sessionActive=false;CHECK(evaluate()==Preflight::SessionInvalid);a.sessionActive=true;
  a.expectedConnection=8;CHECK(evaluate()==Preflight::SessionInvalid);a.expectedConnection=7;
  a.life=0;CHECK(evaluate()==Preflight::SessionInvalid);a.life=100;
- a.field=4;CHECK(evaluate()==Preflight::SessionInvalid);a.field=3;
+ a.combatAreaAllowed=false;CHECK(evaluate()==Preflight::SessionInvalid);a.combatAreaAllowed=true;
+ a.field=3;t.field=3;a.combatAreaAllowed=false;CHECK(evaluate()==Preflight::SessionInvalid);
+ a.field=4;t.field=4;a.combatAreaAllowed=true;
+ a.field=-1;CHECK(evaluate()==Preflight::SessionInvalid);a.field=4;
+ a.field=256;CHECK(evaluate()==Preflight::SessionInvalid);a.field=4;
  a.lastSequence=1;CHECK(evaluate()==Preflight::Replay);a.lastSequence=0;
  a.lastSequence=0xffffffffu;CHECK(evaluate()==Preflight::Replay);a.lastSequence=0;
  t.active=false;CHECK(evaluate()==Preflight::TargetInvalid);t.active=true;
  t.serial=11;CHECK(evaluate()==Preflight::TargetInvalid);t.serial=99;
  t.kind=3;CHECK(evaluate()==Preflight::NotMonster);t.kind=2;
  t.life=0;CHECK(evaluate()==Preflight::TargetDead);t.life=20;
- t.field=4;CHECK(evaluate()==Preflight::WrongField);t.field=3;
+ t.field=3;CHECK(evaluate()==Preflight::WrongField);t.field=4;
  t.observedAt=0;CHECK(CheckBasicAttackIntent(&w,sizeof(w),a,t,1001)==Preflight::StaleTarget);t.observedAt=950;
  t.x=161*256;CHECK(evaluate()==Preflight::OutOfRange);t.x=100*256;
  t.y=65*256;CHECK(evaluate()==Preflight::OutOfRange);t.y=0;

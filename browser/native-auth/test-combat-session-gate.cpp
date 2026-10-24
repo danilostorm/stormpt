@@ -8,8 +8,8 @@ static int n=0;
 int main(){try{
  SessionAttackGate gate;
  AttackWire w={28,kBasicAttackOpcode,1,1,99,1,0};
- ActorContext a={11,7,7,0,0,3,0,0,0,100,true};
- TargetContext t={99,2,950,3,100*256,0,0,20,true};
+ ActorContext a={11,7,7,0,0,4,0,0,0,100,true,true};
+ TargetContext t={99,2,950,4,100*256,0,0,20,true};
  bool accepted=false;int calls=0;
  auto run=[&](std::uint32_t now,bool ok){return TryBasicAttack(gate,&w,sizeof(w),a,t,now,[&](){++calls;return ok;},accepted);};
  CHECK(run(1000,true)==Preflight::SessionInvalid);

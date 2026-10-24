@@ -265,6 +265,14 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] ZIEL GPU GTX 1650 com driver OK; smoke de WebGL2 headless inconclusivo, sem benchmark FPS novo.
 - Progresso global de paridade desktop continua sem percentual confiável.
 
+## 24/10/2026 08h — auditoria final, QA fechado
+- [x] Transporte 101/101; frontend Node 58/58; Chromium fixture 4/4 em contêiner. Falha inicial de 4 testes Chromium por dependências ausentes no host, corrigida no ambiente de teste.
+- [x] AEROCOOL: Server33.exe ativo, porta 1997, SHA original intacto; HTTPS /jogar/ 200, BrowserAssets.ashx 401 sem sessão, native-inventory.js SHA igual à fonte.
+- [x] ZIEL VM IA GTX 1650 ativa, Chrome/Edge presentes (sem benchmark); SUPERFRAME e ORACLE acessíveis, HTTPS conferido. Nenhuma cópia auxiliar nova nem limpeza necessária.
+- [x] Backups 07h/07h30 e manifesto 07h30 verificados por checksum. Novo relatório e logs consolidados no AEROCOOL.
+- [ ] Combate real, monstro vivo QA, skills, inventário transacional, chat entre dois jogadores, paridade desktop, RX 550 e regressão Windows pendentes. Progresso global SEM percentual.
+- Relatório: builds/STATUS_2026-10-24_0800_FINAL_AUDIT.md.
+
 ## 24/10/2026 09h — pré-validação isolada de intenção de ataque (QA fechado)
 - [x] Contrato de ataque básico de 28 bytes (opcode QA 0x53570007): somente sequência e serial do alvo, sem coordenadas, poder, dano, EXP ou loot enviados pelo navegador.
 - [x] Pré-validação C++ isolada (NÃO ligada ao GameServer): sessão, replay, monstro vivo, mapa, alcance, vertical, freshness e cooldown; 27/27 verificações C++ na ORACLE ARM64.
@@ -272,6 +280,7 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] ZIEL: VM IA em execução com passthrough PCI; sem novo benchmark de GPU. HTTPS QA 200 e asset sem sessão 401.
 - [ ] Bloqueador: resolver monstro REAL no servidor, integrar pré-validação na sessão C++ com estado autoritativo, implementar regras originais de combate e testes end-to-end. Nada publicado nem habilitado em produção.
 - [ ] Habilidades, dano, morte, EXP, loot e inventário transacional permanecem pendentes. Progresso global SEM percentual auditado.
+
 
 ## 24/10/2026 10h — gate de sessão para ataque QA isolado
 - [x] Implementado native-auth/browser_combat_session_gate.hpp: vínculo explícito a conexão autenticada, revogação, replay/cooldown e confirmação nativa antes de consumir sequência.
@@ -314,12 +323,14 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - Relatório: builds/STATUS_2026-10-24_1300_NATIVE_LOGIN_LOCKDOWN.md.
 
 ## 24/10/2026 14h — primeiro modelo original para monstro confirmado pelo servidor (QA fechado)
-- [x] Resolver visual aceita D-Meca para entidade `kind=2` SOMENTE no caminho original `char/monster/d_meca/dmeca.ini`; nenhum spawn ou dano sintético.
-- [x] GLB original `dmeca.idle.textured.glb` passou Khronos glTF Validator com 0 erros/avisos. AEROCOOL: frontend selecionado 17/17, transporte 109/109. SUPERFRAME: 5/5 com hashes idênticos.
-- [x] Publicado apenas `entity-assets.js` no IIS QA após backup/comparação de fonte. Chromium QA real entrou em Ricarten, renderizou 14 NPCs, sem erros JS.
-- [ ] Nenhum monstro real observado no QA: renderização de monstro vivo e combate NÃO demonstrados. ZIEL VM IA/GTX 1650 ativa, mas Edge headless WebGL2 inconclusivo (exit 1002); ORACLE bloqueada por autenticação Tailscale.
-- [x] Server33.exe SHA-256 preservado; QA fechado; backup/manifesto SHA-256 verificados no AEROCOOL.
-- [ ] Combate, dano, EXP, loot, animação de monstro, chat entre duas contas e paridade desktop pendentes. Sem percentual global auditado.
+- [x] Resolver visual passa a aceitar o modelo original D-Meca para entidade `kind=2` SOMENTE com o caminho nativo exato `char/monster/d_meca/dmeca.ini`, preservando 14 modelos NPC existentes. Não gera entidades, vida, combate ou spawns sintéticos.
+- [x] Modelo `dmeca.idle.textured.glb` existente validado pelo Khronos glTF Validator: zero erros e zero avisos; sem nova conversão ou cópia de asset.
+- [x] AEROCOOL: 17/17 testes de frontend selecionados, 109/109 testes de transporte. SUPERFRAME: 5/5 testes independentes, hashes de ambos os arquivos idênticos.
+- [x] Publicado apenas o módulo `entity-assets.js` no IIS QA após comparar o arquivo remoto com o original e realizar backup; SHA-256 de fonte, deploy, IIS e HTTPS coincidem.
+- [x] Chromium QA real: login, personagem, Ricarten, 14 NPCs renderizados, sem erros JS nem falhas HTTP de módulos. Nenhum monstro real observado na sessão; portanto NÃO há prova de renderização de monstro ao vivo.
+- [x] GameServer `Server33.exe` SHA-256 inalterado; asset privado 401 sem sessão; QA permanece fechado.
+- [ ] ZIEL VM IA GTX 1650 reconhecida, mas tentativa de Edge headless WebGL2 falhou (código 1002): teste GPU real inconclusivo. ORACLE indisponível por exigência de autenticação Tailscale.
+- [ ] Combate nativo, spawn de monstro QA, animações de monstro, dano, EXP, loot, chat de duas contas e paridade desktop continuam pendentes. Percentual global não auditado.
 - Relatório: builds/STATUS_2026-10-24_1400_ORIGINAL_MONSTER_MODEL_QA.md.
 
 ## 24/10/2026 15h — recuperação de carregamento de modelos originais (staging)
@@ -341,3 +352,10 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] Chromium QA real: falha de rede injetada uma vez no download original do NPC Enzo; retry após snapshot (2 tentativas), 14 NPCs recuperados, erros JS zero. Primeira tentativa de teste falhou na navegação pública, repetição passou.
 - [ ] Combate, monstro real, skills, EXP, loot, inventário transacional, WebGL2 acelerado e regressão desktop pendentes. Sem percentual global auditado.
 - Relatório: builds/STATUS_2026-10-24_1600_ENTITY_RETRY_QA_DEPLOY.md.
+
+## 24/10/2026 17h — preparação de combate em mapa nativo permitido (isolado)
+- [x] Removido hardcode de Ricarten dos resolvedores C++ isolados; índice de campo agora conferido contra tamanho da tabela nativa e ponteiro de StageArea, com estado de combate permitido derivado do servidor.
+- [x] AEROCOOL: 30/30 preflight, 35/35 gate, 65/65 resolver e 65/65 resolver ASan/UBSan; 109/109 transporte, 6/6 JS combate.
+- [x] SUPERFRAME: HTTPS 200, recurso privado 401; ZIEL VM IA com GTX 1650 VFIO verificada, sem benchmark; ORACLE requer Tailscale.
+- [ ] Ainda sem mapa real selecionado, monstro QA, integração do GameServer, dano/EXP/loot e teste cliente Windows. Código C++ NÃO implantado; piloto QA preservado.
+- Progresso global sem percentual; relatório builds/STATUS_2026-10-24_1700_COMBAT_FIELD_GUARD.md.
