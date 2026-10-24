@@ -9,3 +9,7 @@ Validação: 83/83 testes de transporte e 29/29 testes frontend. Layout Win32 me
 Publicação dos quatro módulos no IIS com backup. Corrigida regra de módulos no nginx e validada configuração. Gateway reiniciado; GameServer não foi alterado nem reiniciado. Teste público sofreu timeout de WebSocket e depois de carregamento; validação pública não concluída: última tentativa terminou em timeout de WebSocket antes da lista de personagens, sem erros JavaScript. A rota interna /game respondeu 401 ao handshake sem credenciais, como esperado; isso não comprova o caminho público autenticado. Os personagens QA possuem inventários vazios, portanto o teste conectado não prova visualização de itens não vazios.
 
 Restam ações autoritativas de itens, combate, chat, áudio, classes e mapas adicionais, compatibilidade e regressão Windows. A nova abertura foi adiada conforme solicitado.
+
+## Validação pública concluída — 23/10/2026 22:40 BRT
+
+Chromium público passou com login e personagem reais, entrada em Ricarten, painel pelo I, mochila II, consulta dos atributos e movimentação após Escape. Nenhum erro JavaScript e nenhum pacote de mutação de item ao abrir o painel. Personagem QA com zero itens. Resultado em builds/real-inventory-browser-result.json (privado). O teste pausou a abertura pelo botão existente antes do login para reduzir a carga do SwiftShader; a abertura do produto continua animada por padrão. Essa tentativa bem-sucedida não determina a causa dos timeouts anteriores; não foi necessário mudar autenticação, portas ou reiniciar o GameServer.

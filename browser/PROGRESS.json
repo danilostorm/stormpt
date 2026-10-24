@@ -159,8 +159,12 @@
     "inventoryNativeRealItemsHashMatch": 20,
     "inventoryNativeRealSaveSamples": 3,
     "inventoryTransactions": false,
-    "inventoryPublicBrowserVerified": false
+    "inventoryPublicBrowserVerified": true,
+    "inventoryShortcutPublicBrowser": true,
+    "inventorySecondaryBagPublicBrowser": true,
+    "movementAfterInventoryPublicBrowser": true,
+    "inventoryPublicQaEmpty": true
   },
-  "nextCriticalMilestone": "Validar inventário público, implementar ações autoritativas de itens e combate básico; chat, áudio e regressão Windows antes de ampliar acesso.",
+  "nextCriticalMilestone": "Ações autoritativas de itens e combate básico; chat, áudio e regressão Windows antes de ampliar acesso.",
   "latestWorkReport": "builds/STATUS_2026-10-23_INVENTORY.md"
 }
