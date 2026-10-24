@@ -182,3 +182,15 @@ Ver builds/STATUS_2026-10-23_ANIMATED_WALKING.md.
 Progresso global estimado: **64%**. <progress value="64" max="100">64%</progress>
 
 Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferreiro Gus, pose estática) integrados. GTX 1650 confirmou ~56 FPS em 1080p. Ver relatório builds/STATUS_2026-10-23_ENTITIES_GPU.md para validações e limitações. NPCs animados/interativos, combate, demais sistemas, RX550, regressão Windows e segurança para acesso geral seguem pendentes.
+
+## 24/10/2026 02h — chat nativo no piloto fechado (não concluído)
+
+- [x] PR #2, PROGRESS.json, relatórios e fontes do AEROCOOL reconciliados. Estimativa global suspensa.
+- [x] Chat opcode 22: interface, sessão e gateway. Envio CP1252, 70 bytes, rejeição de comandos, limitação de taxa, texto do servidor sem HTML. Pacote de chat inválido não derruba a sessão do mundo.
+- [x] 96/96 testes de transporte no AEROCOOL, 38/38 testes unitários selecionados do cliente, Chromium do HUD aprovado; SUPERFRAME 96/96 com fontes idênticas por SHA-256.
+- [x] ORACLE: 15/15 testes Python de pipeline em checkout isolado; logs no AEROCOOL com SHA-256.
+- [x] Código publicado somente no piloto QA /jogar com seis módulos JS; IIS e AEROCOOL conferidos por SHA-256. SQL, GameServer e StormPK não modificados.
+- [x] Chromium público autenticou conta QA, carregou Ricarten, bloqueou comando /admin, transmitiu um pacote nativo opcode 22 e permaneceu no mundo sem erro JS.
+- [ ] Recepção do chat ainda não confirmada: zero broadcasts opcode 22 retornaram ao mesmo cliente QA em 12 segundos; testar segundo cliente real e caminho de broadcast nativo.
+- [ ] ZIEL: GPU GTX 1650/driver verificados; benchmark anterior 23/10 17:44 (~56 FPS). Nova tentativa Edge headless não produziu DOM, portanto sem novo benchmark válido.
+- [ ] Falta equivalência desktop: combate, skills, NPCs transacionais, inventário editável, chat bidirecional, áudio, classes/mapas, testes RX 550, segurança geral e regressão Windows.
