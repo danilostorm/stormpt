@@ -1,3 +1,26 @@
+/**
+ * Find the nearest real NPC from a GameServer entity snapshot.
+ * Never fabricates an NPC, bypasses range validation, or sends packets.
+ * The GameServer must independently approve every interaction.
+ */
+export function nearestNpc(snapshot, observerPosition, {maxDistance=50}={}) {
+ if(!snapshot||!Array.isArray(snapshot.entities)||
+    !Array.isArray(observerPosition)||observerPosition.length!==3||
+    !observerPosition.every(Number.isFinite)||
+    !Number.isFinite(maxDistance)||maxDistance<=0||maxDistance>1000)return null;
+ const candidates=[];
+ for(const entity of snapshot.entities){
+  if(entity?.kind!==1||!Number.isSafeInteger(entity.serial)||entity.serial<=0||
+     !Array.isArray(entity.position)||entity.position.length!==3||
+     !entity.position.every(Number.isFinite))continue;
+  const distance=Math.hypot((entity.position[0]-observerPosition[0])/256,
+                            (entity.position[2]-observerPosition[2])/256);
+  if(distance<=maxDistance)candidates.push({serial:entity.serial,distance});
+ }
+ candidates.sort((a,b)=>a.distance-b.distance||a.serial-b.serial);
+ return candidates.length?candidates[0].serial:null;
+}
+
 export function radarPoint(observer,position,{radius=1000,size=128}={}){
  if(!Array.isArray(observer)||!Array.isArray(position)||observer.length!==3||position.length!==3||![...observer,...position,radius,size].every(Number.isFinite)||radius<=0||size<16)throw Error('Invalid radar coordinates');
  const x=(position[0]-observer[0])/256,z=(position[2]-observer[2])/256,distance=Math.hypot(x,z);
