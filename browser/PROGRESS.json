@@ -315,10 +315,18 @@
     "originalMonsterModelPublicQaRealMonsterRendered": false,
     "originalMonsterModelZielGpuBenchmarkVerified": false,
     "originalMonsterModelOracleAvailableAt1400": false,
-    "originalMonsterModelGameServerShaUnchanged": true
+    "originalMonsterModelGameServerShaUnchanged": true,
+    "entityAssetRetrySourceImplemented": true,
+    "entityAssetRetryFrontendSelectedTestsPassed": 11,
+    "entityAssetRetryRendererIntegrationTestsPassed": 3,
+    "entityAssetRetryTransportTestsPassed": 109,
+    "entityAssetRetrySuperframeIndependentTestsPassed": 6,
+    "entityAssetRetryZielGpuBenchmarkRun": false,
+    "entityAssetRetryIisQaPublished": false,
+    "entityAssetRetryGameServerModified": false
   },
   "nextCriticalMilestone": "Validar monstro real no QA sem afetar produção; mapear ABI e implementar combate server-authoritative, regressão cliente Windows; ver DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_1400_ORIGINAL_MONSTER_MODEL_QA.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_1500_ENTITY_ASSET_RETRY.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
