@@ -374,3 +374,12 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] Seis arquivos candidatos em builds/staging-1900-native-field-binding, readback 6/6; backup em backups/20261024-1900-native-field-binding com SHA-256 e 16/16 arquivos conferidos. Nenhum módulo ativo substituído.
 - [ ] Prévia /jogar e /jogar-beta responderam HTTP 502 nesta verificação; backend precisa diagnóstico, sem reinícios às cegas.
 - [ ] Mapa não-vila, monstro real, ataque/dano/EXP/loot, regressão Windows e benchmark GPU continuam pendentes. Relatório builds/STATUS_2026-10-24_1900_FIELD_BINDING_RECOVERY.md.
+
+## 24/10/2026, 20h — teste de bloqueio de combate no gateway QA (isolado)
+- [x] PR #2, ROADMAP.md, PROGRESS.json e relatório local 19h conferidos antes do trabalho.
+- [x] SUPERFRAME: 2/2 testes novos WebSocket/TCP com GameServer sintético: ataque rejeitado antes do login e após lista de personagens; zero pacotes de ataque encaminhados. Regressão total 116/116.
+- [x] AEROCOOL: destino de staging e backup via SMB; SSH TCP/22 ainda recusado. Nenhum módulo ativo, GameServer ou IIS alterado.
+- [x] Prévia /jogar e /jogar-beta voltaram a responder HTTP 200; recurso privado /BrowserAssets.ashx sem sessão retornou 401. TCP 1997 não alcançado a partir do SUPERFRAME (não prova serviço parado).
+- [x] ZIEL: VM IA em execução, QEMU guest agent responde; sem teste novo de Chrome/Edge/WebGL2/FPS. ORACLE não utilizado por bloqueio de autenticação Tailscale.
+- [ ] Combate verdadeiro continua BLOQUEADO: o gateway rejeita intenção de ataque, sem integração C++/GameServer, monstro vivo, dano, EXP ou loot. Mapas de combate e regressão Windows pendentes.
+- [ ] Paridade global sem percentual auditado. Relatório: builds/STATUS_2026-10-24_2000_COMBAT_GATEWAY_DENY.md.
