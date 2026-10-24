@@ -1,18 +1,29 @@
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {resolveEntityAsset} from './entity-assets.mjs';
+import {assetRetryDelayMs,shouldAttemptAssetLoad} from './entity-asset-retry.mjs';
 /** Original supported assets only. Unconverted entities remain on the live radar. */
 export class NativeEntityView{
  constructor(scene){this.scene=scene;this.loader=new GLTFLoader();this.assets=new Map();this.instances=new Map();this.snapshot=null;this.errors=[];this.disposed=false;}
  load(asset){
-  if(this.assets.has(asset.key))return;
-  const slot={template:null};this.assets.set(asset.key,slot);
-  this.loader.loadAsync('/BrowserAssets.ashx?asset='+asset.key).then(gltf=>{
+  let slot=this.assets.get(asset.key);
+  if(!slot){slot={template:null,pending:false,failures:0,nextAttemptAt:0};this.assets.set(asset.key,slot);}
+  if(!shouldAttemptAssetLoad(slot,performance.now()))return;
+  slot.pending=true;
+  Promise.resolve().then(()=>this.loader.loadAsync('/BrowserAssets.ashx?asset='+asset.key)).then(gltf=>{
    for(const node of gltf.scene.children)node.visible=typeof node.userData.nativeNpcVisible==='boolean'?node.userData.nativeNpcVisible:asset.highNodes.includes(node.name);
    let meshes=0;gltf.scene.traverse(o=>{if(o.isMesh&&o.visible&&o.parent.visible)meshes++;});
-   if(!meshes){this.disposeAsset(gltf.scene);throw Error('Original NPC mesh missing');}
+   if(!meshes){this.disposeAsset(gltf.scene);throw Error('Original entity mesh missing');}
    if(this.disposed){this.disposeAsset(gltf.scene);return;}
-   slot.template=gltf.scene;this.refresh();
-  }).catch(()=>{if(!this.disposed)this.errors.push('Original NPC asset unavailable');});
+   slot.template=gltf.scene;slot.failures=0;slot.nextAttemptAt=0;
+   this.errors=this.errors.filter(e=>e!=='Original entity asset unavailable: '+asset.key);
+   this.refresh();
+  }).catch(()=>{
+   if(this.disposed)return;
+   slot.failures=Math.min(16,slot.failures+1);
+   slot.nextAttemptAt=performance.now()+assetRetryDelayMs(slot.failures);
+   const message='Original entity asset unavailable: '+asset.key;
+   if(!this.errors.includes(message))this.errors.push(message);
+  }).finally(()=>{slot.pending=false;});
  }
  apply(snapshot){this.snapshot=snapshot;this.refresh();}
  refresh(){
