@@ -14,8 +14,15 @@ const NPC_ASSETS=Object.freeze({
  "char/npc/stella/stella.inx":Object.freeze({key:"npc-stella",highNodes:[]}),
  "char/monster/d_meca/dmeca.ini":Object.freeze({key:"npc-dmeca",highNodes:[]}),
 });
+// Exact native model path only; this never creates a monster or permits attacks.
+// The same converted original asset is already used by the NPC of this model.
+const MONSTER_ASSETS=Object.freeze({
+ "char/monster/d_meca/dmeca.ini":NPC_ASSETS["char/monster/d_meca/dmeca.ini"]
+});
 export function resolveEntityAsset(entity){
- if(entity?.kind!==1||typeof entity.bodyModel!=="string")return null;
+ if(typeof entity?.bodyModel!=="string")return null;
+ const catalog=entity.kind===1?NPC_ASSETS:entity.kind===2?MONSTER_ASSETS:null;
+ if(!catalog)return null;
  const model=entity.bodyModel.replaceAll("\\","/").toLowerCase();
- return Object.prototype.hasOwnProperty.call(NPC_ASSETS,model)?NPC_ASSETS[model]:null;
+ return Object.prototype.hasOwnProperty.call(catalog,model)?catalog[model]:null;
 }
