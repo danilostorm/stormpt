@@ -80,3 +80,39 @@ test('malformed native chat is dropped without disconnecting or spoofing message
  assert.equal(client.sendChat('Continuo no mundo'),true);
  client.close();
 });
+
+function nativeNearbyFrame(text,{serial=123,opcode=26}={}){
+ const encoded=Uint8Array.from([...text].map(c=>c.charCodeAt(0)));
+ const frame=new Uint8Array(32+encoded.length);
+ const v=new DataView(frame.buffer);
+ v.setInt32(0,frame.length,true);v.setInt32(4,opcode,true);
+ v.setUint32(12,serial,true);frame.set(encoded,16);
+ return frame;
+}
+test('native opcode 26 from nearby real player reaches chat HUD event',async()=>{
+ const events=[],client=await makeClient(events);
+ client.ws.receive(nativeNearbyFrame('Outro jogador', {serial:0xABCDEF}));
+ assert.deepEqual(events.find(e=>e.type==='chat-message')?.message,
+  {serial:0xABCDEF,text:'Outro jogador',channel:'nearby'});
+ assert.equal(client.phase,'native-world-ready');
+ client.close();
+});
+test('nearby messages before native world are not shown',async()=>{
+ const events=[],client=await makeClient(events);
+ client.phase='native-character-list-ready';
+ client.ws.receive(nativeNearbyFrame('before world'));
+ assert.equal(events.filter(e=>e.type==='chat-message').length,0);
+ client.close();
+});
+test('malformed opcode 26 is dropped while movement and chat remain available',async()=>{
+ const events=[],client=await makeClient(events);
+ const malformed=nativeNearbyFrame('Oi');
+ malformed[malformed.length-1]=42; // corrupt native zero padding
+ client.ws.receive(malformed);
+ assert.deepEqual(events.find(e=>e.type==='chat-dropped'),
+  {type:'chat-dropped',reason:'invalid-native-chat'});
+ assert.equal(events.some(e=>e.type==='chat-message'),false);
+ assert.equal(client.phase,'native-world-ready');
+ assert.equal(client.sendChat('Continuo conectado'),true);
+ client.close();
+});

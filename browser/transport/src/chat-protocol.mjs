@@ -9,6 +9,13 @@
  */
 import {inspectPacket} from './packets.mjs';
 export const CHAT_OPCODE=22;
+// Verified against Shared/smPacket.h enum (zero-based):
+// OPCODE_WHISPERMESSAGE=26 is the *nearby player* chat emitted by
+// SrcServer/src/Server/OnSever.cpp SendPlayDataGroup lines 12554-12598.
+// Outgoing text uses opcode 22; other nearby players receive opcode 26.
+// The server does not echo nearby chat to its sender.
+export const NEARBY_CHAT_OPCODE=26;
+
 export const MAX_CHAT_BYTES=70;
 const CP1252=Object.freeze({
   '\u20ac':0x80,'\u201a':0x82,'\u0192':0x83,'\u201e':0x84,'\u2026':0x85,
@@ -59,6 +66,34 @@ export function decodeChatMessage(frame){
   if(/[\u0000-\u0008\u000b-\u001f\u007f]/.test(text))throw new RangeError('Invalid text control');
   return {origin,text};
 }
+/**
+ * Decode native TRANS_CHATMESSAGE from the real C++ server, never a browser
+ * generated packet. The 16-byte header is size/code/dwIP/dwObjectSerial;
+ * szMessage starts at offset 16. Original server transmits 32 + strlen(text)
+ * bytes, including the NUL and 15 zero-filled trailing bytes from the struct.
+ * No network IP is exposed to the browser event or shown as a username.
+ */
+export function decodeNearbyChatMessage(frame){
+  if(!(frame instanceof Uint8Array))throw new TypeError('Expected Uint8Array');
+  const {opcode,length}=inspectPacket(frame);
+  if(opcode!==NEARBY_CHAT_OPCODE||length<33||length>32+255)
+    throw new RangeError('Malformed native nearby chat length');
+  const view=new DataView(frame.buffer,frame.byteOffset,frame.byteLength);
+  const serial=view.getUint32(12,true);
+  const raw=frame.subarray(16);
+  const nul=raw.indexOf(0);
+  if(nul<1||nul>255||length!==32+nul)
+    throw new RangeError('Malformed nearby chat text length');
+  // C++ TRANS_CHATMESSAGE() clears the entire message buffer. Reject
+  // non-zero trailing padding to avoid accepting hidden injected content.
+  if(raw.subarray(nul+1).some(byte=>byte!==0))
+    throw new RangeError('Nonzero nearby chat padding');
+  const text=new TextDecoder('windows-1252',{fatal:false}).decode(raw.subarray(0,nul));
+  if(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(text))
+    throw new RangeError('Invalid nearby chat controls');
+  return {serial,text,channel:'nearby'};
+}
+
 export class ChatSendThrottle{
   constructor({minIntervalMs=2000,now=()=>Date.now()}={}){
     if(!Number.isInteger(minIntervalMs)||minIntervalMs<500||minIntervalMs>30000||typeof now!=='function')

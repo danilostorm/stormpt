@@ -58,3 +58,36 @@ test('gateway-level binary validation blocks commands and malformed frames',asyn
  packet[8]=47; // An untrusted JS client could bypass the form.
  assert.throws(()=>validateClientChatFrame(packet),/Comandos/);
 });
+
+// C++ ABI cross-reference: Shared/smPacket.h TRANS_CHATMESSAGE (16-byte
+// header) and OnSever.cpp SendPlayDataGroup: size=32+strlen(message).
+test('native nearby player chat opcode 26 decodes the real server ABI',async()=>{
+ const {NEARBY_CHAT_OPCODE,decodeNearbyChatMessage}=await import('../src/chat-protocol.mjs');
+ assert.equal(NEARBY_CHAT_OPCODE,26);
+ const text=Uint8Array.from([79,108,0xe1,33]);
+ const packet=new Uint8Array(32+text.length);
+ const view=new DataView(packet.buffer);
+ view.setInt32(0,packet.length,true);
+ view.setInt32(4,26,true);
+ view.setUint32(8,0xc0a80102,true); // raw IP is never returned
+ view.setUint32(12,0x12345678,true);
+ packet.set(text,16);
+ assert.deepEqual(decodeNearbyChatMessage(packet),
+  {serial:0x12345678,text:'Olá!',channel:'nearby'});
+ assert.equal(Object.hasOwn(decodeNearbyChatMessage(packet),'origin'),false);
+});
+
+test('native nearby chat rejects spoofing, malformed sizes and hidden data',async()=>{
+ const {decodeNearbyChatMessage}=await import('../src/chat-protocol.mjs');
+ const valid=new Uint8Array(35);
+ const dv=new DataView(valid.buffer);
+ dv.setInt32(0,valid.length,true);dv.setInt32(4,26,true);
+ valid.set([79,105,33,0],16);
+ assert.equal(decodeNearbyChatMessage(valid).text,'Oi!');
+ const tamper=change=>{const p=valid.slice();change(p,new DataView(p.buffer));return p};
+ assert.throws(()=>decodeNearbyChatMessage(tamper(p=>{p[20]=42})),/padding/);
+ assert.throws(()=>decodeNearbyChatMessage(tamper(p=>{p[18]=0})),/length/);
+ assert.throws(()=>decodeNearbyChatMessage(tamper((p,v)=>v.setInt32(4,22,true))),/length/);
+ assert.throws(()=>decodeNearbyChatMessage(tamper(p=>{p[16]=10})),/controls/);
+ assert.throws(()=>decodeNearbyChatMessage(tamper((p,v)=>v.setInt32(0,999,true))));
+});

@@ -1,5 +1,5 @@
 import {NPC,encodeNpcRequest,decodeNpcReply} from '../../transport/src/npc-protocol.mjs';
-import {CHAT_OPCODE,encodeChatMessage,decodeChatMessage,ChatSendThrottle} from '../../transport/src/chat-protocol.mjs';
+import {CHAT_OPCODE,NEARBY_CHAT_OPCODE,encodeChatMessage,decodeChatMessage,decodeNearbyChatMessage,ChatSendThrottle} from '../../transport/src/chat-protocol.mjs';
 import {ENTITIES,decodeEntitySnapshot} from '../../transport/src/entity-protocol.mjs';
 import {WORLD,encodeWorldJoin,encodeMoveIntent,decodeWorldSnapshot} from '../../transport/src/world-protocol.mjs';
 import {decodeRecordWorld} from '../../transport/src/record-world.mjs';
@@ -130,14 +130,14 @@ export class StormPTBrowserSession {
             if(snapshot.sequence!==this.entitySequence+1)throw Error('Invalid entity snapshot sequence');
             this.entitySequence=snapshot.sequence;this.entityState=snapshot;this.#emit('world-entities',{snapshot});return;
           }
-          if(this.nativeLogin && opcode===CHAT_OPCODE){
+          if(this.nativeLogin && (opcode===CHAT_OPCODE||opcode===NEARBY_CHAT_OPCODE)){
             // The desktop server may emit informational chat before world entry.
             // Do not treat such packets as authenticated in-world messages.
             if(this.phase==='native-world-ready'){
               // A malformed chat broadcast must not terminate an otherwise
               // valid world session or interrupt movement. Drop only chat.
               try{
-                const message=decodeChatMessage(bytes);
+                const message=opcode===NEARBY_CHAT_OPCODE?decodeNearbyChatMessage(bytes):decodeChatMessage(bytes);
                 this.#emit('chat-message',{message});
               }catch{
                 this.#emit('chat-dropped',{reason:'invalid-native-chat'});
