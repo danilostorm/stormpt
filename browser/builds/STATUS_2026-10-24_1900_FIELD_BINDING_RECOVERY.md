@@ -31,3 +31,7 @@
 4. Medir WebGL2/FPS em Chrome/Edge acelerados pela GTX 1650 na VM IA do ZIEL.
 
 **Paridade global com o cliente desktop: sem percentual auditado. Combate nativo ainda não funcional.**
+
+### Diagnóstico adicional sem intervenção
+- Nova consulta `/jogar/`: HTTP **502** novamente. `192.168.30.169` não respondeu a 2 pings ICMP e as portas TCP 80, 443 e 1997 não foram alcançadas a partir do SUPERFRAME. Esses resultados são compatíveis com VM ou caminho de rede indisponível, mas não demonstram se a VM está desligada, isolada ou bloqueada por firewall.
+- AEROCOOL continua respondendo SMB e HTTPS localmente; não foi tentado reiniciar a VM, o GameServer, o proxy ou o host.
