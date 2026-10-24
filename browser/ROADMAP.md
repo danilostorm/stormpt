@@ -220,3 +220,14 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] Paridade de áudio desktop incompleta: passos, combate, NPCs, efeitos, músicas dos demais mapas e ajustes de mixagem/posição.
 - [ ] Chat entre dois jogadores, combate, skills, inventário transacional, mapas/classes, RX 550 e regressão Windows permanecem pendentes.
 - Progresso global sem percentual confiável. Relatório: builds/STATUS_2026-10-24_0400_AUDIO_NATIVE.md.
+
+## 24/10/2026 05h — seleção de monstros e HP autoritativo (sem combate)
+- [x] Inspecionados PR #2, DESKTOP_PARITY.md, PROGRESS.json e relatório 04h antes de modificar.
+- [x] Nova seleção de monstros (kind=2) pelo radar; nome, nível, distância e vida vêm exclusivamente de snapshots do GameServer, sem inventar dados.
+- [x] Atualização de HP/distância com snapshots seguintes, limpeza automática quando monstro desaparece; jogador/NPC não são tratados como monstro.
+- [x] UI segura por textContent, barra de vida acessível, sem emitir ataques, dano ou comandos ao servidor.
+- [x] Testes: 101/101 transporte, 43/43 frontend unitário selecionado, 9/9 pipeline Python, 8/8 radar/alvo, Chromium isolado passou; SUPERFRAME 8/8 com tar SHA-256 idêntico, ORACLE checagem sintática (Node 12 não suporta --test).
+- [x] Chromium HTTPS com conta QA REAL carregou personagem e Ricarten, novo painel presente, sem erros JS ou 4xx em módulos. Primeira tentativa desconectou antes do mundo; segunda tentativa passou. Não há monstro vivo em Ricarten QA para testar seleção com GameServer real.
+- [x] Publicado somente em /jogar QA; Nginx permitiu apenas native-target.js. Cache externo de 404 antigo exigiu import versionado ?v=20261024-0500.
+- [ ] Não é combate: faltam spawn de monstro real na sessão QA, intenção de ataque, validação nativa, dano, morte, loot, EXP e testes de segurança.
+- [ ] Nenhum percentual global de paridade com desktop calculado. Consultar DESKTOP_PARITY.md.

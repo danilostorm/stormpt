@@ -207,10 +207,19 @@
     "audioOtherMapsComplete": false,
     "desktopAudioParityComplete": false,
     "originalRicartenMusicSha256": "20245bcba2b361fcf34c0d8ebf4efd778055dc02e96db59305b462b5f846db47",
-    "originalRicartenAmbientSha256": "a1cbca6059e5645c372dfaabbe7cac89009a04905c26cb345db8a9c209bde621"
+    "originalRicartenAmbientSha256": "a1cbca6059e5645c372dfaabbe7cac89009a04905c26cb345db8a9c209bde621",
+    "monsterTargetReadOnlyUiImplemented": true,
+    "monsterTargetSourceIsGameServerSnapshot": true,
+    "monsterTargetIsCombat": false,
+    "monsterTargetPublicQaWorldSmokePassed": true,
+    "monsterTargetRealMonsterGameServerTested": false,
+    "monsterTargetQaUnitTestsPassed": 8,
+    "monsterTargetAuxSuperframeTestsPassed": 8,
+    "monsterTargetAuxOracleSyntaxOnly": true,
+    "monsterTargetZielNewFpsMeasured": false
   },
-  "nextCriticalMilestone": "Concluir NPCs pendentes/animações e implementar ações autoritativas de itens e combate; referência integral em DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_0300_CHAT_NATIVE_RECEIVE.md",
+  "nextCriticalMilestone": "Validar monstro real na sessão QA, implementar intenção de ataque/dano autoritativos e regressão Windows; ver DESKTOP_PARITY.md.",
+  "latestWorkReport": "builds/STATUS_2026-10-24_0500_MONSTER_TARGET.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {

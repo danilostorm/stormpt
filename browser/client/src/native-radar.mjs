@@ -4,8 +4,8 @@ export function radarPoint(observer,position,{radius=1000,size=128}={}){
  return distance>radius?null:{x:size/2+x*(size/2-6)/radius,y:size/2+z*(size/2-6)/radius,distance};
 }
 export class NativeRadar{
- constructor(container,onSelect=()=>{}){
-  this.onSelect=onSelect;
+ constructor(container,onSelect=()=>{},onTarget=()=>{}){
+  this.onSelect=onSelect;this.onTarget=onTarget;
   this.container=document.createElement('aside');this.container.className='world-nearby';
   this.container.innerHTML='<button type="button" aria-expanded="false">Próximos</button><canvas width="128" height="128" aria-label="Radar de entidades próximas"></canvas><ul hidden></ul>';
   container.append(this.container);this.canvas=this.container.querySelector('canvas');this.list=this.container.querySelector('ul');this.button=this.container.querySelector('button');
@@ -22,7 +22,7 @@ export class NativeRadar{
   const label='Próximos ('+rows.length+')';if(this.button.textContent!==label)this.button.textContent=label;
   if(this.list.hidden)return;this.list.replaceChildren();
   rows.sort((a,b)=>a.distance-b.distance);
-  for(const {entity:e,distance}of rows){const li=document.createElement('li');if(e.kind===1){const button=document.createElement('button');button.type='button';button.dataset.npcSerial=String(e.serial);button.textContent=e.name+' · '+Math.round(distance);button.addEventListener('click',()=>this.onSelect(e.serial));li.append(button);}else li.textContent=kinds[e.kind]+' · '+e.name+' · '+Math.round(distance);this.list.append(li);}
+  for(const {entity:e,distance}of rows){const li=document.createElement('li');if(e.kind===1){const button=document.createElement('button');button.type='button';button.dataset.npcSerial=String(e.serial);button.textContent=e.name+' · '+Math.round(distance);button.addEventListener('click',()=>this.onSelect(e.serial));li.append(button);}else if(e.kind===2){const button=document.createElement('button');button.type='button';button.dataset.monsterSerial=String(e.serial);button.textContent='Monstro · '+e.name+' · '+Math.round(distance);button.addEventListener('click',()=>this.onTarget(e.serial));li.append(button);}else li.textContent=kinds[e.kind]+' · '+e.name+' · '+Math.round(distance);this.list.append(li);}
  }
  dispose(){this.container.remove();}
 }

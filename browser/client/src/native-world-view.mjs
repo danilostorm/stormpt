@@ -4,6 +4,7 @@ import {NativeWorldAudio} from './native-audio.mjs';
 import * as THREE from 'three';
 import {NativeEntityView} from './native-entity-view.mjs';
 import {NativeRadar} from './native-radar.mjs';
+import {NativeTargetPanel} from './native-target.mjs';
 import {FrameMetrics} from './frame-metrics.mjs';
 import {AdaptiveRenderScale} from './adaptive-render-scale.mjs';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -18,7 +19,7 @@ export class NativeWorldView {
   this.container=document.createElement('section');this.container.id='stormptWorld';
   this.container.innerHTML='<style>#stormptWorld{position:fixed;inset:0;z-index:100;background:#111822;color:#f3dfb1;font:14px system-ui}#stormptWorld > canvas{width:100%;height:100%;display:block;outline:0;touch-action:none}.world-hud{position:absolute;top:18px;left:18px;background:#121720e8;border:1px solid #8b6a3b;padding:12px 18px;border-radius:8px;pointer-events:none}.world-hud strong{display:block;font-size:18px}.world-hud small{color:#c3b18d}.world-exit{position:absolute;right:18px;top:18px;padding:10px 18px;cursor:pointer}.world-help{position:absolute;bottom:18px;left:18px;padding:8px 12px;background:#121720ce;border-radius:6px;pointer-events:none}.world-controls{position:absolute;right:18px;bottom:18px;display:grid;grid-template-columns:repeat(3,42px);gap:4px}.world-nearby{position:absolute;left:18px;bottom:72px}.world-nearby button{display:block;width:128px;background:#121720e8;color:#ecdab1;border:1px solid #8b6a3b;padding:5px;cursor:pointer}.world-nearby canvas{display:block;width:128px;height:128px}.world-nearby ul{position:absolute;left:138px;bottom:0;margin:0;padding:10px 18px;min-width:180px;max-height:180px;overflow:auto;background:#121720e8;list-style:none;font-size:12px}.world-controls button{height:42px;touch-action:none;user-select:none}</style><canvas tabindex="0" aria-label="StormPT em Ricarten"></canvas><aside class="world-hud"><strong></strong><span></span><br><small>Ricarten</small></aside><button class="world-exit" type="button">Sair do mundo</button><div class="world-help">WASD / setas · Arraste para girar · Roda para aproximar</div><div class="world-controls"><span></span><button data-key="ArrowUp">▲</button><span></span><button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div>';
   document.body.append(this.container);this.canvas=this.container.querySelector('canvas');
-  this.onNpc=onNpc;this.radar=new NativeRadar(this.container,serial=>this.talkTo(serial));this.radar.update([],initial.position);
+  this.onNpc=onNpc;this.targetPanel=new NativeTargetPanel(this.container,{onClose:()=>this.canvas.focus()});this.radar=new NativeRadar(this.container,serial=>this.talkTo(serial),serial=>this.targetMonster(serial));this.radar.update([],initial.position);
   this.container.querySelector('strong').textContent=record.identity.name+' · Nível '+record.identity.level;
   this.container.querySelector('.world-hud span').textContent='Vida '+record.life.current+' / '+record.life.max;
   this.container.querySelector('.world-exit').addEventListener('click',()=>onExit());
@@ -45,6 +46,10 @@ export class NativeWorldView {
   }
   this.ready=this.load(onReady);
  }
+ targetMonster(serial){
+  if(!this.entities||!this.targetPanel.select(this.entities,serial,this.latest.position))return;
+  this.keys.clear();this.direction();this.npcPanel.hidden=true;
+ }
  talkTo(serial){
   this.inventoryPanel?.close();this.keys.clear();this.direction();this.npcPanel.hidden=false;this.npcPanel.querySelector('h2').textContent='Conversando…';this.npcPanel.querySelector('p').textContent='';this.npcPanel.querySelector('small').textContent='';this.npcPanel.querySelector('button').focus();
   try{this.onNpc(serial);}catch(e){this.npcPanel.querySelector('p').textContent=e.message;}
@@ -68,12 +73,12 @@ export class NativeWorldView {
   if(s.serial!==this.record.identity.serial||s.name!==this.record.identity.name||s.field!==3)throw Error('Estado de outro personagem.');
   if(this.motion){const moved=s.status===0&&(s.position[0]!==this.latest.position[0]||s.position[2]!==this.latest.position[2]);this.motion.setMoving(moved,performance.now());}
   this.latest=s;
-  if(this.entities)this.radar.update(this.entities.entities,s.position);
+  if(this.entities){this.radar.update(this.entities.entities,s.position);this.targetPanel.update(this.entities,s.position);}
   if(this.root){this.from.copy(this.root.position);this.to.set(s.position[0]/256,s.position[1]/256,s.position[2]/256);this.hasTarget=true;this.received=performance.now();}
  }
  applyEntities(snapshot){
   if(snapshot.observer!==this.record.identity.serial||snapshot.field!==3)throw Error('Entity snapshot belongs to another world');
-  this.entities=snapshot;this.entityView?.apply(snapshot);this.radar.update(snapshot.entities,this.latest.position);
+  this.entities=snapshot;this.entityView?.apply(snapshot);this.radar.update(snapshot.entities,this.latest.position);this.targetPanel.update(snapshot,this.latest.position);
  }
  async load(onReady){
   try{
@@ -122,11 +127,12 @@ export class NativeWorldView {
   return {...this.metrics.snapshot(),quality:this.adaptiveQuality?.snapshot(),renderer:debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER),vendor:debug?gl.getParameter(debug.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),width:r.domElement.width,height:r.domElement.height,pixelRatio:r.getPixelRatio(),calls:r.info.render.calls,triangles:r.info.render.triangles,geometries:r.info.memory.geometries,textures:r.info.memory.textures,programs:r.info.programs?.length};
  }
  entityProbe(){return this.entityView?.stats()||null;}
+ targetProbe(){return this.targetPanel?.probe()||null;}
  audioProbe(){return this.audioPanel?.snapshot()||null;}
  animationProbe(){return this.motion?.probe()||null;}
  dispose(){
   if(this.disposed)return;this.disposed=true;clearInterval(this.timer);cancelAnimationFrame(this.raf);this.abort.abort();
   if(this.root){this.world?.scene.remove(this.root);this.world?.disposeStage(this.root);}
-  this.audioPanel?.dispose();this.chatPanel?.dispose();this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
+  this.targetPanel?.dispose();this.audioPanel?.dispose();this.chatPanel?.dispose();this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
  }
 }
