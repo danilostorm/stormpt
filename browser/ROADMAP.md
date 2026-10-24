@@ -272,3 +272,31 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] ZIEL: VM IA em execução com passthrough PCI; sem novo benchmark de GPU. HTTPS QA 200 e asset sem sessão 401.
 - [ ] Bloqueador: resolver monstro REAL no servidor, integrar pré-validação na sessão C++ com estado autoritativo, implementar regras originais de combate e testes end-to-end. Nada publicado nem habilitado em produção.
 - [ ] Habilidades, dano, morte, EXP, loot e inventário transacional permanecem pendentes. Progresso global SEM percentual auditado.
+
+## 24/10/2026 10h — gate de sessão para ataque QA isolado
+- [x] Implementado native-auth/browser_combat_session_gate.hpp: vínculo explícito a conexão autenticada, revogação, replay/cooldown e confirmação nativa antes de consumir sequência.
+- [x] 22/22 verificações C++ executadas na ORACLE ARM64; 107/107 testes de transporte no AEROCOOL. SUPERFRAME conferiu hashes, mas não compilou (g++ indisponível). AEROCOOL também sem g++ no host.
+- [x] Fontes e binário de teste ARM64 consolidados no AEROCOOL, SHA-256 conferido; nenhum deploy ou mutação de GameServer/SQL.
+- [ ] O gate permanece ISOLADO, sem conexão ao GameServer. Requer sessão nativa, monstro real e regras originais de dano, EXP e loot.
+- [ ] ZIEL VM IA ativa, sem benchmark de GPU nesta execução. Progresso global não mensurado.
+- Relatório: builds/STATUS_2026-10-24_1000_COMBAT_SESSION_GATE.md.
+
+
+## 24/10/2026 11h — isolamento de sessão durante callback de combate (sem deploy)
+- [x] Corrigido no gate C++ isolado: intenção em execução impede callback reentrante; revogação/rebind (inclusive mesmo ID de conexão) invalida geração; exceção libera o bloqueio sem consumir sequência.
+- [x] 35/35 verificações C++ na ORACLE ARM64, incluindo compilação estrita e AddressSanitizer/UBSan; 107/107 transporte AEROCOOL.
+- [x] Artefato ARM64, fontes, testes e logs retornaram ao AEROCOOL com SHA-256 e backup pré-alteração.
+- [ ] NÃO integrado ao GameServer. Callback nativo deve ser transacional e sincronizado com a sessão; teste isolado não comprova ataque, dano, morte, EXP nem loot.
+- [ ] Monstro real QA, paridade desktop e teste gráfico novo permanecem pendentes; progresso global não auditado.
+- Relatório: builds/STATUS_2026-10-24_1100_COMBAT_GATE_HARDENING.md.
+
+## 24/10/2026 12h — resolvedor nativo de monstro e personagem, isolado
+- [x] PR #2, PROGRESS.json, ROADMAP.md e relatório 11h inspecionados antes de agir.
+- [x] Implementado resolvedor read-only para obter monstro real pelo serial único em chrAutoPlayer, estado smCHAR_STATE_ENEMY, stage nativo, vida e posição verificadas; sem confiar em campos de dano/posição do navegador.
+- [x] Implementado resolvedor de personagem usando conexão, conta, nome, vida, mundo ativo e heartbeat verificados pelo servidor; a integração deverá chamar Match(p,true) sob locks nativos.
+- [x] ORACLE: 56/56 testes C++11 release e 56/56 com ASan/UBSan; SUPERFRAME: 6/6 testes JS; AEROCOOL: 107/107 transporte. SHA-256 dos binários e fontes conferidos.
+- [x] ZIEL: VM IA ligada, GTX 1650 enumerada; nenhum benchmark de GPU nesta etapa sem mudança gráfica.
+- [x] AEROCOOL: HTTP 200 na rota QA e HTTP 401 no recurso privado sem sessão.
+- [ ] O resolvedor é ISOLADO, sem hook no GameServer ativo; não há ataque, dano, EXP ou loot. Precisa de monstro QA real, integração Windows sob locks e validação transacional nativa.
+- [ ] Progresso global de paridade desktop não mensurado; piloto QA fechado.
+- Relatório: builds/STATUS_2026-10-24_1200_NATIVE_MONSTER_RESOLVER.md.
