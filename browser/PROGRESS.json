@@ -293,10 +293,19 @@
     "combatNativeResolverTransportRegressionPassed": 107,
     "combatNativeResolverLiveGameServerIntegrationEnabled": false,
     "combatNativeResolverRealMonsterTested": false,
-    "combatNativeResolverZielGpuBenchmarkRun": false
+    "combatNativeResolverZielGpuBenchmarkRun": false,
+    "nativePilotLegacyDesktopLoginFallbackBlocked": true,
+    "nativePilotLegacyLoginZeroTcpBytesIntegrationPassed": true,
+    "nativePilotTransportTestsPassedAfterLockdown": 109,
+    "nativePilotSuperframeTransportTestsPassedAfterLockdown": 109,
+    "nativePilotPublicQaLoginAndWorldAfterGatewayRestart": true,
+    "nativePilotChatBetweenTwoAccountsVerified": false,
+    "nativePilotCombatDamageEnabled": false,
+    "nativePilotZielGpuBenchmarkAt1300": false,
+    "nativePilotOracleAvailableAt1300": false
   },
   "nextCriticalMilestone": "Validar monstro real no QA sem afetar produção; mapear ABI e implementar combate server-authoritative, regressão cliente Windows; ver DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_0900_COMBAT_PREFLIGHT.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_1300_NATIVE_LOGIN_LOCKDOWN.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
