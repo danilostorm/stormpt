@@ -29,3 +29,8 @@
 - GameServer original verificado novamente no Windows: SHA-256 `355970C565149F86EB302B98663ABA3CD7EA07BCD6D253434C5C83C210C4D428`, processo ativo e porta 1997 escutando.
 - SUPERFRAME conferiu independentemente os dois SHA-256 públicos e asset privado 401.
 - Sem percentual global auditado. Esta execução publica e valida a correção de renderização, NÃO habilita combate.
+
+## Consolidação
+- Arquivo de evidências aprovado no AEROCOOL: `backups/20261024-1600-entity-retry-deploy/approved-entity-retry-1600.tar.gz` (34 entradas, 34 hashes conferidos).
+- Rollback: cópia do renderer IIS anterior no AEROCOOL e em `C:\StormPT-2703\BrowserQA\Backups\20261024-1600-entity-retry` na VM Windows; cópia da configuração Nginx anterior no AEROCOOL.
+- Nenhum diretório temporário criado em ZIEL, SUPERFRAME ou ORACLE nesta execução; nenhuma limpeza remota necessária.
