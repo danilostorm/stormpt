@@ -12,12 +12,12 @@ function selected(){
  const list=Buffer.alloc(2676);list.writeInt32LE(2676);list.writeInt32LE(9,4);list.write(account,8);list.writeInt32LE(1,32);list.write('WebHero',36);list.write('body.ini',68);list.write('head.inf',132);list.writeInt32LE(1,196);list.writeInt32LE(1,200);
  g.onServer(list);g.onClient(encodeWebCharacterSelection({characterName:'WebHero'}));return g;
 }
-function record(owner=account){
- const b=Buffer.alloc(1796);b.writeInt32LE(1796);b.writeInt32LE(4,4);b.write('RC 1.50',8);b.write('WebHero',16);b.write('body.ini',48);b.write('head.inf',112);b.writeUInt32LE(1234,176);b.writeInt32LE(1,196);b.writeInt32LE(1,200);b.writeInt32LE(150,480);b.writeInt32LE(3,484);b.writeInt32LE(-1047*256,492);b.writeInt32LE(-16973*256,496);b.write(owner,748);
+function record(owner=account,field=3){
+ const b=Buffer.alloc(1796);b.writeInt32LE(1796);b.writeInt32LE(4,4);b.write('RC 1.50',8);b.write('WebHero',16);b.write('body.ini',48);b.write('head.inf',112);b.writeUInt32LE(1234,176);b.writeInt32LE(1,196);b.writeInt32LE(1,200);b.writeInt32LE(150,480);b.writeInt32LE(field,484);b.writeInt32LE(-1047*256,492);b.writeInt32LE(-16973*256,496);b.write(owner,748);
  const frame=Buffer.alloc(b.length+32);frame.writeInt32LE(frame.length);frame.writeInt32LE(4,4);frame.writeInt32LE(b.length,16);b.copy(frame,20);return frame;
 }
-function state(seq=0){
- const b=Buffer.alloc(80);for(const [o,v] of [[0,80],[4,WORLD.state],[8,1],[12,1234],[16,seq],[20,1000],[24,3],[28,-1047*256],[32,205*256],[36,-16973*256]])b.writeInt32LE(v,o);b.write('WebHero',48);return b;
+function state(seq=0,field=3){
+ const b=Buffer.alloc(80);for(const [o,v] of [[0,80],[4,WORLD.state],[8,1],[12,1234],[16,seq],[20,1000],[24,field],[28,-1047*256],[32,205*256],[36,-16973*256]])b.writeInt32LE(v,o);b.write('WebHero',48);return b;
 }
 function active(){const g=selected();g.onServer(record());g.onClient(encodeWorldJoin({serial:1234}));g.onServer(state());return g;}
 test('world requires own complete record and matching server identity',()=>{
@@ -42,7 +42,7 @@ test('world backpressure allows four intents and resumes only on server acknowle
 });
 
 import {ENTITIES} from '../src/entity-protocol.mjs';
-function entities(sequence=1,observer=1234){const b=Buffer.alloc(32);for(const[o,v]of [[0,32],[4,ENTITIES.opcode],[8,1],[12,observer],[16,sequence],[20,1000],[24,3]])b.writeUInt32LE(v,o);return b;}
+function entities(sequence=1,observer=1234,field=3){const b=Buffer.alloc(32);for(const[o,v]of [[0,32],[4,ENTITIES.opcode],[8,1],[12,observer],[16,sequence],[20,1000],[24,field]])b.writeUInt32LE(v,o);return b;}
 test('entities require confirmed world and cannot be sent by the client',()=>{const g=selected();assert.throws(()=>g.onServer(entities()),/confirmation/);const h=active();assert.throws(()=>h.onClient(entities()),/not implemented/);});
 test('entity stream enforces observer identity and independent monotonic sequence',()=>{const g=active();assert.throws(()=>g.onServer(entities(1,99)),/identity/);assert.throws(()=>g.onServer(entities(2)),/sequence/);g.onServer(entities());assert.throws(()=>g.onServer(entities()),/sequence/);g.onServer(entities(2));g.close();assert.throws(()=>g.onServer(entities(3)),/closed/);});
 
@@ -60,4 +60,18 @@ test('native guard rejects cross-field world and entity frames without advancing
  assert.throws(()=>g.onServer(wrongEntities),/identity\/size mismatch/);
  g.onServer(entities(1)); // Entity sequence also remains intact.
  assert.equal(g.phase,'native-world-active');
+});
+
+// These are synthetic records, not evidence of a live non-village stage.
+test('trusted non-Ricarten field follows the native record through world and entities',()=>{
+ const g=selected();g.onServer(record(account,4));g.onClient(encodeWorldJoin({serial:1234}));
+ assert.throws(()=>g.onServer(state(0,3)),/Invalid authoritative snapshot/);
+ g.onServer(state(0,4));g.onClient(encodeMoveIntent({sequence:1,direction:3}));
+ assert.throws(()=>g.onServer(state(1,3)),/Invalid authoritative snapshot/);
+ g.onServer(state(1,4));
+ assert.throws(()=>g.onServer(entities(1,1234,3)),/identity\/size mismatch/);
+ g.onServer(entities(1,1234,4));assert.equal(g.phase,'native-world-active');
+});
+test('native record rejects invalid field before world activation',()=>{
+ for(const field of [-1,256]){const g=selected();assert.throws(()=>g.onServer(record(account,field)),/Invalid saved field/);}
 });
