@@ -22,3 +22,15 @@ test('authoritative snapshots reject wrong identity, map, coordinates and malfor
  assert.throws(()=>decodeWorldSnapshot(b,{expectedSerial:12}));assert.throws(()=>decodeWorldSnapshot(b,{expectedName:'OtherHero'}));
  for(const [offset,value]of [[24,47],[28,999999999],[40,4096],[44,3]]){const bad=b.slice();new DataView(bad.buffer).setInt32(offset,value,true);assert.throws(()=>decodeWorldSnapshot(bad));}
 });
+
+test('world snapshots accept another map only when bound to a trusted native record field',()=>{
+ const b=new Uint8Array(80),v=new DataView(b.buffer);
+ for(const [o,n] of [[0,80],[4,WORLD.state],[8,1],[12,123],[16,0],[20,1000],[24,4],[28,256],[32,256],[36,256]])v.setInt32(o,n,true);
+ b.set(new TextEncoder().encode('WebHero'),48);
+ assert.throws(()=>decodeWorldSnapshot(b),/Invalid authoritative snapshot/);
+ assert.equal(decodeWorldSnapshot(b,{expectedField:4,expectedSerial:123,expectedName:'WebHero'}).field,4);
+ for(const field of [-1,256,NaN,3.5,'4',null])
+  assert.throws(()=>decodeWorldSnapshot(b,{expectedField:field}),/Invalid trusted world field/);
+ v.setInt32(24,3,true);
+ assert.throws(()=>decodeWorldSnapshot(b,{expectedField:4}),/Invalid authoritative snapshot/);
+});
