@@ -1,0 +1,80 @@
+[
+  {
+    "stem": "Bcn03",
+    "bones": 47,
+    "components": 752,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "Bcn05",
+    "bones": 53,
+    "components": 848,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "MN-007",
+    "bones": 64,
+    "components": 1024,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "STELLA",
+    "bones": 97,
+    "components": 1552,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "TN-005",
+    "bones": 47,
+    "components": 752,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "TN-010",
+    "bones": 50,
+    "components": 800,
+    "maxFixedPointDifference": 1
+  },
+  {
+    "stem": "TN-012",
+    "bones": 68,
+    "components": 1088,
+    "maxFixedPointDifference": 1
+  },
+  {
+    "stem": "Teacher02",
+    "bones": 49,
+    "components": 784,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "Teacher03",
+    "bones": 49,
+    "components": 784,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "cash",
+    "bones": 51,
+    "components": 816,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "dmeca",
+    "bones": 58,
+    "components": 928,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "enzo",
+    "bones": 55,
+    "components": 880,
+    "maxFixedPointDifference": 0
+  },
+  {
+    "stem": "maskedwoman",
+    "bones": 34,
+    "components": 544,
+    "maxFixedPointDifference": 0
+  }
+]

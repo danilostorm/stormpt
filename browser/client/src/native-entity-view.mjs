@@ -7,7 +7,7 @@ export class NativeEntityView{
   if(this.assets.has(asset.key))return;
   const slot={template:null};this.assets.set(asset.key,slot);
   this.loader.loadAsync('/BrowserAssets.ashx?asset='+asset.key).then(gltf=>{
-   for(const node of gltf.scene.children)node.visible=asset.highNodes.includes(node.name);
+   for(const node of gltf.scene.children)node.visible=typeof node.userData.nativeNpcVisible==='boolean'?node.userData.nativeNpcVisible:asset.highNodes.includes(node.name);
    let meshes=0;gltf.scene.traverse(o=>{if(o.isMesh&&o.visible&&o.parent.visible)meshes++;});
    if(!meshes){this.disposeAsset(gltf.scene);throw Error('Original NPC mesh missing');}
    if(this.disposed){this.disposeAsset(gltf.scene);return;}

@@ -28,6 +28,19 @@ public sealed class StormPTBrowserAssets : IHttpHandler, IReadOnlySessionState {
    case "fighter-head-animated":filename="tmh-B01.skinned.textured.glb";break;
    case "fighter-motion":filename="fighter-motion.ptan";break;
    case "npc-blacksmith":filename="TN-004.idle.textured.glb";break;
+   case "npc-mix":filename="Teacher03.idle.textured.glb";break;
+   case "npc-enzo":filename="enzo.idle.textured.glb";break;
+   case "npc-craftsman":filename="TN-012.idle.textured.glb";break;
+   case "npc-moriph":filename="MN-007.idle.textured.glb";break;
+   case "npc-beauty":filename="maskedwoman.idle.textured.glb";break;
+   case "npc-stones":filename="Bcn03.idle.textured.glb";break;
+   case "npc-guard":filename="TN-010.idle.textured.glb";break;
+   case "npc-bcn05":filename="Bcn05.idle.textured.glb";break;
+   case "npc-cash":filename="cash.idle.textured.glb";break;
+   case "npc-teacher2":filename="Teacher02.idle.textured.glb";break;
+   case "npc-tn005":filename="TN-005.idle.textured.glb";break;
+   case "npc-stella":filename="STELLA.idle.textured.glb";break;
+   case "npc-dmeca":filename="dmeca.idle.textured.glb";break;
    default:Fail(c,404);return;
   }
   string path=Path.Combine(@"C:\StormPT-2703\BrowserAssets",filename);
