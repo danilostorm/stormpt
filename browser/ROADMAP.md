@@ -194,3 +194,4 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] Recepção do chat ainda não confirmada: zero broadcasts opcode 22 retornaram ao mesmo cliente QA em 12 segundos; testar segundo cliente real e caminho de broadcast nativo.
 - [ ] ZIEL: GPU GTX 1650/driver verificados; benchmark anterior 23/10 17:44 (~56 FPS). Nova tentativa Edge headless não produziu DOM, portanto sem novo benchmark válido.
 - [ ] Falta equivalência desktop: combate, skills, NPCs transacionais, inventário editável, chat bidirecional, áudio, classes/mapas, testes RX 550, segurança geral e regressão Windows.
+- [x] Limpeza pós-consolidação verificada: temporários próprios em SUPERFRAME, ORACLE e probe Edge no ZIEL removidos após hashes e backup no AEROCOOL.
