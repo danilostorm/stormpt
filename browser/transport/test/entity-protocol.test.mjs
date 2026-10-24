@@ -12,3 +12,13 @@ test('entity identity, length, duplicates and client asset paths fail closed',()
  assert.throws(()=>decodeEntitySnapshot(packet().subarray(0,200)));
 });
 test('entity names preserve original Windows-1252 accents without HTML decoding',()=>{const b=packet();b.fill(0,76,108);b.write('Com\xe9rcio <NPC>',76,'latin1');const r=decodeEntitySnapshot(b);assert.equal(r.entities[0].name,'Comércio <NPC>');b[107]=1;assert.throws(()=>decodeEntitySnapshot(b));});
+
+test('entity snapshots are bound to the authenticated native field, not arbitrary map IDs',()=>{
+ const b=packet(0);b.writeInt32LE(4,24);
+ assert.throws(()=>decodeEntitySnapshot(b),/identity\/size mismatch/);
+ assert.equal(decodeEntitySnapshot(b,{expectedField:4,expectedObserver:1234}).field,4);
+ for(const field of [-1,256,NaN,3.5,'4',null])
+  assert.throws(()=>decodeEntitySnapshot(b,{expectedField:field}),/Invalid trusted entity field/);
+ b.writeInt32LE(3,24);
+ assert.throws(()=>decodeEntitySnapshot(b,{expectedField:4}),/identity\/size mismatch/);
+});
