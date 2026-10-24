@@ -1,4 +1,5 @@
 import {NPC,encodeNpcRequest,decodeNpcReply} from '../../transport/src/npc-protocol.mjs';
+import {CHAT_OPCODE,encodeChatMessage,decodeChatMessage,ChatSendThrottle} from '../../transport/src/chat-protocol.mjs';
 import {ENTITIES,decodeEntitySnapshot} from '../../transport/src/entity-protocol.mjs';
 import {WORLD,encodeWorldJoin,encodeMoveIntent,decodeWorldSnapshot} from '../../transport/src/world-protocol.mjs';
 import {decodeRecordWorld} from '../../transport/src/record-world.mjs';
@@ -32,6 +33,7 @@ export class StormPTBrowserSession {
     this.onEvent=onEvent;
     this.Socket=Socket;
     this.connectTimeoutMs=connectTimeoutMs;
+    this.chatThrottle=new ChatSendThrottle({minIntervalMs:2500});
     this.phase='disconnected';
     this.ws=null;
     this.observer=new CharacterSessionObserver({
@@ -128,6 +130,21 @@ export class StormPTBrowserSession {
             if(snapshot.sequence!==this.entitySequence+1)throw Error('Invalid entity snapshot sequence');
             this.entitySequence=snapshot.sequence;this.entityState=snapshot;this.#emit('world-entities',{snapshot});return;
           }
+          if(this.nativeLogin && opcode===CHAT_OPCODE){
+            // The desktop server may emit informational chat before world entry.
+            // Do not treat such packets as authenticated in-world messages.
+            if(this.phase==='native-world-ready'){
+              // A malformed chat broadcast must not terminate an otherwise
+              // valid world session or interrupt movement. Drop only chat.
+              try{
+                const message=decodeChatMessage(bytes);
+                this.#emit('chat-message',{message});
+              }catch{
+                this.#emit('chat-dropped',{reason:'invalid-native-chat'});
+              }
+            }
+            return;
+          }
           if(this.nativeLogin && opcode===NPC.reply){
             if(this.phase!=='native-world-ready'||!this.npcPending)throw Error('Unsolicited NPC reply');
             const reply=decodeNpcReply(bytes,{expectedObserver:this.worldRecord.identity.serial,expectedSequence:this.npcPending.sequence,expectedTarget:this.npcPending.target});
@@ -163,7 +180,7 @@ export class StormPTBrowserSession {
   }
   enterWorld(){
     if(!this.nativeLogin||this.phase!=='native-character-record-ready'||!this.worldRecord)throw Error('Verified native character record required');
-    this.npcSequence=0;this.npcPending=null;this.lastNpcSent=0;this.entitySequence=0;this.entityState=null;this.moveSeq=0;this.lastAck=-1;this.lastMoveSent=Date.now();this.phase='awaiting-native-world';
+    this.chatThrottle.reset();this.npcSequence=0;this.npcPending=null;this.lastNpcSent=0;this.entitySequence=0;this.entityState=null;this.moveSeq=0;this.lastAck=-1;this.lastMoveSent=Date.now();this.phase='awaiting-native-world';
     this.ws.send(encodeWorldJoin({serial:this.worldRecord.identity.serial}));
   }
   requestNpc(target){
@@ -171,6 +188,14 @@ export class StormPTBrowserSession {
     if(this.npcPending||Date.now()-this.lastNpcSent<600)throw Error('Aguarde a resposta do NPC.');
     const sequence=this.npcSequence+1,packet=encodeNpcRequest({sequence,target});
     this.ws.send(packet);this.npcSequence=sequence;this.npcPending={sequence,target};this.lastNpcSent=Date.now();return sequence;
+  }
+  sendChat(text){
+    if(!this.nativeLogin||this.phase!=='native-world-ready'||!this.ws)
+      throw Error('Entre no mundo para conversar.');
+    const frame=encodeChatMessage(text);
+    if(!this.chatThrottle.allow())throw Error('Aguarde 2,5 segundos entre mensagens.');
+    this.ws.send(frame);
+    return true;
   }
   sendMove(direction){
     if(this.phase!=='native-world-ready')throw Error('Server world confirmation required');
