@@ -23,7 +23,8 @@ export function decodeMoveIntent(input){
  if(v.getUint32(8,true)!==1||v.getUint32(20,true)||!sequence||direction>8)throw Error('Invalid move intent');
  return {sequence,direction};
 }
-export function decodeWorldSnapshot(input,{expectedSerial,expectedName}={}){
+export function decodeWorldSnapshot(input,{expectedSerial,expectedName,expectedField=3}={}){
+ if(!Number.isInteger(expectedField)||expectedField<0||expectedField>255)throw RangeError('Invalid trusted world field');
  const b=bytes(input),h=inspectPacket(b);
  if(h.opcode!==WORLD.state||h.length!==80)throw Error('Invalid native world snapshot');
  const v=new DataView(b.buffer,b.byteOffset,b.length),serial=v.getUint32(12,true),sequence=v.getUint32(16,true),tick=v.getUint32(20,true);
@@ -31,7 +32,7 @@ export function decodeWorldSnapshot(input,{expectedSerial,expectedName}={}){
  const raw=b.subarray(48,80),nul=raw.indexOf(0);
  if(nul<1||raw.subarray(0,nul).some(c=>c<32||c>126)||raw.subarray(nul).some(c=>c!==0))throw Error('Invalid snapshot name');
  const name=new TextDecoder().decode(raw.subarray(0,nul));
- if(v.getUint32(8,true)!==1||!serial||field!==3||position.some(n=>Math.abs(n)>25600000)||
+ if(v.getUint32(8,true)!==1||!serial||field!==expectedField||position.some(n=>Math.abs(n)>25600000)||
     heading<0||heading>4095||![0,1,2].includes(status))throw Error('Invalid authoritative snapshot values');
  if(expectedSerial!==undefined&&serial!==expectedSerial||expectedName!==undefined&&name!==expectedName)throw Error('World snapshot identity mismatch');
  return {serial,sequence,tick,field,position,heading,status,name};
