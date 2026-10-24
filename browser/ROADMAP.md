@@ -321,3 +321,12 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] Server33.exe SHA-256 preservado; QA fechado; backup/manifesto SHA-256 verificados no AEROCOOL.
 - [ ] Combate, dano, EXP, loot, animação de monstro, chat entre duas contas e paridade desktop pendentes. Sem percentual global auditado.
 - Relatório: builds/STATUS_2026-10-24_1400_ORIGINAL_MONSTER_MODEL_QA.md.
+
+## 24/10/2026 15h — recuperação de carregamento de modelos originais (staging)
+- [x] Corrigido o slot de GLB que nunca tentava novamente após erro transitório: backoff limitado, sem polling extra, uma requisição por modelo, recuperação e limpeza segura.
+- [x] AEROCOOL: 11/11 testes selecionados, 3/3 testes de integração Three, 109/109 transporte; SUPERFRAME: 6/6 e SHA-256 idêntico.
+- [x] ZIEL VM IA ativa e agente Windows acessível, sem benchmark GPU nesta execução; ORACLE bloqueada por Tailscale.
+- [x] HTTPS QA 200; asset privado sem sessão 401. GameServer/SQL/StormPK intocados.
+- [ ] Módulos de renderer/helper apenas preparados em staging; não implantados no IIS até validação conjunta e backup remoto.
+- [ ] Monstro real QA, combate/dano/EXP/loot, habilidades e inventário transacional continuam pendentes. Sem percentual global.
+- Relatório: builds/STATUS_2026-10-24_1500_ENTITY_ASSET_RETRY.md.
