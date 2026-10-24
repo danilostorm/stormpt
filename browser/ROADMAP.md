@@ -367,3 +367,10 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] AEROCOOL indisponível neste horário via conector SSH (erro interno); Desktop Commander informa dispositivo offline. Sem backup no AEROCOOL, sem deploy IIS, sem build GameServer, sem benchmark GPU e sem alteração do piloto QA.
 - [ ] Próximo passo: reconectar AEROCOOL, obter `ROADMAP.md`, `PROGRESS.json` e relatórios locais para conciliar divergências, sincronizar branch após testes completos, criar backup e verificar hashes. Só então inventariar campo original de combate com monstros reais e preparar transição sob validação nativa.
 - [ ] O GameServer ainda fixa Ricarten na entrada do mundo; esta mudança NÃO habilita viagem, combate, dano, EXP, loot nem inventário transacional.
+
+## 24/10/2026, 19h — regressão integral e staging no AEROCOOL via SMB
+- [x] AEROCOOL acessado via SMB a partir do SUPERFRAME; relatórios locais, ROADMAP e PROGRESS lidos e diferenças para GitHub conciliadas sem sobrescrever a raiz ativa. SSH AEROCOOL ainda recusado.
+- [x] HEAD 18h testado no SUPERFRAME com Node 22: 112/112 após npm ci; dois testes adicionais de vínculo de campo nativo passaram; regressão final 114/114. Não é teste de GameServer real.
+- [x] Seis arquivos candidatos em builds/staging-1900-native-field-binding, readback 6/6; backup em backups/20261024-1900-native-field-binding com SHA-256 e 16/16 arquivos conferidos. Nenhum módulo ativo substituído.
+- [ ] Prévia /jogar e /jogar-beta responderam HTTP 502 nesta verificação; backend precisa diagnóstico, sem reinícios às cegas.
+- [ ] Mapa não-vila, monstro real, ataque/dano/EXP/loot, regressão Windows e benchmark GPU continuam pendentes. Relatório builds/STATUS_2026-10-24_1900_FIELD_BINDING_RECOVERY.md.
