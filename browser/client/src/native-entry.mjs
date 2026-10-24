@@ -127,4 +127,4 @@ $('enterGame').addEventListener('click',async()=>{
 });
 new MutationObserver(updateButton).observe($('loggedIn'),{attributes:true,attributeFilter:['hidden']});
 updateButton();
-window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe(),entityModels:worldView?.entityProbe()})),performance:()=>worldView?.performanceProbe(),resetPerformance:()=>worldView?.resetPerformance(),close:()=>session?.close()};
+window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe(),entityModels:worldView?.entityProbe(),audio:worldView?.audioProbe()})),performance:()=>worldView?.performanceProbe(),resetPerformance:()=>worldView?.resetPerformance(),close:()=>session?.close()};

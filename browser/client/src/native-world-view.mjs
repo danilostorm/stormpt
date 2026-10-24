@@ -1,5 +1,6 @@
 import {NativeInventoryPanel} from './native-inventory.mjs';
 import {NativeChatPanel} from './native-chat.mjs';
+import {NativeWorldAudio} from './native-audio.mjs';
 import * as THREE from 'three';
 import {NativeEntityView} from './native-entity-view.mjs';
 import {NativeRadar} from './native-radar.mjs';
@@ -24,6 +25,7 @@ export class NativeWorldView {
   this.npcPanel=document.createElement('aside');this.npcPanel.className='world-npc-dialog';this.npcPanel.hidden=true;this.npcPanel.setAttribute('role','dialog');this.npcPanel.setAttribute('aria-label','Conversa com NPC');this.npcPanel.style.cssText='position:absolute;top:25%;left:50%;transform:translateX(-50%);width:min(360px,85vw);padding:18px;background:#121720f5;border:1px solid #b29355;border-radius:8px;z-index:5';this.npcPanel.innerHTML='<h2></h2><p style="white-space:pre-line"></p><small></small><br><button type="button">Fechar</button>';this.container.append(this.npcPanel);this.npcPanel.querySelector('button').addEventListener('click',()=>{this.npcPanel.hidden=true;this.canvas.focus();});
   this.inventoryPanel=new NativeInventoryPanel(this.container,{inventory:record.inventory,sheet:record.sheet,name:record.identity.name,level:record.identity.level,onClose:()=>this.canvas.focus(),onOpen:()=>{this.keys.clear();this.direction();this.npcPanel.hidden=true;}});
   this.chatPanel=new NativeChatPanel(this.container,{onSend:onChat,onClose:()=>this.canvas.focus(),onOpen:()=>{this.keys.clear();this.direction();this.inventoryPanel.close();this.npcPanel.hidden=true;}});
+  this.audioPanel=new NativeWorldAudio(this.container);
   this.abort=new AbortController();const opts={signal:this.abort.signal};
   this.canvas.addEventListener('keydown',e=>{if(e.code==='Enter'&&!e.repeat){e.preventDefault();this.chatPanel.open();return;}if(e.code==='KeyI'&&!e.repeat){e.preventDefault();this.inventoryPanel.toggle();return;}if(this.isKey(e.code)){e.preventDefault();this.keys.add(e.code);}},opts);
   this.canvas.addEventListener('keyup',e=>{if(this.isKey(e.code)){e.preventDefault();this.keys.delete(e.code);this.direction();}},opts);
@@ -120,10 +122,11 @@ export class NativeWorldView {
   return {...this.metrics.snapshot(),quality:this.adaptiveQuality?.snapshot(),renderer:debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER),vendor:debug?gl.getParameter(debug.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),width:r.domElement.width,height:r.domElement.height,pixelRatio:r.getPixelRatio(),calls:r.info.render.calls,triangles:r.info.render.triangles,geometries:r.info.memory.geometries,textures:r.info.memory.textures,programs:r.info.programs?.length};
  }
  entityProbe(){return this.entityView?.stats()||null;}
+ audioProbe(){return this.audioPanel?.snapshot()||null;}
  animationProbe(){return this.motion?.probe()||null;}
  dispose(){
   if(this.disposed)return;this.disposed=true;clearInterval(this.timer);cancelAnimationFrame(this.raf);this.abort.abort();
   if(this.root){this.world?.scene.remove(this.root);this.world?.disposeStage(this.root);}
-  this.chatPanel?.dispose();this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
+  this.audioPanel?.dispose();this.chatPanel?.dispose();this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
  }
 }

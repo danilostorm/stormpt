@@ -2,9 +2,9 @@ import './account-client.js';
 import {StormPTAccountTicket} from './account-ticket.js';
 import {StormPTBrowserSession} from './browser-session.js';
 const $=id=>document.getElementById(id);
-const state={phase:'site-login',characters:[],selected:null};
+const state={phase:'site-login',characters:[],selected:null,chatLog:[]};
 let session=null,busy=false,worldView=null,worldLoading=false,automaticAccount=null;
-function clearWorld(){worldView?.dispose();worldView=null;worldLoading=false;state.entities=null;}
+function clearWorld(){worldView?.dispose();worldView=null;worldLoading=false;state.entities=null;state.chatLog=[];}
 async function presentWorld(first){
  worldLoading=true;state.phase="loading-world";status("Carregando Ricarten…");
  const active=session;
@@ -14,11 +14,13 @@ async function presentWorld(first){
   worldView=new NativeWorldView({record:state.world,initial:active.worldState||first,
    onDirection:direction=>{if(session===active&&active.phase==="native-world-ready"){const n=active.sendMove(direction);if(n)state.movementRequests=(state.movementRequests||0)+1;}},
    onNpc:target=>active.requestNpc(target),
+   onChat:text=>active.sendChat(text),
    onExit:()=>{clearWorld();active.close();status("Você saiu do mundo. Carregue os personagens para entrar novamente.");},
    onReady:details=>{if(session===active){state.render=details;state.phase="in-world";status("Conectado em Ricarten.");}},
    onError:e=>{clearWorld();active.close();state.phase="error";status(e.message);}
   });
   if(active.entityState)worldView.applyEntities(active.entityState);
+  for(const message of state.chatLog)worldView.applyChat(message);
  }catch(e){worldLoading=false;state.phase="error";status(e.message);active.close();}
 }
 
@@ -96,6 +98,10 @@ $('enterGame').addEventListener('click',async()=>{
    }
    if(e.type==='character-world-state'){state.world=e.world;}
    if(e.type==='character-record'){state.characterLoaded=true;state.phase='joining-world';status('Entrando em Ricarten…');session.enterWorld();}
+   if(e.type==='chat-message'){
+    state.chatLog.push(e.message);if(state.chatLog.length>40)state.chatLog.shift();
+    worldView?.applyChat(e.message);
+   }
    if(e.type==='npc-reply'){state.npcReply=e.reply;worldView?.applyNpc(e.reply);}
    if(e.type==='world-entities'){state.entities=e.snapshot;if(worldView)worldView.applyEntities(e.snapshot);}
    if(e.type==='world-state'){
@@ -121,4 +127,4 @@ $('enterGame').addEventListener('click',async()=>{
 });
 new MutationObserver(updateButton).observe($('loggedIn'),{attributes:true,attributeFilter:['hidden']});
 updateButton();
-window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe(),entityModels:worldView?.entityProbe()})),performance:()=>worldView?.performanceProbe(),resetPerformance:()=>worldView?.resetPerformance(),close:()=>session?.close()};
+window.__stormptNativeQA={snapshot:()=>JSON.parse(JSON.stringify({...state,animation:worldView?.animationProbe(),entityModels:worldView?.entityProbe(),audio:worldView?.audioProbe()})),performance:()=>worldView?.performanceProbe(),resetPerformance:()=>worldView?.resetPerformance(),close:()=>session?.close()};

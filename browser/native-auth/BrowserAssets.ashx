@@ -22,6 +22,8 @@ public sealed class StormPTBrowserAssets : IHttpHandler, IReadOnlySessionState {
   string filename;
   switch(c.Request.QueryString["asset"]){
    case "ricarten":filename="Ricarten.textured.glb";break;
+   case "ricarten-music":filename="ricarten-original-music.wav";break;
+   case "ricarten-ambient":filename="ricarten-original-ambient.wav";break;
    case "fighter-body":filename="tmbB01.bind.textured.glb";break;
    case "fighter-head":filename="tmh-B01.bind.textured.glb";break;
    case "fighter-body-animated":filename="tmbB01.skinned.textured.glb";break;
@@ -45,7 +47,7 @@ public sealed class StormPTBrowserAssets : IHttpHandler, IReadOnlySessionState {
   }
   string path=Path.Combine(@"C:\StormPT-2703\BrowserAssets",filename);
   if(!File.Exists(path)){Fail(c,503);return;}
-  c.Response.ContentType=filename.EndsWith(".ptan",StringComparison.Ordinal)?"application/octet-stream":"model/gltf-binary";
+  c.Response.ContentType=filename.EndsWith(".wav",StringComparison.Ordinal)?"audio/wav":filename.EndsWith(".ptan",StringComparison.Ordinal)?"application/octet-stream":"model/gltf-binary";
   c.Response.AddHeader("Content-Length",new FileInfo(path).Length.ToString());
   if(c.Request.HttpMethod=="GET")c.Response.TransmitFile(path);
  }

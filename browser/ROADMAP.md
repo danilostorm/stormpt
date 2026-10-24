@@ -195,3 +195,28 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] ZIEL: GPU GTX 1650/driver verificados; benchmark anterior 23/10 17:44 (~56 FPS). Nova tentativa Edge headless não produziu DOM, portanto sem novo benchmark válido.
 - [ ] Falta equivalência desktop: combate, skills, NPCs transacionais, inventário editável, chat bidirecional, áudio, classes/mapas, testes RX 550, segurança geral e regressão Windows.
 - [x] Limpeza pós-consolidação verificada: temporários próprios em SUPERFRAME, ORACLE e probe Edge no ZIEL removidos após hashes e backup no AEROCOOL.
+
+## 24/10/2026 03h — recebimento do chat nativo do GameServer
+- [x] Inspeção C++ original confirmou opcode 22 (envio) e opcode 26 (recepção por jogadores próximos), sem eco ao remetente.
+- [x] Decodificador seguro de TRANS_CHATMESSAGE (16 bytes de cabeçalho, CP1252, tamanho 32+strlen, NUL/padding) sem divulgar IP ou atribuir identidade falsa.
+- [x] 101/101 transporte no AEROCOOL e SUPERFRAME; 38/38 frontend unitário no AEROCOOL; 21/21 unitários do checkout PR no SUPERFRAME; 15/15 pipeline no ORACLE.
+- [x] Chromium público QA: login, personagem, Ricarten, envio opcode 22, seis frames reais opcode 26 e uma linha de chat recebida; sem eco próprio ou erros JS.
+- [x] Dois módulos JS publicados somente no piloto QA após backup, conferência de SHA-256 e verificação HTTPS.
+- [ ] Conversa entre dois jogadores reais ainda não comprovada. Não afirmar chat multiplayer completo.
+- [ ] ZIEL: novo benchmark GTX 1650 inconclusivo (Chrome headless sem WebGL2, Edge sem DOM). Sem FPS novo.
+- [ ] Combate, skills, inventário transacional, áudio, classes/mapas, regressão Windows e abertura geral continuam pendentes.
+- Progresso global continua sem percentual confiável; ver `builds/STATUS_2026-10-24_0300_CHAT_NATIVE_RECEIVE.md`.
+
+## 24/10/2026 04h — música e ambiente ORIGINAIS de Ricarten, QA real
+- [x] Inspeção somente leitura do cliente original Windows: BGM Town 1 - Tempskron_Ricarten - When wind comes-o.bgm é RIFF/WAVE PCM estéreo 22.050 Hz, duração 95,99 s. Áudio ambiente tempskron-town.wav tem cabeçalho proprietário JODOLH; convertido para RIFF alterando somente os primeiros oito bytes, PCM original preservado (4,88 s).
+- [x] Conversor assets/converter/legacy_audio.py: conversão estrita, sem sobrescrever arquivo diferente; 6/6 testes Python.
+- [x] client/src/native-audio.mjs: controle opcional com clique do usuário, música e ambiente originais em loop, volume, desligar, pausa em segundo plano, limpeza ao sair; sem autoplay ou áudio falso.
+- [x] BrowserAssets.ashx: duas entradas novas explicitamente permitidas, MIME audio/wav, mesmas verificações de sessão ASP.NET e conta QA, sem servir assets originais publicamente.
+- [x] Teste Chromium isolado com dois WAVs originais: sem download antes do clique; reprodução, volume, pausa/reinício, descarte e ausência de erros JS.
+- [x] Teste Chromium na URL HTTPS pública com conta QA REAL: login, personagem, Ricarten, duas respostas audio/wav HTTP 200, duas trilhas tocando, sem autoplay, volume e desligamento aprovados, sem erro JS.
+- [x] 101/101 transporte, 38/38 frontend unitário e 6/6 conversor no AEROCOOL; SUPERFRAME 101/101 do PR anterior; ORACLE 15/15 pipeline. Logs auxiliares consolidados com SHA-256.
+- [x] ZIEL VM IA ativa, GTX 1650 com driver OK, Chrome/Edge presentes e /jogar HTTPS 200; nenhum benchmark novo de FPS.
+- [x] GameServer Server33.exe SHA-256 original intacto, piloto fechado e assets de áudio restritos ao QA.
+- [ ] Paridade de áudio desktop incompleta: passos, combate, NPCs, efeitos, músicas dos demais mapas e ajustes de mixagem/posição.
+- [ ] Chat entre dois jogadores, combate, skills, inventário transacional, mapas/classes, RX 550 e regressão Windows permanecem pendentes.
+- Progresso global sem percentual confiável. Relatório: builds/STATUS_2026-10-24_0400_AUDIO_NATIVE.md.
