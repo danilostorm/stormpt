@@ -240,3 +240,27 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] C++ original de dano inspecionado somente leitura; navegador NÃO deve definir dano autoritativo.
 - [ ] Ataque, dano, morte, loot e EXP reais ausentes; duplo clique em monstro real não validado.
 - Progresso global sem percentual confiável; relatório builds/STATUS_2026-10-24_0600_TARGET_NAVIGATION.md.
+
+## 24/10/2026 07h — E: interação real com NPC e marcador 3D de alvo
+- [x] NativeRadar.nearestNpc: somente snapshots autenticados, NPC real, serial/posição/tipo válidos, até 50 unidades, sem inventar NPC.
+- [x] Tecla E no NativeWorldView conversa com NPC próximo via solicitação ao GameServer. T/Shift+T, WASD e NPC por duplo clique preservados.
+- [x] Marcador circular 3D sobre monstro selecionado, posição exclusivamente do servidor; oculta ao perder alvo, sair do mundo ou morrer; recursos gráficos liberados em dispose. Sem ataque/dano.
+- [x] 53/53 testes unitários selecionados, 101/101 transporte, 6/6 SUPERFRAME e 7/7 ORACLE, hashes conferidos.
+- [x] Chromium público REAL: login, personagem, Ricarten, caminhada QA até Enzo (159→65→21 unidades), tecla E, resposta NPC status 0, diálogo exibido. Repetição em nova sessão também passou.
+- [x] Chromium anônimo: importações dos módulos novos e seleção fixture aprovadas; sem sessão assets 401.
+- [x] IIS QA, deploy AEROCOOL e HTTPS com SHA-256 idênticos; Server33.exe intacto e porta 1997 ativa; GitHub PR #2 atualizado.
+- [ ] Marcador 3D ainda NÃO testado com monstro real (sem monstro vivo em Ricarten QA); combate não implementado.
+- [ ] ZIEL GTX 1650/driver confirmados, sem benchmark novo; RX 550 e regressão Windows pendentes.
+- [ ] Combate, skills, inventário transacional, mapas/classes, chat entre dois jogadores, áudio completo e abertura geral pendentes.
+- Progresso global SEM PERCENTUAL confiável; ver DESKTOP_PARITY.md.
+
+## 24/10/2026 07h30 — detalhamento de inventário original (piloto QA)
+- [x] Inventário de consulta exibe requisitos numéricos do item (nível, força, inteligência, talento, agilidade e vitalidade), valores atuais do personagem e preço registrado, sem afirmar elegibilidade de classe/equipamento.
+- [x] Dados vêm do registro nativo decodificado, não são inventados; interface utiliza textContent e não envia mutações ao GameServer.
+- [x] Corrigida sobreposição: áudio (z-index 8) interceptava clique em atributos do inventário (z-index 6); inventário agora usa z-index 12.
+- [x] 7/7 testes unitários no AEROCOOL e SUPERFRAME; 5/5 checagens estáticas na ORACLE; SHA-256 idêntico. Chromium com fixture aprovou requisitos, preço, proteção HTML e sobreposição.
+- [x] Arquivo JS publicado apenas em /jogar-beta, SHA-256 idêntico no AEROCOOL, IIS e HTTPS.
+- [ ] Conta QA tem inventário realmente vazio (0 itens), portanto não há validação de item real, equipar/usar/mover/vender.
+- [x] Chromium público com conta QA real e GameServer: Ricarten carregado, inventário abriu, Atributos clicável acima do áudio (z-index 12 > 8), fechamento/saída funcionando, sem erros JS. Conta QA possui 0 itens; detalhes de item validados somente por fixture.
+- [ ] ZIEL GPU GTX 1650 com driver OK; smoke de WebGL2 headless inconclusivo, sem benchmark FPS novo.
+- Progresso global de paridade desktop continua sem percentual confiável.
