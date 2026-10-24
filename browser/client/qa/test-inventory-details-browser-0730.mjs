@@ -21,6 +21,14 @@ try{
  await page.goto('http://127.0.0.1:3909/',{waitUntil:'networkidle'});
  await page.waitForFunction(()=>window.ready);
  await page.locator('.world-inventory-toggle').click();
+ await page.evaluate(()=>{
+  const overlay=document.createElement('aside');
+  overlay.className='world-audio-controls';
+  overlay.style.cssText='position:absolute;top:74px;right:18px;z-index:8;width:220px;height:180px;background:#654';
+  document.querySelector('#world').append(overlay);
+ });
+ await page.locator('.world-inventory summary').click();
+ assert.equal(await page.locator('.world-inventory details').getAttribute('open'),'');
  await page.locator('.inventory-items button').click();
  const details=await page.locator('.inventory-detail').innerText();
  assert.match(details,/Preço registrado no item: 1\.234\.567 ouro/);
