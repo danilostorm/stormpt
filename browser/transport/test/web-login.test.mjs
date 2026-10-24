@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createHmac} from 'node:crypto';
 import {encodeWebLoginPacket,decodeWebLoginPacket,encodeWebCharacterSelection,readWebTicket} from '../src/web-login.mjs';
 import {GameLoginGuard} from '../src/game-login-guard.mjs';
+import {encodeOriginalLoginPacket} from '../src/login-layout.mjs';
 const account='Webqatest',sid='1'.repeat(32);
 const token=(change={})=>{
  const c={aud:'stormpt-gameserver',account,exp:Math.floor(Date.now()/1000)+45,nonce:'AAECAwQFBgcICQoLDA0ODw',sid,...change};
@@ -39,4 +40,14 @@ test('native character selection uses explicit web version, zero Windows checksu
  const v=new DataView(p.buffer);assert.equal(p.length,52);assert.equal(v.getUint32(4,true),5);
  assert.equal(v.getUint32(8,true),0);assert.equal(v.getUint32(12,true),0);assert.equal(v.getUint32(16,true),1);
  assert.throws(()=>encodeWebCharacterSelection({characterName:'x'.repeat(32)}));
+});
+
+test('native QA pilot rejects legacy login even for the same bound account',()=>{
+ const native=new GameLoginGuard({account,allowNativeWebLogin:true,sessionBinding:sid});
+ const legacy=encodeOriginalLoginPacket({account,password:'test-only',clientHash:'a'.repeat(32)});
+ assert.throws(()=>native.onClient(legacy),/Legacy desktop login disabled/);
+ assert.equal(native.phase,'awaiting-login');
+ const supported=new GameLoginGuard({account});
+ supported.onClient(legacy);
+ assert.equal(supported.phase,'awaiting-character-list');
 });
