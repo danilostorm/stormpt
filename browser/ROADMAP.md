@@ -338,6 +338,6 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] AEROCOOL: 14/14 frontend/Three, 109/109 transporte; Chromium anônimo importou os módulos sem erros.
 - [x] Chromium QA real: primeira tentativa teve timeout WebSocket; segunda passou login, Ricarten, 14 NPCs, inventário read-only e caminhada, sem erro JS.
 - [x] ZIEL VM IA: GTX 1650 OK; sem benchmark novo. SUPERFRAME: HTTP 200; ORACLE: autenticação Tailscale pendente.
-- [ ] Recuperação de download após falha real no IIS ainda não foi provocada; somente integração Three controlada comprova retry.
+- [x] Chromium QA real: falha de rede injetada uma vez no download original do NPC Enzo; retry após snapshot (2 tentativas), 14 NPCs recuperados, erros JS zero. Primeira tentativa de teste falhou na navegação pública, repetição passou.
 - [ ] Combate, monstro real, skills, EXP, loot, inventário transacional, WebGL2 acelerado e regressão desktop pendentes. Sem percentual global auditado.
 - Relatório: builds/STATUS_2026-10-24_1600_ENTITY_RETRY_QA_DEPLOY.md.
