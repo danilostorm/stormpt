@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {itemSummary} from '../src/native-inventory.mjs';
+test('item summary preserves original names and real stack quantities',()=>{assert.equal(itemSummary({name:'Poção',quantity:5}),'Poção × 5');assert.equal(itemSummary({name:'Machado',quantity:1}),'Machado');assert.equal(itemSummary({name:'<img onerror=alert(1)>',quantity:1}),'<img onerror=alert(1)>');});
+test('item summary rejects invalid stacks instead of inventing inventory quantities',()=>{for(const quantity of [0,-1,NaN,1.5])assert.throws(()=>itemSummary({name:'Item',quantity}));});

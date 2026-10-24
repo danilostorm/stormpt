@@ -1,3 +1,4 @@
+import {NativeInventoryPanel} from './native-inventory.mjs';
 import * as THREE from 'three';
 import {NativeEntityView} from './native-entity-view.mjs';
 import {NativeRadar} from './native-radar.mjs';
@@ -19,8 +20,9 @@ export class NativeWorldView {
   this.container.querySelector('.world-hud span').textContent='Vida '+record.life.current+' / '+record.life.max;
   this.container.querySelector('.world-exit').addEventListener('click',()=>onExit());
   this.npcPanel=document.createElement('aside');this.npcPanel.className='world-npc-dialog';this.npcPanel.hidden=true;this.npcPanel.setAttribute('role','dialog');this.npcPanel.setAttribute('aria-label','Conversa com NPC');this.npcPanel.style.cssText='position:absolute;top:25%;left:50%;transform:translateX(-50%);width:min(360px,85vw);padding:18px;background:#121720f5;border:1px solid #b29355;border-radius:8px;z-index:5';this.npcPanel.innerHTML='<h2></h2><p style="white-space:pre-line"></p><small></small><br><button type="button">Fechar</button>';this.container.append(this.npcPanel);this.npcPanel.querySelector('button').addEventListener('click',()=>{this.npcPanel.hidden=true;this.canvas.focus();});
+  this.inventoryPanel=new NativeInventoryPanel(this.container,{inventory:record.inventory,sheet:record.sheet,name:record.identity.name,level:record.identity.level,onClose:()=>this.canvas.focus(),onOpen:()=>{this.keys.clear();this.direction();this.npcPanel.hidden=true;}});
   this.abort=new AbortController();const opts={signal:this.abort.signal};
-  this.canvas.addEventListener('keydown',e=>{if(this.isKey(e.code)){e.preventDefault();this.keys.add(e.code);}},opts);
+  this.canvas.addEventListener('keydown',e=>{if(e.code==='KeyI'&&!e.repeat){e.preventDefault();this.inventoryPanel.toggle();return;}if(this.isKey(e.code)){e.preventDefault();this.keys.add(e.code);}},opts);
   this.canvas.addEventListener('keyup',e=>{if(this.isKey(e.code)){e.preventDefault();this.keys.delete(e.code);this.direction();}},opts);
   this.canvas.addEventListener('blur',()=>{this.keys.clear();this.direction();},opts);
   window.addEventListener('blur',()=>{this.keys.clear();this.direction();},opts);
@@ -39,7 +41,7 @@ export class NativeWorldView {
   this.ready=this.load(onReady);
  }
  talkTo(serial){
-  this.keys.clear();this.direction();this.npcPanel.hidden=false;this.npcPanel.querySelector('h2').textContent='Conversando…';this.npcPanel.querySelector('p').textContent='';this.npcPanel.querySelector('small').textContent='';this.npcPanel.querySelector('button').focus();
+  this.inventoryPanel?.close();this.keys.clear();this.direction();this.npcPanel.hidden=false;this.npcPanel.querySelector('h2').textContent='Conversando…';this.npcPanel.querySelector('p').textContent='';this.npcPanel.querySelector('small').textContent='';this.npcPanel.querySelector('button').focus();
   try{this.onNpc(serial);}catch(e){this.npcPanel.querySelector('p').textContent=e.message;}
  }
  applyNpc(reply){
@@ -115,6 +117,6 @@ export class NativeWorldView {
  dispose(){
   if(this.disposed)return;this.disposed=true;clearInterval(this.timer);cancelAnimationFrame(this.raf);this.abort.abort();
   if(this.root){this.world?.scene.remove(this.root);this.world?.disposeStage(this.root);}
-  this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
+  this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
  }
 }

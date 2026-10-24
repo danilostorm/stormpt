@@ -1,14 +1,14 @@
 {
   "project": "StormPT Web – cliente jogável em navegador sem launcher, como PWeb",
   "lastUpdateDate": "2026-10-23",
-  "completionEstimatePercent": 65,
+  "completionEstimatePercent": 66,
   "estimateScope": "100% significa jogo Priston Tale utilizável no navegador com login real, personagem, mundo, movimento, monstros, combate, inventário, chat, som, otimização e publicação. Percentual é estimativa subjetiva.",
   "weightedMilestones": [
     {
       "name": "Source real e comunicação de rede",
       "weight": 12,
       "earned": 12,
-      "note": "Gateway e perfil nativo vinculados à conta, sequência e confirmação; snapshots de entidades; 72 testes."
+      "note": "Gateway e perfil nativo vinculados à conta; 83 testes de transporte."
     },
     {
       "name": "Conversão dos arquivos do cliente",
@@ -31,19 +31,19 @@
     {
       "name": "Mecânicas e sincronização jogável",
       "weight": 25,
-      "earned": 7,
-      "note": "Movimento, colisão e posição persistentes; entidades reais e primeira conversa de NPC confirmada no GameServer e Chromium público. Transações e combate pendentes."
+      "earned": 8,
+      "note": "Movimento e diálogo NPC nativos; consulta de inventário e atributos do save real. Equipar, usar, transacionar e combater pendentes."
     },
     {
       "name": "Qualidade, áudio, compatibilidade, publicação",
       "weight": 10,
       "earned": 5,
-      "note": "GTX 1650 real a 1080p ~56 FPS; 28 testes frontend; RX550 e regressão Windows pendentes."
+      "note": "GTX 1650 real a 1080p ~56 FPS; 29 testes frontend; RX550 e regressão Windows pendentes."
     }
   ],
   "verifiedNow": {
-    "transportTests": 77,
-    "browserClientUnitTests": 27,
+    "transportTests": 83,
+    "browserClientUnitTests": 29,
     "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
     "csharpIssuerCompiled": true,
     "crossLanguageSignedTicketVerified": true,
@@ -153,8 +153,14 @@
     "unauthenticatedNpcDataNotDisclosed": true,
     "movementAfterNpcDialoguePublicBrowser": true,
     "nativeNpcMaximumRangeUnits": 160,
-    "accountFormWaitsForInitialSession": true
+    "accountFormWaitsForInitialSession": true,
+    "inventoryReadOnlyImplemented": true,
+    "inventoryNativeSyntheticByteMatch": true,
+    "inventoryNativeRealItemsHashMatch": 20,
+    "inventoryNativeRealSaveSamples": 3,
+    "inventoryTransactions": false,
+    "inventoryPublicBrowserVerified": false
   },
-  "nextCriticalMilestone": "Inventário autoritativo, combate básico, chat e áudio; regressão Windows e segurança de outras contas antes de ampliar o acesso.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_NPC_DIALOGUE.md"
+  "nextCriticalMilestone": "Validar inventário público, implementar ações autoritativas de itens e combate básico; chat, áudio e regressão Windows antes de ampliar acesso.",
+  "latestWorkReport": "builds/STATUS_2026-10-23_INVENTORY.md"
 }

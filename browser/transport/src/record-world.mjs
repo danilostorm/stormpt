@@ -1,3 +1,4 @@
+import {decodeRecordInventory,decodeCharacterSheet} from './record-inventory.mjs';
 /** Read-only map/spawn data from actual Win32 TRANS_RECORD_DATA.
  * Layout measured by record-layout.cpp compiled against the private game headers.
  * A saved position is initial server record state; it is not a movement acknowledgement.
@@ -23,5 +24,5 @@ export function decodeRecordWorld(bytes,{expectedAccount,expectedName}={}){
  if(throwCount<0||throwCount>64||itemCount<0||itemCount>200||itemSubStart<0||itemSubStart>itemCount||
     dataSize<0||1796+dataSize!==bytes.length)throw Error('Invalid record item bounds');
  return {identity,field,position:{x,z},coordinateScale:256,source:'gameserver-saved-record',masterAccount,
-  life:{current:v.getInt16(308,true),max:v.getInt16(310,true)},itemCount};
+  life:{current:v.getInt16(308,true),max:v.getInt16(310,true)},itemCount,inventory:decodeRecordInventory(bytes),sheet:decodeCharacterSheet(bytes)};
 }
