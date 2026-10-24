@@ -330,7 +330,8 @@
     "entityAssetRetryRealQaChromiumPassed": true,
     "entityAssetRetryRealQaFirstAttemptWebsocketTimeout": true,
     "entityAssetRetryRealQaNpcModelsRendered": 14,
-    "entityAssetRetryLiveFailureRecoveryTested": false
+    "entityAssetRetryLiveFailureRecoveryTested": true,
+    "entityAssetRetryLiveFailureRecoveryAttempts": 2
   },
   "nextCriticalMilestone": "Monstro nativo real em área QA e integração transacional de combate ao GameServer; validar ataque/dano/EXP/loot e regressão Windows sem afetar personagens.",
   "latestWorkReport": "builds/STATUS_2026-10-24_1600_ENTITY_RETRY_QA_DEPLOY.md",
