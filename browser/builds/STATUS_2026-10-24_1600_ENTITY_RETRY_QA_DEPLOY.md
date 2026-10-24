@@ -10,7 +10,8 @@
 ## Testes
 - AEROCOOL: 14/14 testes selecionados de frontend/Three/retry e 109/109 testes de transporte, todos aprovados.
 - Chromium anônimo HTTPS: imports reais de `native-world-view.js`, `native-radar.js` e `entity-asset-retry.js`, sem erros JS ou respostas 4xx de módulos; teste de fixture aprovado.
-- Chromium QA com conta real: primeira tentativa falhou por timeout WebSocket na autenticação (sem erro JS); segunda tentativa passou sem reiniciar serviços: login, personagem, Ricarten, 14 modelos originais de NPC, inventário vazio de consulta, movimento e saída. Erros JS: zero. Esse sucesso NÃO demonstra falha de download real seguida de recuperação nem monstro vivo.
+- Chromium QA com conta real: primeira tentativa falhou por timeout WebSocket na autenticação (sem erro JS); segunda tentativa passou sem reiniciar serviços: login, personagem, Ricarten, 14 modelos originais de NPC, inventário vazio de consulta, movimento e saída. Erros JS: zero.
+- **Teste de recuperação HTTPS/QA real:** no Chromium, uma requisição autêntica ao modelo original do NPC Enzo foi abortada intencionalmente no navegador (falha de rede controlada, sem alterar GameServer ou dados). O próximo snapshot disparou a segunda requisição, que passou; os 14 NPCs voltaram a ser renderizados, erro transitório removido e zero erros JavaScript. Resultado: 2 tentativas, 1 falha injetada e 1 recuperação. Primeira tentativa deste teste falhou ainda na navegação pública (ERR_SOCKET_NOT_CONNECTED, antes do login); repetição passou.
 - HTTPS: `/jogar/` 200; ambos módulos 200 e hash exato; `BrowserAssets.ashx?asset=npc-dmeca` sem sessão 401; acesso a web.config 403.
 - Teste WebSocket de diagnóstico com Origin correto e HTTP/1.1: rota local e pública rejeitam sem sessão (401). O timeout da primeira tentativa de login merece observação; a repetição passou.
 
@@ -25,4 +26,6 @@
 - GameServer, SQL, contas, personagens e StormPK não foram alterados intencionalmente; nenhum restart do GameServer ou gateway.
 - Piloto QA continua fechado, assets autenticados.
 - Pendente: monstro real em mapa QA apropriado, integração segura do ataque C++ ao GameServer, dano, morte, EXP, loot, habilidades, inventário transacional, regressão cliente Windows e benchmark GTX 1650 com browser acelerado.
+- GameServer original verificado novamente no Windows: SHA-256 `355970C565149F86EB302B98663ABA3CD7EA07BCD6D253434C5C83C210C4D428`, processo ativo e porta 1997 escutando.
+- SUPERFRAME conferiu independentemente os dois SHA-256 públicos e asset privado 401.
 - Sem percentual global auditado. Esta execução publica e valida a correção de renderização, NÃO habilita combate.
