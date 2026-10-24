@@ -300,3 +300,15 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] O resolvedor é ISOLADO, sem hook no GameServer ativo; não há ataque, dano, EXP ou loot. Precisa de monstro QA real, integração Windows sob locks e validação transacional nativa.
 - [ ] Progresso global de paridade desktop não mensurado; piloto QA fechado.
 - Relatório: builds/STATUS_2026-10-24_1200_NATIVE_MONSTER_RESOLVER.md.
+
+
+## 24/10/2026 13h — correção de desvio de login legado no gateway QA (implantado)
+- [x] PR #2, ROADMAP.md, PROGRESS.json e relatório 12h inspecionados antes da alteração.
+- [x] Removido fallback de login desktop legado quando allowNativeWebLogin=true; o ticket QA web exige login nativo vinculado à sessão.
+- [x] Teste WebSocket/TCP com login legado rejeitado: zero bytes encaminhados ao GameServer; modo legado não-ativado permanece compatível.
+- [x] AEROCOOL 109/109 testes transporte, Chromium QA real pós-reinício autenticou, entrou em Ricarten, enviou chat, permaneceu no mundo e não gerou erros JS.
+- [x] SUPERFRAME 109/109 testes de transporte, SHA-256 de três arquivos idênticos; GitHub PR #2 atualizado.
+- [x] ZIEL VM IA GTX 1650 ativa, sem teste de FPS; ORACLE indisponível por autenticação Tailscale.
+- [x] Gateway reiniciado isoladamente sem conexões ativas; GameServer, SQL, personagens e StormPK não alterados.
+- [ ] Combate, dano, EXP, loot, monstro QA real e chat entre duas contas ainda não demonstrados; progresso global sem percentual.
+- Relatório: builds/STATUS_2026-10-24_1300_NATIVE_LOGIN_LOCKDOWN.md.
