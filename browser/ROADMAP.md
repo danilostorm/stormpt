@@ -264,3 +264,11 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] Chromium público com conta QA real e GameServer: Ricarten carregado, inventário abriu, Atributos clicável acima do áudio (z-index 12 > 8), fechamento/saída funcionando, sem erros JS. Conta QA possui 0 itens; detalhes de item validados somente por fixture.
 - [ ] ZIEL GPU GTX 1650 com driver OK; smoke de WebGL2 headless inconclusivo, sem benchmark FPS novo.
 - Progresso global de paridade desktop continua sem percentual confiável.
+
+## 24/10/2026 09h — pré-validação isolada de intenção de ataque (QA fechado)
+- [x] Contrato de ataque básico de 28 bytes (opcode QA 0x53570007): somente sequência e serial do alvo, sem coordenadas, poder, dano, EXP ou loot enviados pelo navegador.
+- [x] Pré-validação C++ isolada (NÃO ligada ao GameServer): sessão, replay, monstro vivo, mapa, alcance, vertical, freshness e cooldown; 27/27 verificações C++ na ORACLE ARM64.
+- [x] 107/107 transporte AEROCOOL (inclui 6 testes novos); SUPERFRAME 6/6; fontes conferidas por SHA-256.
+- [x] ZIEL: VM IA em execução com passthrough PCI; sem novo benchmark de GPU. HTTPS QA 200 e asset sem sessão 401.
+- [ ] Bloqueador: resolver monstro REAL no servidor, integrar pré-validação na sessão C++ com estado autoritativo, implementar regras originais de combate e testes end-to-end. Nada publicado nem habilitado em produção.
+- [ ] Habilidades, dano, morte, EXP, loot e inventário transacional permanecem pendentes. Progresso global SEM percentual auditado.
