@@ -330,3 +330,14 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] Módulos de renderer/helper apenas preparados em staging; não implantados no IIS até validação conjunta e backup remoto.
 - [ ] Monstro real QA, combate/dano/EXP/loot, habilidades e inventário transacional continuam pendentes. Sem percentual global.
 - Relatório: builds/STATUS_2026-10-24_1500_ENTITY_ASSET_RETRY.md.
+
+## 24/10/2026 16h — retry de modelos originais publicado no QA
+- [x] PR #2, ROADMAP.md, PROGRESS.json e relatório 15h conferidos antes do deploy.
+- [x] Nginx AEROCOOL: allowlist mínima para `entity-asset-retry.js`, sintaxe testada e reload sem reiniciar GameServer.
+- [x] IIS Windows StormPT: renderer e helper publicados juntos após backup e SHA-256; fonte/IIS/HTTPS idênticos.
+- [x] AEROCOOL: 14/14 frontend/Three, 109/109 transporte; Chromium anônimo importou os módulos sem erros.
+- [x] Chromium QA real: primeira tentativa teve timeout WebSocket; segunda passou login, Ricarten, 14 NPCs, inventário read-only e caminhada, sem erro JS.
+- [x] ZIEL VM IA: GTX 1650 OK; sem benchmark novo. SUPERFRAME: HTTP 200; ORACLE: autenticação Tailscale pendente.
+- [ ] Recuperação de download após falha real no IIS ainda não foi provocada; somente integração Three controlada comprova retry.
+- [ ] Combate, monstro real, skills, EXP, loot, inventário transacional, WebGL2 acelerado e regressão desktop pendentes. Sem percentual global auditado.
+- Relatório: builds/STATUS_2026-10-24_1600_ENTITY_RETRY_QA_DEPLOY.md.
