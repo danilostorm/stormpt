@@ -49,3 +49,15 @@ test('entity stream enforces observer identity and independent monotonic sequenc
 import {NPC,encodeNpcRequest} from '../src/npc-protocol.mjs';
 function npcReply(sequence=1,target=77){const b=Buffer.alloc(320);[320,NPC.reply,1,1234,sequence,target,1,0].forEach((x,i)=>b.writeUInt32LE(x,i*4));return b;}
 test('NPC queries need active world, strict sequence, and a single pending response',()=>{const before=selected();assert.throws(()=>before.onClient(encodeNpcRequest({sequence:1,target:77})),/active world/);const g=active();assert.throws(()=>g.onServer(npcReply()),/Unsolicited/);assert.throws(()=>g.onClient(encodeNpcRequest({sequence:2,target:77})),/sequence/);g.onClient(encodeNpcRequest({sequence:1,target:77}));assert.throws(()=>g.onClient(encodeNpcRequest({sequence:2,target:77})),/pending/);assert.throws(()=>g.onServer(npcReply(1,78)),/identity/);g.onServer(npcReply());g.onClient(encodeNpcRequest({sequence:2,target:77}));g.onServer(npcReply(2));assert.equal(g.phase,'native-world-active');});
+
+test('native guard rejects cross-field world and entity frames without advancing acknowledgements',()=>{
+ const g=active();
+ g.onClient(encodeMoveIntent({sequence:1,direction:3}));
+ const wrongWorld=state(1);wrongWorld.writeInt32LE(4,24);
+ assert.throws(()=>g.onServer(wrongWorld),/Invalid authoritative snapshot/);
+ g.onServer(state(1)); // A rejected frame did not consume the pending sequence.
+ const wrongEntities=entities(1);wrongEntities.writeInt32LE(4,24);
+ assert.throws(()=>g.onServer(wrongEntities),/identity\/size mismatch/);
+ g.onServer(entities(1)); // Entity sequence also remains intact.
+ assert.equal(g.phase,'native-world-active');
+});
