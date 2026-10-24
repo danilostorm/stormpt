@@ -302,10 +302,23 @@
     "nativePilotChatBetweenTwoAccountsVerified": false,
     "nativePilotCombatDamageEnabled": false,
     "nativePilotZielGpuBenchmarkAt1300": false,
-    "nativePilotOracleAvailableAt1300": false
+    "nativePilotOracleAvailableAt1300": false,
+    "originalMonsterDmecaExactModelQaEnabled": true,
+    "originalMonsterDmecaGlbValidatorErrors": 0,
+    "originalMonsterDmecaGlbValidatorWarnings": 0,
+    "originalMonsterModelFrontendSelectedTestsPassed": 17,
+    "originalMonsterModelTransportTestsPassed": 109,
+    "originalMonsterModelSuperframeTestsPassed": 5,
+    "originalMonsterModelPublicQaLoginWorldPassed": true,
+    "originalMonsterModelPublicQaRenderedNpcCount": 14,
+    "originalMonsterModelPublicQaRealMonsterObserved": false,
+    "originalMonsterModelPublicQaRealMonsterRendered": false,
+    "originalMonsterModelZielGpuBenchmarkVerified": false,
+    "originalMonsterModelOracleAvailableAt1400": false,
+    "originalMonsterModelGameServerShaUnchanged": true
   },
   "nextCriticalMilestone": "Validar monstro real no QA sem afetar produção; mapear ABI e implementar combate server-authoritative, regressão cliente Windows; ver DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_1300_NATIVE_LOGIN_LOCKDOWN.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_1400_ORIGINAL_MONSTER_MODEL_QA.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
