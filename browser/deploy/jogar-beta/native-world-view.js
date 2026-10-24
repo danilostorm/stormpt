@@ -4,6 +4,7 @@ import {NativeWorldAudio} from './native-audio.js';
 import * as THREE from 'three';
 import {NativeEntityView} from './native-entity-view.js';
 import {NativeRadar} from './native-radar.js';
+import {NativeTargetPanel,cycleMonsterTarget} from './native-target.js?v=20261024-0600';
 import {FrameMetrics} from './frame-metrics.js';
 import {AdaptiveRenderScale} from './adaptive-render-scale.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -16,9 +17,9 @@ export class NativeWorldView {
   this.record=record;this.latest=initial;this.onDirection=onDirection;this.onExit=onExit;this.onError=onError;
   this.metrics=new FrameMetrics();this.cameraTarget=new THREE.Vector3();this.from=new THREE.Vector3();this.to=new THREE.Vector3();this.hasTarget=false;this.keys=new Set();this.yaw=.58;this.distance=110;this.pitch=.58;this.disposed=false;
   this.container=document.createElement('section');this.container.id='stormptWorld';
-  this.container.innerHTML='<style>#stormptWorld{position:fixed;inset:0;z-index:100;background:#111822;color:#f3dfb1;font:14px system-ui}#stormptWorld > canvas{width:100%;height:100%;display:block;outline:0;touch-action:none}.world-hud{position:absolute;top:18px;left:18px;background:#121720e8;border:1px solid #8b6a3b;padding:12px 18px;border-radius:8px;pointer-events:none}.world-hud strong{display:block;font-size:18px}.world-hud small{color:#c3b18d}.world-exit{position:absolute;right:18px;top:18px;padding:10px 18px;cursor:pointer}.world-help{position:absolute;bottom:18px;left:18px;padding:8px 12px;background:#121720ce;border-radius:6px;pointer-events:none}.world-controls{position:absolute;right:18px;bottom:18px;display:grid;grid-template-columns:repeat(3,42px);gap:4px}.world-nearby{position:absolute;left:18px;bottom:72px}.world-nearby button{display:block;width:128px;background:#121720e8;color:#ecdab1;border:1px solid #8b6a3b;padding:5px;cursor:pointer}.world-nearby canvas{display:block;width:128px;height:128px}.world-nearby ul{position:absolute;left:138px;bottom:0;margin:0;padding:10px 18px;min-width:180px;max-height:180px;overflow:auto;background:#121720e8;list-style:none;font-size:12px}.world-controls button{height:42px;touch-action:none;user-select:none}</style><canvas tabindex="0" aria-label="StormPT em Ricarten"></canvas><aside class="world-hud"><strong></strong><span></span><br><small>Ricarten</small></aside><button class="world-exit" type="button">Sair do mundo</button><div class="world-help">WASD / setas · Arraste para girar · Roda para aproximar</div><div class="world-controls"><span></span><button data-key="ArrowUp">▲</button><span></span><button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div>';
+  this.container.innerHTML='<style>#stormptWorld{position:fixed;inset:0;z-index:100;background:#111822;color:#f3dfb1;font:14px system-ui}#stormptWorld > canvas{width:100%;height:100%;display:block;outline:0;touch-action:none}.world-hud{position:absolute;top:18px;left:18px;background:#121720e8;border:1px solid #8b6a3b;padding:12px 18px;border-radius:8px;pointer-events:none}.world-hud strong{display:block;font-size:18px}.world-hud small{color:#c3b18d}.world-exit{position:absolute;right:18px;top:18px;padding:10px 18px;cursor:pointer}.world-help{position:absolute;bottom:18px;left:18px;padding:8px 12px;background:#121720ce;border-radius:6px;pointer-events:none}.world-controls{position:absolute;right:18px;bottom:18px;display:grid;grid-template-columns:repeat(3,42px);gap:4px}.world-nearby{position:absolute;left:18px;bottom:72px}.world-nearby button{display:block;width:128px;background:#121720e8;color:#ecdab1;border:1px solid #8b6a3b;padding:5px;cursor:pointer}.world-nearby canvas{display:block;width:128px;height:128px}.world-nearby ul{position:absolute;left:138px;bottom:0;margin:0;padding:10px 18px;min-width:180px;max-height:180px;overflow:auto;background:#121720e8;list-style:none;font-size:12px}.world-controls button{height:42px;touch-action:none;user-select:none}</style><canvas tabindex="0" aria-label="StormPT em Ricarten"></canvas><aside class="world-hud"><strong></strong><span></span><br><small>Ricarten</small></aside><button class="world-exit" type="button">Sair do mundo</button><div class="world-help">WASD / setas · T: alvo próximo · Shift+T: anterior · Duplo clique: selecionar · Arraste: câmera</div><div class="world-controls"><span></span><button data-key="ArrowUp">▲</button><span></span><button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div>';
   document.body.append(this.container);this.canvas=this.container.querySelector('canvas');
-  this.onNpc=onNpc;this.radar=new NativeRadar(this.container,serial=>this.talkTo(serial));this.radar.update([],initial.position);
+  this.onNpc=onNpc;this.targetPanel=new NativeTargetPanel(this.container,{onClose:()=>this.canvas.focus()});this.radar=new NativeRadar(this.container,serial=>this.talkTo(serial),serial=>this.targetMonster(serial));this.radar.update([],initial.position);
   this.container.querySelector('strong').textContent=record.identity.name+' · Nível '+record.identity.level;
   this.container.querySelector('.world-hud span').textContent='Vida '+record.life.current+' / '+record.life.max;
   this.container.querySelector('.world-exit').addEventListener('click',()=>onExit());
@@ -27,7 +28,7 @@ export class NativeWorldView {
   this.chatPanel=new NativeChatPanel(this.container,{onSend:onChat,onClose:()=>this.canvas.focus(),onOpen:()=>{this.keys.clear();this.direction();this.inventoryPanel.close();this.npcPanel.hidden=true;}});
   this.audioPanel=new NativeWorldAudio(this.container);
   this.abort=new AbortController();const opts={signal:this.abort.signal};
-  this.canvas.addEventListener('keydown',e=>{if(e.code==='Enter'&&!e.repeat){e.preventDefault();this.chatPanel.open();return;}if(e.code==='KeyI'&&!e.repeat){e.preventDefault();this.inventoryPanel.toggle();return;}if(this.isKey(e.code)){e.preventDefault();this.keys.add(e.code);}},opts);
+  this.canvas.addEventListener('keydown',e=>{if(e.code==='Enter'&&!e.repeat){e.preventDefault();this.chatPanel.open();return;}if(e.code==='KeyI'&&!e.repeat){e.preventDefault();this.inventoryPanel.toggle();return;}if(e.code==='KeyT'&&!e.repeat){const serial=cycleMonsterTarget(this.entities,this.targetPanel.serial,this.latest.position,{reverse:e.shiftKey});if(serial!==null){e.preventDefault();this.targetMonster(serial);}return;}if(this.isKey(e.code)){e.preventDefault();this.keys.add(e.code);}},opts);
   this.canvas.addEventListener('keyup',e=>{if(this.isKey(e.code)){e.preventDefault();this.keys.delete(e.code);this.direction();}},opts);
   this.canvas.addEventListener('blur',()=>{this.keys.clear();this.direction();},opts);
   window.addEventListener('blur',()=>{this.keys.clear();this.direction();},opts);
@@ -36,7 +37,7 @@ export class NativeWorldView {
   this.canvas.addEventListener('pointerdown',e=>{this.drag={x:e.clientX,y:e.clientY};this.canvas.setPointerCapture(e.pointerId);this.canvas.focus();},opts);
   this.canvas.addEventListener('pointermove',e=>{if(!this.drag)return;this.yaw-=(e.clientX-this.drag.x)*.008;this.pitch=Math.max(.2,Math.min(1.2,this.pitch+(e.clientY-this.drag.y)*.005));this.drag={x:e.clientX,y:e.clientY};},opts);
   this.canvas.addEventListener('pointerup',()=>{this.drag=null;},opts);
-  this.canvas.addEventListener('dblclick',e=>{if(!this.world||!this.entityView)return;const rect=this.canvas.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1),this.world.camera);const entries=[...this.entityView.instances.values()];const hit=ray.intersectObjects(entries.filter(i=>i.entity.kind===1).map(i=>i.root),true)[0];if(hit){let o=hit.object;while(o){const entry=entries.find(i=>i.root===o);if(entry){this.talkTo(entry.entity.serial);break;}o=o.parent;}}},opts);
+  this.canvas.addEventListener('dblclick',e=>{if(!this.world||!this.entityView)return;const rect=this.canvas.getBoundingClientRect(),ray=new THREE.Raycaster();ray.setFromCamera(new THREE.Vector2((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1),this.world.camera);const entries=[...this.entityView.instances.values()];const hit=ray.intersectObjects(entries.filter(i=>i.entity.kind===1||i.entity.kind===2).map(i=>i.root),true)[0];if(hit){let o=hit.object;while(o){const entry=entries.find(i=>i.root===o);if(entry){if(entry.entity.kind===1)this.talkTo(entry.entity.serial);else if(entry.entity.kind===2)this.targetMonster(entry.entity.serial);break;}o=o.parent;}}},opts);
   this.canvas.addEventListener('wheel',e=>{e.preventDefault();this.distance=Math.max(45,Math.min(220,this.distance+e.deltaY*.08));},{...opts,passive:false});
   this.canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.keys.clear();onError(Error('A conexão gráfica foi interrompida. Recarregue o jogo.'));},opts);
   for(const b of this.container.querySelectorAll('[data-key]')){
@@ -44,6 +45,10 @@ export class NativeWorldView {
    for(const event of ['pointerup','pointercancel'])b.addEventListener(event,()=>{this.keys.delete(b.dataset.key);this.direction();},opts);
   }
   this.ready=this.load(onReady);
+ }
+ targetMonster(serial){
+  if(!this.entities||!this.targetPanel.select(this.entities,serial,this.latest.position))return;
+  this.keys.clear();this.direction();this.npcPanel.hidden=true;
  }
  talkTo(serial){
   this.inventoryPanel?.close();this.keys.clear();this.direction();this.npcPanel.hidden=false;this.npcPanel.querySelector('h2').textContent='Conversando…';this.npcPanel.querySelector('p').textContent='';this.npcPanel.querySelector('small').textContent='';this.npcPanel.querySelector('button').focus();
@@ -68,12 +73,12 @@ export class NativeWorldView {
   if(s.serial!==this.record.identity.serial||s.name!==this.record.identity.name||s.field!==3)throw Error('Estado de outro personagem.');
   if(this.motion){const moved=s.status===0&&(s.position[0]!==this.latest.position[0]||s.position[2]!==this.latest.position[2]);this.motion.setMoving(moved,performance.now());}
   this.latest=s;
-  if(this.entities)this.radar.update(this.entities.entities,s.position);
+  if(this.entities){this.radar.update(this.entities.entities,s.position);this.targetPanel.update(this.entities,s.position);}
   if(this.root){this.from.copy(this.root.position);this.to.set(s.position[0]/256,s.position[1]/256,s.position[2]/256);this.hasTarget=true;this.received=performance.now();}
  }
  applyEntities(snapshot){
   if(snapshot.observer!==this.record.identity.serial||snapshot.field!==3)throw Error('Entity snapshot belongs to another world');
-  this.entities=snapshot;this.entityView?.apply(snapshot);this.radar.update(snapshot.entities,this.latest.position);
+  this.entities=snapshot;this.entityView?.apply(snapshot);this.radar.update(snapshot.entities,this.latest.position);this.targetPanel.update(snapshot,this.latest.position);
  }
  async load(onReady){
   try{
@@ -122,11 +127,12 @@ export class NativeWorldView {
   return {...this.metrics.snapshot(),quality:this.adaptiveQuality?.snapshot(),renderer:debug?gl.getParameter(debug.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER),vendor:debug?gl.getParameter(debug.UNMASKED_VENDOR_WEBGL):gl.getParameter(gl.VENDOR),width:r.domElement.width,height:r.domElement.height,pixelRatio:r.getPixelRatio(),calls:r.info.render.calls,triangles:r.info.render.triangles,geometries:r.info.memory.geometries,textures:r.info.memory.textures,programs:r.info.programs?.length};
  }
  entityProbe(){return this.entityView?.stats()||null;}
+ targetProbe(){return this.targetPanel?.probe()||null;}
  audioProbe(){return this.audioPanel?.snapshot()||null;}
  animationProbe(){return this.motion?.probe()||null;}
  dispose(){
   if(this.disposed)return;this.disposed=true;clearInterval(this.timer);cancelAnimationFrame(this.raf);this.abort.abort();
   if(this.root){this.world?.scene.remove(this.root);this.world?.disposeStage(this.root);}
-  this.audioPanel?.dispose();this.chatPanel?.dispose();this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
+  this.targetPanel?.dispose();this.audioPanel?.dispose();this.chatPanel?.dispose();this.inventoryPanel?.dispose();this.entityView?.dispose();this.radar?.dispose();this.world?.dispose();this.container.remove();
  }
 }

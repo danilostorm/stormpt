@@ -231,3 +231,12 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] Publicado somente em /jogar QA; Nginx permitiu apenas native-target.js. Cache externo de 404 antigo exigiu import versionado ?v=20261024-0500.
 - [ ] Não é combate: faltam spawn de monstro real na sessão QA, intenção de ataque, validação nativa, dano, morte, loot, EXP e testes de segurança.
 - [ ] Nenhum percentual global de paridade com desktop calculado. Consultar DESKTOP_PARITY.md.
+
+## 24/10/2026 06h — seleção por teclado e duplo clique, QA fechado
+- [x] T/Shift+T percorrem somente monstros vivos dos snapshots autoritativos; duplo clique preparado para modelos suportados, preservando NPCs.
+- [x] 47/47 frontend, 101/101 transporte, 4/4 novos testes, Chromium isolado e QA público com conta real aprovados; sem monstro real para testar seleção ao vivo.
+- [x] SUPERFRAME 4/4; ORACLE SHA idêntico e validação estática Python, Node 12 incompatível; ZIEL GTX 1650/HTTP 200 verificados, sem FPS novo.
+- [x] Publicação QA com hashes IIS/HTTPS idênticos, backup prévio e GameServer preservado.
+- [x] C++ original de dano inspecionado somente leitura; navegador NÃO deve definir dano autoritativo.
+- [ ] Ataque, dano, morte, loot e EXP reais ausentes; duplo clique em monstro real não validado.
+- Progresso global sem percentual confiável; relatório builds/STATUS_2026-10-24_0600_TARGET_NAVIGATION.md.

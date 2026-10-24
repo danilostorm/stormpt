@@ -25,6 +25,27 @@ export function monsterTarget(snapshot, serial, observerPosition) {
     source:'gameserver-entity-snapshot',sequence:snapshot.sequence
   });
 }
+/**
+ * Cycle ONLY through monsters supplied by the latest authenticated GameServer
+ * entity snapshot. Never sends combat packets or creates synthetic enemies.
+ * Key T cycles nearest-first; Shift+T cycles backwards. Returns null if empty.
+ */
+export function cycleMonsterTarget(snapshot, currentSerial, observerPosition, {reverse=false, maxDistance=1000}={}) {
+  if (!snapshot || !Array.isArray(snapshot.entities) ||
+      !Array.isArray(observerPosition) || observerPosition.length!==3 ||
+      !observerPosition.every(Number.isFinite) ||
+      !Number.isFinite(maxDistance) || maxDistance<=0) return null;
+  const valid=snapshot.entities
+    .filter(e=>e?.kind===2)
+    .map(e=>monsterTarget(snapshot,e.serial,observerPosition))
+    .filter(e=>e && e.life>0 && e.distance<=maxDistance)
+    .sort((a,b)=>a.distance-b.distance || a.serial-b.serial);
+  if(!valid.length)return null;
+  const index=valid.findIndex(e=>e.serial===currentSerial);
+  return valid[(index<0 ? (reverse?valid.length-1:0) :
+    (index+(reverse?-1:1)+valid.length)%valid.length)].serial;
+}
+
 export class NativeTargetPanel {
   constructor(container,{onClose=()=>{}}={}) {
     this.onClose=onClose;this.serial=null;this.snapshotData=null;
