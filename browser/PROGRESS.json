@@ -4,7 +4,7 @@
   "completionEstimatePercent": null,
   "estimateScope": "Equivalência funcional com o cliente desktop deste StormPT. Estimativa global suspensa até inventário e critérios verificáveis; consultar DESKTOP_PARITY.md.",
   "verifiedNow": {
-    "transportTests": 101,
+    "transportTests": 107,
     "browserClientUnitTests": 38,
     "webglScene": "129 malhas AncientW e 15 MmbA01 no Chromium com fixture de QA",
     "csharpIssuerCompiled": true,
@@ -250,10 +250,21 @@
     "nativeInventoryDetailUnitTests": 7,
     "nativeInventoryDetailsPublicSha256": "d02498ef23d279ede5fe25f708adc228a34192e9f9f66ea0dd1d947033af2508",
     "inventoryDetailPublicBrowserQA": "passed-real-account-empty-inventory",
-    "inventoryAudioLayerRealBrowserVerified": true
+    "inventoryAudioLayerRealBrowserVerified": true,
+    "combatIntentQaOnlyWireContractImplemented": true,
+    "combatIntentWireBytes": 28,
+    "combatIntentWireOpcode": "0x53570007",
+    "combatIntentWireTransportSuitePassed": 107,
+    "combatIntentWireNewTestsPassed": 6,
+    "combatIntentNativePreflightChecksPassed": 27,
+    "combatIntentAuxSuperframeTestsPassed": 6,
+    "combatIntentAuxOracleCppChecksPassed": 27,
+    "combatIntentLiveGameServerIntegrationEnabled": false,
+    "combatIntentLiveMonsterAndDamageTested": false,
+    "combatIntentZielGpuBenchmarkRun": false
   },
   "nextCriticalMilestone": "Validar monstro real no QA sem afetar produção; mapear ABI e implementar combate server-authoritative, regressão cliente Windows; ver DESKTOP_PARITY.md.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_0600_TARGET_NAVIGATION.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_0900_COMBAT_PREFLIGHT.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
