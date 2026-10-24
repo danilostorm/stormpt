@@ -50,6 +50,7 @@ export class GameLoginGuard {
   #creatingName=null;
   #recordAssembler=new RecordAssembler();
   #serial=0;
+  #worldField=3; // Overwritten only by the authenticated native character record.
   #sentSequence=0;
   #ackSequence=-1;
   #entitySequence=0;
@@ -166,13 +167,13 @@ export class GameLoginGuard {
       const record=this.#recordAssembler.feed(packet);
       if(record){
         const decoded=decodeRecordWorld(record,{expectedAccount:this.#account,expectedName:this.#selectedName});
-        this.#serial=decoded.identity.serial;this.#state='native-record-received';
+        this.#serial=decoded.identity.serial;this.#worldField=decoded.field;this.#state='native-record-received';
       }
       return;
     }
     if(this.#nativeLogin && opcode===ENTITIES.opcode){
       if(this.#state!=='native-world-active')throw Error('World confirmation required before entities');
-      const snapshot=decodeEntitySnapshot(packet,{expectedObserver:this.#serial});
+      const snapshot=decodeEntitySnapshot(packet,{expectedObserver:this.#serial,expectedField:this.#worldField});
       if(snapshot.sequence!==this.#entitySequence+1)throw Error('Invalid entity sequence');
       this.#entitySequence=snapshot.sequence;return;
     }
@@ -183,7 +184,7 @@ export class GameLoginGuard {
     }
     if(this.#nativeLogin && opcode===WORLD.state){
       if(!['awaiting-native-world','native-world-active'].includes(this.#state))throw Error('Unsolicited world confirmation');
-      const result=decodeWorldSnapshot(packet,{expectedSerial:this.#serial,expectedName:this.#selectedName});
+      const result=decodeWorldSnapshot(packet,{expectedSerial:this.#serial,expectedName:this.#selectedName,expectedField:this.#worldField});
       if(result.sequence!==this.#ackSequence+1||result.sequence>this.#sentSequence)throw Error('Unexpected movement acknowledgement');
       this.#ackSequence=result.sequence;this.#state='native-world-active';return;
     }
