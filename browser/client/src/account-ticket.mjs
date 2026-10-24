@@ -28,7 +28,7 @@ export class StormPTAccountTicket {
       headers:{'Accept':'application/json','X-StormPT-Csrf':this.csrf},
       signal
     });
-    if(!response.ok)throw new Error('Account ticket issuer unavailable ('+response.status+')');
+    if(!response.ok)throw new Error(response.status===403?'Esta conta ainda não está autorizada para o acesso antecipado.':response.status===401?'Sua sessão expirou. Saia da conta e entre novamente.':'Não foi possível conectar ao StormPT. Tente novamente.');
     if(response.redirected || new URL(response.url).origin!==this.origin)
       throw new Error('Unexpected issuer response origin');
     if(!response.headers.get('content-type')?.toLowerCase().startsWith('application/json'))

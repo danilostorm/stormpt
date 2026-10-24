@@ -25,6 +25,18 @@ inline std::string Environment(const char* name){
     char value[512]={0}; DWORD n=GetEnvironmentVariableA(name,value,sizeof(value));
     return n>0&&n<sizeof(value)?std::string(value,n):std::string();
 }
+inline bool PilotAccountAllowed(const std::string& account){
+    if(account.empty())return false;
+    const auto legacy=Environment("STORMPT_WEB_QA_ACCOUNT");
+    if(!legacy.empty()&&account==legacy)return true;
+    std::ifstream file("C:/StormPT-2703/BrowserSecrets/qa-account.txt");
+    std::string line;
+    while(std::getline(file,line)){
+        if(!line.empty()&&line.back()=='\r')line.pop_back();
+        if(!line.empty()&&line==account)return true;
+    }
+    return false;
+}
 inline TicketVerifier* Verifier(){
     static std::unique_ptr<TicketVerifier> verifier=[](){
         const auto path=Environment("STORMPT_GAMESERVER_KEY_PATH");
@@ -66,12 +78,10 @@ inline bool Authorize(rsPLAYINFO* player,const char* data,size_t size,Claims& cl
     if(!end||end==envelope.ticket)return false;
     // Zero padding prevents hidden payloads and ambiguous wire representations.
     for(auto p=end;p<envelope.ticket+sizeof(envelope.ticket);++p)if(*p)return false;
-    const auto allowed=Environment("STORMPT_WEB_QA_ACCOUNT");
-    if(allowed.empty())return false;
     auto verifier=Verifier();
     if(!verifier||!verifier->consume(std::string(envelope.ticket,static_cast<size_t>(end-envelope.ticket)),
         static_cast<std::int64_t>(std::time(nullptr)),claims))return false;
-    if(claims.account!=allowed)return false;
+    if(!PilotAccountAllowed(claims.account))return false;
     std::lock_guard<std::mutex> lock(sessionsMutex);
     sessions[player]={player->dwConnectCount,claims.account,claims.sid,false};
     return true;

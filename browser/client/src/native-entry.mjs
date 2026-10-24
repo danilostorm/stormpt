@@ -3,7 +3,7 @@ import {StormPTAccountTicket} from './account-ticket.mjs';
 import {StormPTBrowserSession} from './browser-session.mjs';
 const $=id=>document.getElementById(id);
 const state={phase:'site-login',characters:[],selected:null};
-let session=null,busy=false,worldView=null,worldLoading=false;
+let session=null,busy=false,worldView=null,worldLoading=false,automaticAccount=null;
 function clearWorld(){worldView?.dispose();worldView=null;worldLoading=false;state.entities=null;}
 async function presentWorld(first){
  worldLoading=true;state.phase="loading-world";status("Carregando Ricarten…");
@@ -24,18 +24,26 @@ async function presentWorld(first){
 
 const panel=document.createElement('section');panel.id='nativeCharacters';
 panel.setAttribute('aria-live','polite');
-$('loggedIn').append(panel);
+$('loggedIn').insertBefore(panel,$('logout'));
+panel.setAttribute('aria-label','Personagens da conta');
 function status(text){$('accountStatus').textContent=text;}
 function updateButton(){
  const signedIn=!$('loggedIn').hidden;
  $('enterGame').disabled=!signedIn||busy;
- $('enterGame').textContent='Carregar personagens';
- if(!signedIn){clearWorld();session?.close();session=null;panel.replaceChildren();state.phase='site-login';}
+ $('enterGame').textContent=busy?'Conectando…':'Tentar novamente';
+ $('enterGame').hidden=state.phase==='character-list';
+ const account=$('accountName').textContent.trim();
+ if(signedIn&&account&&automaticAccount!==account){
+  automaticAccount=account;queueMicrotask(()=>{if(!$('loggedIn').hidden&&!busy)$('enterGame').click();});
+ }
+ if(!signedIn){automaticAccount=null;clearWorld();session?.close();session=null;panel.replaceChildren();state.phase='site-login';}
 }
 function renderList(list){
  state.characters=list.characters;
+ $('loggedIn').querySelector('h1').textContent='SELECIONE SEU PERSONAGEM';
+ $('enterGame').hidden=true;
  panel.replaceChildren();
- const title=document.createElement('h2');title.textContent='Seus personagens';panel.append(title);
+ const intro=$('loggedIn').querySelector('p.small');if(intro)intro.hidden=true;
  if(!list.characters.length){
   const message=document.createElement('p');message.textContent='Sua conta ainda não tem personagens.';
   panel.append(message);status('Conta autenticada no servidor StormPT.');
@@ -103,7 +111,7 @@ $('enterGame').addEventListener('click',async()=>{
    if(e.type==='protocol-error'){state.phase='error';status('Falha no protocolo do servidor.');}
    if(e.type==='transport-closed')clearWorld();
    if(e.type==='transport-closed'&&!['site-login','error','character-created','character-creation-denied'].includes(state.phase)){
-    state.phase='disconnected';status('Conexão com o servidor encerrada.');
+    state.phase='disconnected';status('Conexão com o servidor encerrada.');updateButton();
    }
   }});
   state.phase='connecting';

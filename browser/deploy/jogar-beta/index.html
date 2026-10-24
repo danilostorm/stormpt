@@ -5,7 +5,7 @@
 <div id="openingLoading" role="status" aria-live="polite" aria-busy="true"><strong>STORM<span>PT</span></strong><p>Preparando a abertura…</p><progress id="openingProgress" max="100" value="0" aria-label="Carregando cenário"></progress></div>
 <style>#openingLoading{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#25303c,#090d14 75%);color:#ead9b7;font:14px Georgia,serif}#openingLoading[hidden]{display:none}#openingLoading strong{font-size:46px;letter-spacing:6px;color:#f3e2b9;text-shadow:0 2px 20px #be8c4a66}#openingLoading strong span{color:#c39a5d}#openingLoading p{margin:25px 0 16px}#openingProgress{width:min(260px,70vw);height:5px;accent-color:#bd9658}#openingProgress::-webkit-progress-bar{background:#31343d;border-radius:5px}#openingProgress::-webkit-progress-value{background:#bd9658;border-radius:5px}</style>
 <script>setTimeout(()=>{const e=document.getElementById('openingLoading');if(e){e.hidden=true;e.setAttribute('aria-busy','false')}},12000)</script><noscript><style>#openingLoading{display:none}</style></noscript>
-<header><strong>✦ STORM<span>PT</span> WEB</strong><small>PILOTO FECHADO · CAMINHADA QA</small></header>
+<header><strong>✦ STORM<span>PT</span> WEB</strong><small>ACESSO ANTECIPADO</small></header>
 <main class="stage"><section class="panel" id="entryPanel">
 <section id="loggedOut"><h1>BEM-VINDO</h1><div class="ornament">─ ✧ ─</div>
 <form id="loginForm">
@@ -14,13 +14,13 @@
 <div class="remember"><input id="rememberUser" type="checkbox"><label for="rememberUser">Lembrar apenas o nome da conta</label></div>
 <button class="primary" id="loginSubmit" type="submit" disabled>Entrar</button></form>
 <div class="actions"><button type="button" id="openSignup">CRIAR CONTA</button><button type="button" id="forgotPassword">ESQUECI A SENHA</button></div></section>
-<section id="loggedIn" hidden><h1>CONTA CONECTADA</h1><div class="ornament">─ ✧ ─</div>
-<p>Conta do site: <strong id="accountName"></strong></p>
-<p class="small">O mundo está em teste fechado. Contas autorizadas podem carregar personagens para caminhar em Ricarten.</p>
+<section id="loggedIn" hidden><h1>SELEÇÃO DE PERSONAGENS</h1><div class="ornament">─ ✧ ─</div>
+<p>Conta: <strong id="accountName"></strong></p>
+<p class="small">Conectando ao StormPT para carregar seus personagens.</p>
 <button class="primary" id="enterGame" type="button" disabled>Entrar no mundo</button>
 <button class="secondary" id="logout" type="button" disabled>Sair da conta</button></section>
 <p class="status" id="accountStatus" role="status" aria-live="polite"></p>
-<hr><p class="small">Cadastro original do StormPT. Qualquer conta criada nesta prévia será real e poderá ser usada no servidor.</p>
+<hr><p class="small">Use sua conta StormPT para jogar no navegador.</p>
 </section></main>
 <div class="modal" id="signupModal" role="dialog" aria-modal="true" aria-label="Criar conta" aria-hidden="true">
 <section class="panel"><button class="close" id="closeSignup" aria-label="Fechar">×</button>
@@ -32,5 +32,5 @@
 <div class="two"><button class="primary" id="signupSubmit" type="submit" disabled>Criar conta</button><button class="secondary" id="cancelSignup" type="button">Cancelar</button></div></form>
 <p class="status" id="signupStatus" role="status" aria-live="polite"></p></section></div>
 <script type="importmap">{"imports":{"three":"/jogar-beta/vendor/three.module.js","three/addons/loaders/GLTFLoader.js":"/jogar-beta/vendor/GLTFLoader.js"}}</script>
-<script type="module" src="./opening-background.js?v=20261023-autoplay2"></script>
+<script type="module" src="./opening-background.js?v=20261023-entryfix1"></script>
 <script type="module" src="./native-entry.js"></script></body></html>

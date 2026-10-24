@@ -17,7 +17,8 @@ public sealed class StormPTBrowserAssets : IHttpHandler, IReadOnlySessionState {
   string account=c.Session==null?null:c.Session["StormPTPlayer"] as string,allowed=null;
   try{allowed=File.ReadAllText(@"C:\StormPT-2703\BrowserSecrets\qa-account.txt").Trim();}catch{Fail(c,503);return;}
   if(String.IsNullOrEmpty(account)){Fail(c,401);return;}
-  if(account!=allowed){Fail(c,403);return;}
+  bool permitted=false;foreach(string entry in allowed.Split(new char[]{'\r','\n'},StringSplitOptions.RemoveEmptyEntries))if(String.Equals(account,entry.Trim(),StringComparison.Ordinal))permitted=true;
+  if(!permitted){Fail(c,403);return;}
   string filename;
   switch(c.Request.QueryString["asset"]){
    case "ricarten":filename="Ricarten.textured.glb";break;

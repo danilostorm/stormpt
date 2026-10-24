@@ -9,8 +9,8 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 
 /*
- * Deployed pilot handler at C:\inetpub\stormpt\BrowserTicket.ashx.
- * Keys stay outside the webroot; only the explicitly configured QA account is enabled.
+ * NOT DEPLOYED. Intended for C:\inetpub\stormpt\BrowserTicket.ashx ONLY
+ * after security review and a matching shared secret is configured in IIS.
  * Integrates the real game account session used by Conta.aspx:
  * Session["StormPTPlayer"] and Session["StormPTCsrf"].
  *
@@ -71,7 +71,10 @@ public sealed class StormPTBrowserTicket : IHttpHandler, IReadOnlySessionState
         string allowed=null;
         try { allowed=File.ReadAllText(@"C:\StormPT-2703\BrowserSecrets\qa-account.txt").Trim(); }
         catch { Fail(c,503);return; }
-        if(!Equal(account,allowed)) { Fail(c,403);return; }
+        bool permitted=false;
+        foreach(string entry in allowed.Split(new char[]{'\r','\n'},StringSplitOptions.RemoveEmptyEntries))
+            if(Equal(account,entry.Trim()))permitted=true;
+        if(!permitted) { Fail(c,403);return; }
         if(c.Request.UserHostAddress!="192.168.30.10" ||
            c.Request.Headers["X-Forwarded-Proto"]!="https") { Fail(c,403);return; }
         // Never hardcode this secret in a source file, GitHub, or web.config.

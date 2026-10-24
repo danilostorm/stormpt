@@ -78,7 +78,7 @@
     "nativePilotWhitelistRequired": true,
     "gameWindowsRegressionTested": false,
     "canonicalEngineSourceUpdated": true,
-    "deployedGameServerSha256": "81C3E0DCA141541EB199E4352F07C7E1798B0B2CBF140E9AF7B9765DEDBFB2DC",
+    "deployedGameServerSha256": "355970C565149F86EB302B98663ABA3CD7EA07BCD6D253434C5C83C210C4D428",
     "realCharacterCreationTested": true,
     "realCharacterPersistenceAcrossReconnect": true,
     "realCharacterRecordBytes": 1796,
@@ -138,8 +138,8 @@
     "publicEntityBrowserIntegrationPassed": true,
     "publicEntityBrowserSoftwareViewport": "640x400",
     "canvasFocusLossStopsMovement": true,
-    "originalOpeningStage": true,
-    "originalOpeningCameraPath": true,
+    "originalOpeningStage": false,
+    "originalOpeningCameraPath": false,
     "openingPauseTested": true,
     "openingAnonymousBrowserTested": true,
     "openingTriangles": 40487,
@@ -163,8 +163,18 @@
     "inventoryShortcutPublicBrowser": true,
     "inventorySecondaryBagPublicBrowser": true,
     "movementAfterInventoryPublicBrowser": true,
-    "inventoryPublicQaEmpty": true
+    "inventoryPublicQaEmpty": true,
+    "temporaryAnimatedBackdrop": true,
+    "automaticCharacterSelectionImplemented": true,
+    "pilotConfiguredAccountCount": 2,
+    "ownerAccountConfigured": true,
+    "ownerNativeCharacterListVerified": true,
+    "pilotUnlistedAccountDeniedLive": true,
+    "pilotNativePolicyChecks": 6,
+    "automaticCharacterSelectionPublicBrowser": true,
+    "ownerAccessAssetPolicyUpdated": true,
+    "ownerAccessPublicQaEndToEndPassed": true
   },
   "nextCriticalMilestone": "Ações autoritativas de itens e combate básico; chat, áudio e regressão Windows antes de ampliar acesso.",
-  "latestWorkReport": "builds/STATUS_2026-10-23_INVENTORY.md"
+  "latestWorkReport": "builds/STATUS_2026-10-23_OWNER_LOGIN.md"
 }
