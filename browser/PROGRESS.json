@@ -346,13 +346,22 @@
     "nativeFieldBindingTransportStaged": true,
     "nativeFieldBindingDefaultPilotField": 3,
     "nativeFieldBindingLocalFocusedTestsPassed": 4,
-    "nativeFieldBindingFullRegressionVerified": false,
-    "nativeFieldBindingAEROCOOLConsolidated": false,
+    "nativeFieldBindingFullRegressionVerified": true,
+    "nativeFieldBindingAEROCOOLConsolidated": true,
     "nativeFieldBindingDeployedToQA": false,
-    "nativeFieldBindingRealMapTransitionTested": false
+    "nativeFieldBindingRealMapTransitionTested": false,
+    "nativeFieldBindingFullRegressionMachine": "SUPERFRAME",
+    "nativeFieldBindingFullRegressionTestsPassed": 114,
+    "nativeFieldBindingAEROCOOLStagingOnly": true,
+    "nativeFieldBindingAEROCOOLTransportActiveUpdated": false,
+    "nativeFieldBindingBackupSha256": "e50fa16694e8912311cb6306f558eda3c14772fcb046fcca14cea6bbfac15259",
+    "nativeFieldBindingStagedFileReadbackVerified": 6,
+    "nativeFieldBindingBackupFilesVerified": 16,
+    "nativeFieldBindingQaRouteHttpAt1900": 502,
+    "nativeFieldBindingRealMonsterTested": false
   },
   "nextCriticalMilestone": "Identificar estágio nativo de combate permitido (não vila), validar monstro vivo em QA fechado e transição do cliente web; depois integrar combate transacional original, testar ataque/dano/EXP/loot e regressão Windows.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_1700_COMBAT_FIELD_GUARD.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_1900_FIELD_BINDING_RECOVERY.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
