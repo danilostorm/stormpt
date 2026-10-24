@@ -9,11 +9,12 @@ function model(s){
  if(s&&(!/^char[\\/][A-Za-z0-9_ .\\/-]+$/i.test(s)||s.includes('..')||s.includes(':')))throw Error('Invalid entity asset reference');
  return s;
 }
-export function decodeEntitySnapshot(input,{expectedObserver}={}){
+export function decodeEntitySnapshot(input,{expectedObserver,expectedField=3}={}){
+ if(!Number.isInteger(expectedField)||expectedField<0||expectedField>255)throw RangeError('Invalid trusted entity field');
  const b=input instanceof ArrayBuffer?new Uint8Array(input):input,h=inspectPacket(b),v=new DataView(b.buffer,b.byteOffset,b.byteLength);
  if(h.opcode!==ENTITIES.opcode||h.length<ENTITIES.header||v.getUint32(8,true)!==1)throw Error('Invalid entity snapshot');
  const observer=v.getUint32(12,true),sequence=v.getUint32(16,true),tick=v.getUint32(20,true),field=v.getInt32(24,true),count=v.getUint32(28,true);
- if(!observer||!sequence||field!==3||count>ENTITIES.max||h.length!==ENTITIES.header+count*ENTITIES.row||expectedObserver!==undefined&&observer!==expectedObserver)throw Error('Entity snapshot identity/size mismatch');
+ if(!observer||!sequence||field!==expectedField||count>ENTITIES.max||h.length!==ENTITIES.header+count*ENTITIES.row||expectedObserver!==undefined&&observer!==expectedObserver)throw Error('Entity snapshot identity/size mismatch');
  const ids=new Set(),entities=[];
  for(let i=0;i<count;i++){
   const p=ENTITIES.header+i*ENTITIES.row,serial=v.getUint32(p,true),kind=v.getUint32(p+4,true),motion=v.getUint32(p+8,true),heading=v.getUint32(p+12,true);
