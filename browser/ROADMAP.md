@@ -359,3 +359,11 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] SUPERFRAME: HTTPS 200, recurso privado 401; ZIEL VM IA com GTX 1650 VFIO verificada, sem benchmark; ORACLE requer Tailscale.
 - [ ] Ainda sem mapa real selecionado, monstro QA, integração do GameServer, dano/EXP/loot e teste cliente Windows. Código C++ NÃO implantado; piloto QA preservado.
 - Progresso global sem percentual; relatório builds/STATUS_2026-10-24_1700_COMBAT_FIELD_GUARD.md.
+
+## 24/10/2026, 18h — vínculo de campo nativo no transporte (somente GitHub staging)
+- [x] Os decodificadores de snapshots do mundo e entidades agora aceitam `expectedField` explícito e confiável, mantendo campo 3 como padrão fechado para o piloto atual.
+- [x] O guard de sessão obtém o campo esperado exclusivamente do registro nativo de personagem recebido do GameServer, não de parâmetros enviados pelo navegador; snapshots divergentes são rejeitados antes de avançar sequências.
+- [x] Acrescentados testes de regressão para campo diferente, configuração inválida e sequências não consumidas em rejeições. Quatro cenários de decodificação foram executados em ambiente local isolado, 4/4 aprovados; a suíte integral do repositório e o novo teste do guard ainda NÃO foram executados no AEROCOOL.
+- [ ] AEROCOOL indisponível neste horário via conector SSH (erro interno); Desktop Commander informa dispositivo offline. Sem backup no AEROCOOL, sem deploy IIS, sem build GameServer, sem benchmark GPU e sem alteração do piloto QA.
+- [ ] Próximo passo: reconectar AEROCOOL, obter `ROADMAP.md`, `PROGRESS.json` e relatórios locais para conciliar divergências, sincronizar branch após testes completos, criar backup e verificar hashes. Só então inventariar campo original de combate com monstros reais e preparar transição sob validação nativa.
+- [ ] O GameServer ainda fixa Ricarten na entrada do mundo; esta mudança NÃO habilita viagem, combate, dano, EXP, loot nem inventário transacional.
