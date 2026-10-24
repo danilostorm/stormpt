@@ -29,3 +29,8 @@ Progresso global: sem percentual confiável de equivalência com o desktop. Pilo
 - Não há item real no inventário da conta QA para validar detalhes contra GameServer em produção.
 - Combate/monstros reais, skills, transações de inventário, chat entre dois jogadores, mais mapas/classes, áudio completo, GPU RX 550 e regressão desktop ainda pendentes.
 - Benchmark GPU real no ZIEL requer execução no contexto gráfico interativo com WebGL2 efetivamente acelerado.
+
+## Consolidação e limpeza
+- Artefatos, logs auxiliares e capturas QA consolidados no AEROCOOL e incluídos em backup com manifesto SHA-256; tar e gzip verificados.
+- Somente temporários próprios desta execução removidos de SUPERFRAME, ORACLE e do perfil de Chrome de QA no ZIEL, após backup confirmado. Comprovante em builds/staging-0730/cleanup-receipt.txt.
+- O GameServer Server33.exe estava em execução e seu SHA-256 foi reconfirmado idêntico ao original: 355970C565149F86EB302B98663ABA3CD7EA07BCD6D253434C5C83C210C4D428.
