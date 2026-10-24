@@ -342,7 +342,14 @@
     "combatFieldGuardGameServerIntegrated": false,
     "combatFieldGuardRealCombatFieldVerified": false,
     "combatFieldGuardRealMonsterTested": false,
-    "combatFieldGuardZielGpuBenchmark": false
+    "combatFieldGuardZielGpuBenchmark": false,
+    "nativeFieldBindingTransportStaged": true,
+    "nativeFieldBindingDefaultPilotField": 3,
+    "nativeFieldBindingLocalFocusedTestsPassed": 4,
+    "nativeFieldBindingFullRegressionVerified": false,
+    "nativeFieldBindingAEROCOOLConsolidated": false,
+    "nativeFieldBindingDeployedToQA": false,
+    "nativeFieldBindingRealMapTransitionTested": false
   },
   "nextCriticalMilestone": "Identificar estágio nativo de combate permitido (não vila), validar monstro vivo em QA fechado e transição do cliente web; depois integrar combate transacional original, testar ataque/dano/EXP/loot e regressão Windows.",
   "latestWorkReport": "builds/STATUS_2026-10-24_1700_COMBAT_FIELD_GUARD.md",
