@@ -394,3 +394,14 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [ ] Ledger não publicado no gateway QA; nenhum monstro real nem ataque/dano/EXP/loot validado. Inventário transacional e skills ainda pendentes.
 - [ ] Investigar GameServer indisponível, depois monstro real/mapa não-vila e callback C++ autoritativo. Paridade global sem percentual.
 - Relatório: builds/STATUS_2026-10-24_2100_COMBAT_TARGET_LEDGER.md.
+
+## 24/10/2026, 22:04 — auditoria real do GameServer, regressão e bloqueio de combate
+- [x] PR #2, ROADMAP, PROGRESS e relatório 21h conferidos; conteúdo local de ROADMAP/PROGRESS correspondia ao branch antes da atualização.
+- [x] AEROCOOL: 120/120 transporte, 51/51 frontend, 7/7 pipeline, 5/5 reparação/vinculação e 3/3 cabeçalho legacy; total 186/186. Lockfile adicionado para que `npm ci` limpo do validador de assets funcione.
+- [x] Harness QA atualizado para detectar ticket expirado antes da rede, registrar apenas status sanitizado do upgrade e preservar nomes/seriais; `node --check` passou. Não houve nova execução do harness atualizado contra o GameServer.
+- [x] IIS real: login/painel QA HTTP 200 e POST autenticado de BrowserTicket HTTP 200, ticket de formato válido/TTL 45s e logout concluído. O upgrade WebSocket do probe local falhou com `WebSocket_failed`; nenhuma lista de personagens foi recebida. Causa ainda não isolada.
+- [x] Rechecagem posterior à observação das 21h: `Server33.exe` ativo, TCP 1997 alcançável desde AEROCOOL, SHA-256 inalterado. Não foi reiniciado.
+- [x] Fonte nativa lida sem alterações: dispatcher web aceita join/move/NPC e opcodes de conta/personagem, não combate; mundo web exige campo 3/Ricarten. Campo 4 `Ruin-4` tem estado de ruína e arquivo de spawn configurado (394 bytes), mas nenhum monstro vivo foi observado.
+- [ ] Não há integração nativa de ataque, transição web por gates, dano/EXP/loot, nem build candidato; `msbuild`/ `cl` não encontrados no PATH. Nenhum benchmark GPU na VM IA do ZIEL nesta execução.
+- [ ] Próximo: diagnosticar upgrade WebSocket, implementar transição por gates nativos e ligar intenção a regras originais de dano em build isolado. Combate permanece desabilitado; sem percentual global de paridade.
+- Relatório: `builds/STATUS_2026-10-24_2204_LIVE_GAME_SERVER_AUDIT.md`.
