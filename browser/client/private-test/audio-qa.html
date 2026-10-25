@@ -1,0 +1,7 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>StormPT Audio QA</title></head><body>
+<div id="stage"></div>
+<script type="module">
+import {NativeWorldAudio} from '/src/native-audio.mjs';
+const audio=new NativeWorldAudio(document.getElementById('stage'));
+window.__audioQA=audio;
+</script></body></html>

@@ -1,0 +1,32 @@
+import {chromium} from 'playwright';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+const page=await browser.newPage({viewport:{width:900,height:700}});
+const errors=[],posts=[];
+page.on('pageerror',e=>errors.push(e.message));
+page.on('request',r=>{if(r.method()!=='GET')posts.push(r.url())});
+try{
+ const res=await page.goto('http://127.0.0.1:3910/target-qa.html',{waitUntil:'networkidle'});
+ assert.equal(res.status(),200);
+ await page.waitForFunction(()=>!!window.__targetQA);
+ await page.locator('.world-nearby > button').click();
+ assert.equal(await page.locator('[data-monster-serial]').count(),1);
+ await page.locator('[data-monster-serial]').click();
+ assert.match(await page.locator('.world-monster-target').innerText(),/Monstro QA · Nível 12/);
+ assert.match(await page.locator('.world-monster-target').innerText(),/65 \/ 100/);
+ assert.equal(await page.locator('[role=progressbar]').getAttribute('aria-valuenow'),'65');
+ await page.evaluate(()=>window.__targetQA.update([{serial:812,kind:2,name:'Monstro QA',level:12,life:25,maxLife:100,position:[51200,0,0]}]));
+ assert.equal(await page.locator('[role=progressbar]').getAttribute('aria-valuenow'),'25');
+ assert.match(await page.locator('.world-monster-target').innerText(),/Distância: 200/);
+ await page.evaluate(()=>window.__targetQA.update([]));
+ assert.equal(await page.locator('.world-monster-target').isHidden(),true);
+ await page.evaluate(()=>window.__targetQA.update([{serial:812,kind:2,name:'<img src=x onerror=alert(1)>',level:12,life:5,maxLife:10,position:[0,0,0]}]));
+ await page.locator('[data-monster-serial]').click();
+ assert.equal(await page.locator('.world-monster-target img').count(),0);
+ assert.match(await page.locator('.world-monster-target').innerText(),/<img/);
+ await page.locator('[aria-label="Desmarcar monstro"]').click();
+ assert.equal(await page.locator('.world-monster-target').isHidden(),true);
+ assert.deepEqual(posts,[]);
+ assert.deepEqual(errors,[]);
+ console.log(JSON.stringify({ok:true,monsterSelection:true,serverHpUpdates:true,serverDistance:true,despawnClears:true,xssSafe:true,noAttackPackets:true,errors}));
+}finally{await browser.close()}

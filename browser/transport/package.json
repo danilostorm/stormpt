@@ -1,0 +1,14 @@
+{
+  "name": "stormpt-browser-transport",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WebSocket-to-TCP transport for the actual StormPT game protocol",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "start": "node src/gateway.mjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}

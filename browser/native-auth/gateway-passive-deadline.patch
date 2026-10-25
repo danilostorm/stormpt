@@ -1,0 +1,61 @@
+--- a/transport/src/game-login-guard.mjs
++++ b/transport/src/game-login-guard.mjs
+@@ -48,6 +48,7 @@
+     this.#account=account;
+     this.#now=now;
+     this.#loginTimeoutMs=loginTimeoutMs;
++    this.#loginAt=this.#now();
+   }
+   get phase(){return this.#state}
+   get boundAccount(){return this.#account}
+@@ -55,7 +56,7 @@
+   get selectedCharacter(){return this.#selectedName}
+   checkDeadline(){
+     if(this.#state==='closed')throw Error('Transport already closed');
+-    if(this.#state==='awaiting-character-list' &&
++    if((this.#state==='awaiting-login'||this.#state==='awaiting-character-list') &&
+        this.#now()-this.#loginAt>this.#loginTimeoutMs){
+       this.close();
+       throw Error('Timed out waiting for GameServer account response');
+--- a/transport/src/gateway.mjs
++++ b/transport/src/gateway.mjs
+@@ -16,7 +16,10 @@
+   secret,
+   maxSessions = 10,
+   requireBoundTicket = false,
++  loginTimeoutMs = 15000,
+ }) {
++  if (!Number.isInteger(loginTimeoutMs) || loginTimeoutMs < 1000 || loginTimeoutMs > 60000)
++    throw new RangeError('Invalid login timeout');
+   if (!secret || secret.length < 32) throw new Error('Gateway HMAC secret missing');
+   const sessions = new Set();
+   const usedNonces = new Map();
+@@ -55,17 +58,26 @@
+     // The authentic 1997 game server remains unchanged.
+     const tcp = net.createConnection({host:gameHost, port:gamePort});
+     const state = { ws, tcp, boundAccount:ws.stormptBoundAccount,
+-      guard:ws.stormptBoundAccount ? new GameLoginGuard({account:ws.stormptBoundAccount}) : null };
++      guard:ws.stormptBoundAccount ? new GameLoginGuard({account:ws.stormptBoundAccount,loginTimeoutMs}) : null };
+     sessions.add(state);
+     let closed = false;
++    let deadlineTimer;
+     const dispose = () => {
+       if (closed) return;
+       closed = true;
++      if (deadlineTimer) clearInterval(deadlineTimer);
+       sessions.delete(state);
+       state.guard?.close();
+       try { tcp.destroy(); } catch {}
+       try { ws.close(); } catch {}
+     };
++    // Enforce deadlines even when neither peer sends another packet.
++    if (state.guard) {
++      deadlineTimer = setInterval(() => {
++        try { state.guard.checkDeadline(); } catch { dispose(); }
++      }, 250);
++      deadlineTimer.unref();
++    }
+     const decoder = new PacketDecoder(packet => {
+       state.guard?.onServer(packet);
+       if (ws.readyState === WebSocket.OPEN) {
+

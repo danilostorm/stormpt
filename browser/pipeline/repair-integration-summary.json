@@ -1,0 +1,8 @@
+{
+  "source": "char/monster/Monmushroom/mushroom.smd",
+  "status": "validated_candidate",
+  "validationErrors": 0,
+  "error": null,
+  "nativeBindingUsed": "char/monster/monmushroom/monmushroom.inx",
+  "activeInGame": false
+}

@@ -1,0 +1,58 @@
+import {chromium} from 'playwright';
+import {readFileSync,writeFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const qa=JSON.parse(readFileSync('/work/secrets/web-qa-account.json'));
+const browser=await chromium.launch({headless:true,args:['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-gpu-sandbox','--disable-dev-shm-usage']});
+const page=await browser.newPage({viewport:{width:640,height:400}}),errors=[],assetResponses=[];
+page.on('pageerror',e=>errors.push(e.message));
+page.on('response',r=>{if(r.url().includes('/BrowserAssets.ashx'))assetResponses.push({asset:new URL(r.url()).searchParams.get('asset'),status:r.status()});});
+const snapshot=()=>page.evaluate(()=>window.__stormptNativeQA.snapshot());
+async function enter(){
+ await page.click('#enterGame');
+ await page.waitForFunction(()=>window.__stormptNativeQA.snapshot().phase==='character-list',{timeout:30000});
+ await page.getByRole('button',{name:'StormWebQA1 · Nível 1',exact:true}).click();
+ await page.waitForFunction(()=>['in-world','error','disconnected'].includes(window.__stormptNativeQA.snapshot().phase),{timeout:120000});
+ const s=await snapshot();assert.equal(s.phase,'in-world',JSON.stringify(s));
+ return s;
+}
+try{
+ const response=await page.goto(process.env.STORMPT_PUBLIC_PLAY_URL||'https://stormpt.hoststorm.com.br/jogar-beta/index.html',{waitUntil:'networkidle',timeout:45000});assert.equal(response.status(),200);
+ const anonymousStatus=await page.evaluate(async()=>{const r=await fetch('/BrowserAssets.ashx?asset=ricarten',{credentials:'omit'});return r.status;});assert.equal(anonymousStatus,401);
+ await page.fill('#loginUser',qa.account);await page.fill('#loginPassword',qa.password);await page.click('#loginSubmit');
+ await page.waitForFunction(()=>!document.getElementById('loggedIn').hidden,{timeout:30000});
+ const invalidAssetStatus=await page.evaluate(async()=>{const r=await fetch('/BrowserAssets.ashx?asset=../secrets/gateway.hmac');return r.status;});assert.equal(invalidAssetStatus,404);
+ const initial=await enter();assert.equal(initial.worldLive.field,3);assert.equal(initial.render.characterMeshes,4);
+ await page.waitForFunction(()=>window.__stormptNativeQA.snapshot().entityModels?.rendered>=1,undefined,{timeout:30000});
+ const entityState=await snapshot(),blacksmith=entityState.entities.entities.find(e=>e.name==='Ferreiro Gus'),rendered=entityState.entityModels.models.find(e=>e.serial===blacksmith?.serial);
+ assert.ok(blacksmith&&rendered,'Original live NPC required');assert.equal(rendered.triangles,1069);assert.equal(rendered.texturedMeshes,4);
+ assert.deepEqual(rendered.position,blacksmith.position.map(v=>v/256));assert.deepEqual(entityState.entityModels.errors,[]);
+ const canvas=page.locator('#stormptWorld > canvas');await canvas.focus();
+ assert.equal(initial.render.animated,true);assert.equal(initial.animation.clip,'idle');
+ await page.keyboard.down('d');await page.waitForTimeout(450);const walkingA=await snapshot();
+ await page.waitForTimeout(450);const walkingB=await snapshot();
+ assert.equal(walkingA.animation.clip,'walk');assert.equal(walkingB.animation.clip,'walk');
+ assert.ok(walkingA.animation.matrix.some((v,i)=>Math.abs(v-walkingB.animation.matrix[i])>.0001),'Original bone matrices must animate while server confirms movement');
+ await page.screenshot({path:'/work/client/qa/real-world-animated-walking.png'});await page.locator('.world-nearby > button').click();await page.waitForTimeout(500);const focusStop=await snapshot();await page.waitForTimeout(600);assert.deepEqual((await snapshot()).worldLive.position,focusStop.worldLive.position,'Focus loss must stop movement');
+ await page.keyboard.up('d');await page.locator('.world-nearby ul').getByText(/Ferreiro Gus/).waitFor();await page.locator('.world-nearby > button').click();await canvas.focus();
+ await page.waitForTimeout(1800);
+ const moved=await snapshot();assert.equal(moved.animation.clip,'idle');
+ const a=initial.worldLive.position,b=moved.worldLive.position;
+ assert.ok(Math.hypot(b[0]-a[0],b[2]-a[2])>0,'Real keyboard movement must receive changed server coordinates');
+ assert.ok(moved.movementRequests>0);assert.ok(moved.worldLive.sequence>initial.worldLive.sequence);
+ await page.screenshot({path:'/work/client/qa/real-world-movement-chromium.png'});
+ // Heartbeats must keep the native profile alive through the Windows memory-check interval.
+ await page.waitForTimeout(65000);
+ const healthy=await snapshot();assert.equal(healthy.phase,'in-world');assert.ok(healthy.worldLive.sequence>moved.worldLive.sequence);
+ await page.getByRole('button',{name:'Sair do mundo',exact:true}).click();await page.waitForTimeout(1800);
+ const reconnected=await enter();
+ assert.equal(reconnected.world.position.x,b[0]);assert.equal(reconnected.world.position.z,b[2]);
+ assert.deepEqual(errors,[]);
+ const result={at:new Date().toISOString(),realBrowser:'Chromium WebGL2 SwiftShader',viewport:{width:640,height:400},url:page.url(),mockedRoutes:false,
+  anonymousAssetsDenied:true,pathTraversalAssetsDenied:true,realKeyboardMovement:true,persistedAcrossReconnect:true,liveEntitySnapshots:true,originalBlacksmithRendered:true,blacksmithTriangles:rendered.triangles,focusLossStopsMovement:true,animatedWalking:true,animatedIdle:true,animationDrivenByServerSnapshots:true,originalBones:walkingB.animation.bones,
+  heartbeatOver65Seconds:true,initialPosition:a,movedPosition:b,reconnectedPosition:reconnected.worldLive.position,
+  render:reconnected.render,assetResponses,errors,pilotOnly:true,fullGameComplete:false};
+ writeFileSync('/work/builds/real-world-browser-result.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
+ await page.evaluate(()=>window.__stormptNativeQA.close());
+}catch(e){
+ console.error(JSON.stringify({error:e.message,state:await snapshot().catch(()=>null),ui:await page.locator('body').innerText(),errors,assetResponses}));process.exitCode=1;
+}finally{await browser.close();}
