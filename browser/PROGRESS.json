@@ -238,11 +238,11 @@
     "nativeNpcKeyboardQaTarget": "Enzo, o Restaurador de Itens",
     "monster3dTargetMarkerSourceAndPublicModuleVerified": true,
     "monster3dTargetMarkerLiveMonsterVerified": false,
-    "latestTransportTestCount": 101,
-    "latestSelectedFrontendUnitTestCount": 53,
+    "latestTransportTestCount": 120,
+    "latestSelectedFrontendUnitTestCount": 51,
     "latestIndependentSuperframeNpcTests": 6,
     "latestIndependentOracleStaticChecks": 7,
-    "latestVerifiedRun": "2026-10-24T07:22:00-03:00",
+    "latestVerifiedRun": "2026-10-24T22:04:00-03:00",
     "nativeInventoryItemRequirementsFixtureTested": true,
     "nativeInventoryItemPriceFixtureTested": true,
     "nativeInventoryAudioOverlayLayerFixTested": true,
@@ -381,10 +381,41 @@
     "gameServer1997ListenerFoundAt2100": false,
     "gameServerServer33ProcessFoundAt2100": false,
     "zielIaGpuDetectedAt2100": "NVIDIA GeForce GTX 1650",
-    "zielIaNewFpsMeasuredAt2100": false
+    "zielIaNewFpsMeasuredAt2100": false,
+    "latestPipelineTestsPassed": 7,
+    "latestRepairBindingTestsPassed": 5,
+    "latestLegacyHeaderTestsPassed": 3,
+    "latestRegressionTotalPassed": 186,
+    "latestRegressionTotalFailed": 0,
+    "latestRegressionHeadAtStart": "fb525f2d8bc1e4fe953189fb109170c61bd0ee06",
+    "latestRegressionMachine": "AEROCOOL isolated checkout",
+    "validationPackageLockAdded": true,
+    "validationPackageCleanNpmCiPassed": true,
+    "realTicketIssuerHttpAt2204": 200,
+    "realTicketPayloadShapeValidAt2204": true,
+    "realTicketTtlSecondsAt2204": 45,
+    "realSiteLoginAndLogoutAt2204": true,
+    "localGatewayWebSocketHandshakePassedAt2204": false,
+    "localGatewayWebSocketFailureAt2204": "WebSocket_failed",
+    "localGatewayWebSocketCharacterListReceivedAt2204": false,
+    "gameServerServer33ProcessFoundAt2204": true,
+    "gameServer1997ListenerReachableFromAerocoolAt2204": true,
+    "gameServerBinaryUnchangedAt2204": true,
+    "gameServerBinarySha256At2204": "355970C565149F86EB302B98663ABA3CD7EA07BCD6D253434C5C83C210C4D428",
+    "nativeCombatDispatchIntegratedAt2204": false,
+    "nativeWorldFieldHardcodedAt2204": 3,
+    "nativeCombatCandidateFieldAt2204": 4,
+    "nativeCombatCandidateFieldNameAt2204": "Ruin-4",
+    "nativeCombatCandidateFieldStateAt2204": "FIELD_STATE_RUIN",
+    "nativeCombatCandidateSpawnFileBytesAt2204": 394,
+    "nativeCombatCandidateLiveMonsterObservedAt2204": false,
+    "msbuildFoundInWindowsPathAt2204": false,
+    "serverCandidateBuildProducedAt2204": false,
+    "zielGpuBenchmarkRunAt2204": false,
+    "realLoginCanonicalResultRestoredAt2204": true
   },
-  "nextCriticalMilestone": "Identificar estágio nativo de combate permitido (não vila), validar monstro vivo em QA fechado e transição do cliente web; depois integrar combate transacional original, testar ataque/dano/EXP/loot e regressão Windows.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_2100_COMBAT_TARGET_LEDGER.md",
+  "nextCriticalMilestone": "Diagnosticar o upgrade WebSocket com ticket fresco; implementar transição de campo por gates nativos para um mapa não-vila; depois integrar intenção de ataque ao dispatcher nativo com validação server-side e compilar candidato isolado. Combate continua desabilitado até teste com monstro vivo, dano, EXP e loot.",
+  "latestWorkReport": "builds/STATUS_2026-10-24_2204_LIVE_GAME_SERVER_AUDIT.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
@@ -424,5 +455,82 @@
       "note": "GTX 1650 real a 1080p ~56 FPS; 29 testes frontend; RX550 e regressão Windows pendentes."
     }
   ],
-  "completionAcceptanceDocument": "DESKTOP_PARITY.md"
+  "completionAcceptanceDocument": "DESKTOP_PARITY.md",
+  "latestAudit": {
+    "at": "2026-10-24T22:04:00-03:00",
+    "prHeadAtStart": "fb525f2d8bc1e4fe953189fb109170c61bd0ee06",
+    "localRoadmapAndProgressMatchedGitHubBeforeUpdate": true,
+    "regression": {
+      "transport": {
+        "passed": 120,
+        "failed": 0
+      },
+      "frontend": {
+        "passed": 51,
+        "failed": 0
+      },
+      "pipeline": {
+        "passed": 7,
+        "failed": 0
+      },
+      "repairBinding": {
+        "passed": 5,
+        "failed": 0
+      },
+      "legacyHeader": {
+        "passed": 3,
+        "failed": 0
+      },
+      "totalPassed": 186,
+      "totalFailed": 0
+    },
+    "validationPackageLock": {
+      "added": true,
+      "cleanNpmCiPassed": true
+    },
+    "qaHarness": {
+      "sanitizedUpgradeStatusCaptureAdded": true,
+      "expiredTicketPreflightAdded": true,
+      "characterNamesAndSerialsOmitted": true,
+      "uniqueResultFilename": true,
+      "syntaxCheckPassed": true,
+      "liveRetestOfUpdatedHarness": false
+    },
+    "liveProbe": {
+      "loginPageHttp": 200,
+      "loginSubmitHttp": 200,
+      "accountPanelHttp": 200,
+      "ticketIssuerHttp": 200,
+      "ticketShapeValid": true,
+      "ticketTtlSeconds": 45,
+      "siteLogoutCompleted": true,
+      "localWebSocketHandshakePassed": false,
+      "failureCode": "WebSocket_failed",
+      "characterListReceived": false
+    },
+    "gameServer": {
+      "processFound": true,
+      "tcp1997ReachableFromAerocool": true,
+      "binarySha256": "355970C565149F86EB302B98663ABA3CD7EA07BCD6D253434C5C83C210C4D428",
+      "binaryUnchanged": true,
+      "combatDispatcherIntegrated": false,
+      "worldFieldHardcoded": 3
+    },
+    "combatFieldCandidate": {
+      "field": 4,
+      "name": "Ruin-4",
+      "state": "FIELD_STATE_RUIN",
+      "spawnFilePresent": true,
+      "spawnFileBytes": 394,
+      "liveMonsterObserved": false
+    },
+    "build": {
+      "msbuildFoundInPath": false,
+      "clFoundInPath": false,
+      "candidateBinaryProduced": false
+    },
+    "gpuBenchmarkRun": false,
+    "gameServerOrDatabaseModified": false,
+    "completionEstimatePercent": null
+  }
 }
