@@ -383,3 +383,14 @@ Snapshots nativos somente de leitura, radar real e primeiro NPC original (Ferrei
 - [x] ZIEL: VM IA em execução, QEMU guest agent responde; sem teste novo de Chrome/Edge/WebGL2/FPS. ORACLE não utilizado por bloqueio de autenticação Tailscale.
 - [ ] Combate verdadeiro continua BLOQUEADO: o gateway rejeita intenção de ataque, sem integração C++/GameServer, monstro vivo, dano, EXP ou loot. Mapas de combate e regressão Windows pendentes.
 - [ ] Paridade global sem percentual auditado. Relatório: builds/STATUS_2026-10-24_2000_COMBAT_GATEWAY_DENY.md.
+
+
+## 24/10/2026, 21h — ledger read-only de monstros e diagnóstico do GameServer
+- [x] PR #2, ROADMAP.md, PROGRESS.json e relatório 20h conferidos; SSH do AEROCOOL recuperado e arquivos locais reconciliados com GitHub.
+- [x] Criado ledger de alvos com serial/mapa/vida/posição provenientes apenas de snapshots do GameServer, vinculado ao registro nativo autenticado, com TTL 2s, rejeição de replay, mapa divergente e remoção de alvos mortos/ausentes.
+- [x] Integração isolada no guard do transporte, sem autorizar ataque; 4/4 testes focados e 120/120 transporte no AEROCOOL, sem falhas.
+- [x] Windows 11 original: VM e guest agent respondem, IIS porta 80 responde, mas consulta read-only não encontrou Server33/listener TCP 1997; sem reiniciar serviço.
+- [x] ZIEL VM IA e GTX 1650 enumeradas, sem benchmark WebGL2/FPS novo; SUPERFRAME somente leitura; ORACLE não utilizado.
+- [ ] Ledger não publicado no gateway QA; nenhum monstro real nem ataque/dano/EXP/loot validado. Inventário transacional e skills ainda pendentes.
+- [ ] Investigar GameServer indisponível, depois monstro real/mapa não-vila e callback C++ autoritativo. Paridade global sem percentual.
+- Relatório: builds/STATUS_2026-10-24_2100_COMBAT_TARGET_LEDGER.md.

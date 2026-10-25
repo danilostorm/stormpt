@@ -19,6 +19,7 @@ import {decodeWebLoginPacket,WEB_LOGIN} from './web-login.mjs';
 import {inspectPacket} from './packets.mjs';
 import {decodeCharacterList} from './character-list.mjs';
 import {CHAT_OPCODE,validateClientChatFrame,ChatSendThrottle} from './chat-protocol.mjs';
+import {CombatTargetLedger} from './combat-target-ledger.mjs';
 
 const LOGIN_SIZE=400;
 const SELECT_SIZE=52;
@@ -50,6 +51,7 @@ export class GameLoginGuard {
   #creatingName=null;
   #recordAssembler=new RecordAssembler();
   #serial=0;
+  #combatTargets=null;
   #worldField=3; // Overwritten only by the authenticated native character record.
   #sentSequence=0;
   #ackSequence=-1;
@@ -78,6 +80,10 @@ export class GameLoginGuard {
   get boundAccount(){return this.#account}
   get characterNames(){return [...this.#names]}
   get selectedCharacter(){return this.#selectedName}
+  // Read-only internal inspection; no browser packet or attack authorization.
+  getServerMonster(serial){
+    return this.#state==='native-world-active' ? this.#combatTargets?.lookup(serial) ?? null : null;
+  }
   checkDeadline(){
     if(this.#state==='closed')throw Error('Transport already closed');
     if((this.#state==='awaiting-login'||this.#state==='awaiting-character-list') &&
@@ -167,7 +173,9 @@ export class GameLoginGuard {
       const record=this.#recordAssembler.feed(packet);
       if(record){
         const decoded=decodeRecordWorld(record,{expectedAccount:this.#account,expectedName:this.#selectedName});
-        this.#serial=decoded.identity.serial;this.#worldField=decoded.field;this.#state='native-record-received';
+        this.#serial=decoded.identity.serial;this.#worldField=decoded.field;
+        this.#combatTargets=new CombatTargetLedger({observer:this.#serial,field:this.#worldField,now:this.#now});
+        this.#state='native-record-received';
       }
       return;
     }
@@ -175,6 +183,7 @@ export class GameLoginGuard {
       if(this.#state!=='native-world-active')throw Error('World confirmation required before entities');
       const snapshot=decodeEntitySnapshot(packet,{expectedObserver:this.#serial,expectedField:this.#worldField});
       if(snapshot.sequence!==this.#entitySequence+1)throw Error('Invalid entity sequence');
+      this.#combatTargets.accept(snapshot);
       this.#entitySequence=snapshot.sequence;return;
     }
     if(this.#nativeLogin && opcode===NPC.reply){
@@ -203,6 +212,8 @@ export class GameLoginGuard {
     // Receiving a list is NOT treated as login success.
   }
   close(){
+    this.#combatTargets?.close();
+    this.#combatTargets=null;
     this.#state='closed';
     this.#names.clear();
     this.#selectedName=null;

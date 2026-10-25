@@ -369,10 +369,22 @@
     "nativeCombatGatewayGameServerPortReachableFromSuperframe": false,
     "nativeCombatGatewayAEROCOOLStagingOnly": true,
     "nativeCombatGatewayDeployed": false,
-    "nativeCombatGatewayRealMonsterTested": false
+    "nativeCombatGatewayRealMonsterTested": false,
+    "nativeCombatReadOnlyMonsterLedgerImplemented": true,
+    "nativeCombatReadOnlyMonsterLedgerFocusedTestsPassed": 4,
+    "nativeCombatReadOnlyMonsterLedgerTransportTestsPassed": 120,
+    "nativeCombatReadOnlyMonsterLedgerAEROCOOLTested": true,
+    "nativeCombatReadOnlyMonsterLedgerQaDeployed": false,
+    "nativeCombatReadOnlyMonsterLedgerRealMonsterVerified": false,
+    "nativeCombatReadOnlyMonsterLedgerAttackForwardingEnabled": false,
+    "aerocoolSshRecoveredAt2100": true,
+    "gameServer1997ListenerFoundAt2100": false,
+    "gameServerServer33ProcessFoundAt2100": false,
+    "zielIaGpuDetectedAt2100": "NVIDIA GeForce GTX 1650",
+    "zielIaNewFpsMeasuredAt2100": false
   },
   "nextCriticalMilestone": "Identificar estágio nativo de combate permitido (não vila), validar monstro vivo em QA fechado e transição do cliente web; depois integrar combate transacional original, testar ataque/dano/EXP/loot e regressão Windows.",
-  "latestWorkReport": "builds/STATUS_2026-10-24_2000_COMBAT_GATEWAY_DENY.md",
+  "latestWorkReport": "builds/STATUS_2026-10-24_2100_COMBAT_TARGET_LEDGER.md",
   "lastLegacyEstimatePercent": 66,
   "legacyWeightedMilestones": [
     {
