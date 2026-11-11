@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -119,8 +119,10 @@ namespace StormPT {
  }
 
  public sealed class Launcher : Form {
-  const int NativeBuildVersion=8;
+  const int NativeBuildVersion=9;
   const string Origin="https://stormpt.hoststorm.cloud";
+  const string LegacyFeed="https://raw.githubusercontent.com/danilostorm/pristonweb/stormpt-launcher-v0.1.0/launcher/feed/";
+  const string LegacyPublicKey="<RSAKeyValue><Modulus>r/W2LGrYfvVEzWSXMHJLYxNHmA9NA7S0cu0tYYwQGCJ3zdJYZnFUwHYCwUJOosS8F9GHi7kpCg7PTgeTdAyrewnE/BmjB/j6fITSXrj5v1Yh+l+zeeXOMNhyM3o0VngPBTAyzN+u7vcWUX6Spv/msSLnw7KiOC0ZVR6XMskKlAtjRihhLAueo6leHhC3ZUoAtgXyWB1JdKiIGV9amg8KL2eYyls4wWzyaEDg8Lmr4BlUYW3cNszGNonvPE5jUXLqP+VZoRgnFSlrwSSW2X8TKugUKthJZ7FbDOkxUY9pK7/DW2ViYk3PqwFNL0OaPR3b06mTqncqz1gYWNAH8MHCAQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
   const string PublicKey="<RSAKeyValue><Modulus>4TaKBu6jfbDgC7GnFmkMzBlM6Htb+LLzLmEBnKYFOOitK7CU2KYg4V8T6M07fqNwqt5g1YlFdDqqjwfQR8+s5PtQPABySISnWrrcZZcMXO/s/CxAfcLUASfrkS6lXPo3WxtAMT+V5MJo1Z/wqrOMRBrLNRdp3Wzuiu3orJAoqAvm8fHljAYQgeMBXqNqsu7EaA3njMCm+8lnR+EEJVpJpwym8ZvZY8vMxhICb1o1bqFMME9HqGm74hq2rQBTzIzwX9O3Jpu7CoIYQ3D/RjdtsFYixQ63bQlkO/0QcI7iDL8KBogHWc619YeUk6RNu5wEpCX8NUEH3b6QcRHLTDc6A98J2iK/7S72WzM89G+gAb8gAsphhZKQI2NvfBFocdzdGYLLqR0EKLsUpt2B5Db5I3tKUQsTziIwdwnYbTI3ACjFP0r6pjVqOdnJitfZKXiLNaeMIFtQmbZFlriwdkz60esX6tsO+6GXDhi6vjpK6nWIuD/ATOd2e/C900Mr9bWl</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
   readonly JavaScriptSerializer json=new JavaScriptSerializer();
   readonly BackgroundWorker worker=new BackgroundWorker();
@@ -771,9 +773,64 @@ namespace StormPT {
     details.ForeColor=muted;details.Text="Validando a versão e preparando a conexão segura.";
     launchWorker.RunWorkerAsync();
   }
-  // Headless test: validate the signed public manifest through Windows TLS/.NET.
+  static void VerifyLegacyLauncher(byte[] manifest, byte[] signature, string key, string executable)
+  {
+    using(var rsa=new RSACryptoServiceProvider()){
+      rsa.PersistKeyInCsp=false;
+      rsa.FromXmlString(key);
+      if(!rsa.VerifyData(manifest,CryptoConfig.MapNameToOID("SHA256"),signature))
+        throw new CryptographicException("Assinatura inválida no feed anterior.");
+    }
+    var entries=Encoding.UTF8.GetString(manifest).Split('\n').Select(line=>line.TrimEnd('\r').Split('|'))
+      .Where(parts=>parts.Length>=4 && String.Equals(parts[1],"launcher.exe",StringComparison.OrdinalIgnoreCase)).ToArray();
+    long size;
+    if(entries.Length!=1 || !long.TryParse(entries[0][2],out size) ||
+       size!=new FileInfo(executable).Length ||
+       !FileHash(executable).Equals(entries[0][3],StringComparison.OrdinalIgnoreCase))
+      throw new CryptographicException("Atualizador não autorizado pelo feed anterior.");
+  }
+  static void ReplaceLegacyLauncher(string[] args)
+  {
+    string target=Path.GetFullPath(args[1]);
+    string root=Path.GetDirectoryName(target);
+    string updates=Path.Combine(root,".stormpt-updates");
+    string helper=Path.GetFullPath(Application.ExecutablePath);
+    string staged=Path.GetFullPath(args[2]);
+    if(!String.Equals(Path.GetFileName(target),"launcher.exe",StringComparison.OrdinalIgnoreCase) ||
+       !String.Equals(helper,Path.Combine(updates,"self-helper.exe"),StringComparison.OrdinalIgnoreCase) ||
+       !String.Equals(staged,Path.Combine(updates,"self.next.exe"),StringComparison.OrdinalIgnoreCase) ||
+       !File.Exists(target) || !FileHash(helper).Equals(args[3],StringComparison.OrdinalIgnoreCase) ||
+       !FileHash(staged).Equals(args[3],StringComparison.OrdinalIgnoreCase))
+      throw new InvalidDataException("Arquivos da atualização anterior inválidos.");
+
+    using(var client=new WebClient()){
+      string request="?t="+DateTime.UtcNow.Ticks;
+      var manifest=client.DownloadData(LegacyFeed+"manifest.txt"+request);
+      var signature=Convert.FromBase64String(client.DownloadString(LegacyFeed+"manifest.sig"+request).Trim());
+      VerifyLegacyLauncher(manifest,signature,LegacyPublicKey,helper);
+    }
+    int parentPid=int.Parse(args[4]);
+    try{
+      using(var parent=Process.GetProcessById(parentPid)){
+        if(!parent.WaitForExit(35000))throw new IOException("O launcher anterior continua aberto.");
+      }
+    }catch(ArgumentException){}
+    string temp=target+".new";
+    File.Copy(helper,temp,true);
+    File.Replace(temp,target,target+".previous",true);
+    Process.Start(new ProcessStartInfo(target){WorkingDirectory=root,UseShellExecute=true});
+  }
+
   [STAThread] public static void Main(string[] args){
     ServicePointManager.SecurityProtocol|=SecurityProtocolType.Tls12;
+    if(args.Length==5 && args[0]=="--replace"){
+      try{ReplaceLegacyLauncher(args);}
+      catch(Exception error){
+        MessageBox.Show(error.Message,"StormPT Launcher",MessageBoxButtons.OK,MessageBoxIcon.Error);
+        Environment.ExitCode=1;
+      }
+      return;
+    }
     if(args.Length==3 && args[0]=="--replace-launcher"){
       try{
         string target=Encoding.UTF8.GetString(Convert.FromBase64String(args[1]));
@@ -1079,3 +1136,4 @@ namespace StormPT {
   }
  }
 }
+
