@@ -119,7 +119,7 @@ namespace StormPT {
  }
 
  public sealed class Launcher : Form {
-  const int NativeBuildVersion=7;
+  const int NativeBuildVersion=8;
   const string Origin="https://stormpt.hoststorm.cloud";
   const string PublicKey="<RSAKeyValue><Modulus>4TaKBu6jfbDgC7GnFmkMzBlM6Htb+LLzLmEBnKYFOOitK7CU2KYg4V8T6M07fqNwqt5g1YlFdDqqjwfQR8+s5PtQPABySISnWrrcZZcMXO/s/CxAfcLUASfrkS6lXPo3WxtAMT+V5MJo1Z/wqrOMRBrLNRdp3Wzuiu3orJAoqAvm8fHljAYQgeMBXqNqsu7EaA3njMCm+8lnR+EEJVpJpwym8ZvZY8vMxhICb1o1bqFMME9HqGm74hq2rQBTzIzwX9O3Jpu7CoIYQ3D/RjdtsFYixQ63bQlkO/0QcI7iDL8KBogHWc619YeUk6RNu5wEpCX8NUEH3b6QcRHLTDc6A98J2iK/7S72WzM89G+gAb8gAsphhZKQI2NvfBFocdzdGYLLqR0EKLsUpt2B5Db5I3tKUQsTziIwdwnYbTI3ACjFP0r6pjVqOdnJitfZKXiLNaeMIFtQmbZFlriwdkz60esX6tsO+6GXDhi6vjpK6nWIuD/ATOd2e/C900Mr9bWl</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
   readonly JavaScriptSerializer json=new JavaScriptSerializer();
@@ -259,8 +259,7 @@ namespace StormPT {
      StartupLog("Manifest-request",null);
      var latestRelease=FetchRelease();
      StartupLog("Manifest-ok",null);
-     State local=LoadState();int newest=latestRelease.Patches.Count==0?0:latestRelease.Patches.Max(x=>x.Version);
-     if(local==null || local.PatchVersion<newest)throw new InvalidOperationException("Há uma atualização obrigatória. Clique em INSTALAR / ATUALIZAR.");
+     if(!Installed() || RequiresUpdate(LoadState(),latestRelease))throw new InvalidOperationException("Há uma atualização obrigatória. Clique em INSTALAR / ATUALIZAR.");
      // Verify the executable and updated DLL; the saved version number alone
      // is not proof that installed files are intact.
      VerifyInstalled(latestRelease);
@@ -467,6 +466,10 @@ namespace StormPT {
     if(r.Patches.GroupBy(x=>x.Version).Any(x=>x.Count()>1))throw new InvalidDataException("Versões duplicadas no manifesto.");
     return r;
   }
+  static bool RequiresUpdate(State state, Release target) {
+    if(state==null || !String.Equals(state.BaseSha256,target.Base.Sha256,StringComparison.OrdinalIgnoreCase))return true;
+    return target.Patches.Any(p=>p.Version>state.PatchVersion);
+  }
   void StartTask(string task){if(worker.IsBusy)return;install.Enabled=false;verify.Enabled=false;play.Enabled=false;choose.Enabled=false;graphics.Enabled=false;progress.Value=0;worker.RunWorkerAsync(task);}
   void Work(object sender,DoWorkEventArgs e){try{
     string task=(string)e.Argument;
@@ -482,10 +485,8 @@ namespace StormPT {
       e.Result=new LauncherUpgrade{FilePath=staged};return;
     }
     if(task=="check"){
-      State st=LoadState();int latest=r.Patches.Count==0?0:r.Patches.Max(x=>x.Version);
-      if(!Installed()){Report(0,"Cliente não instalado. Clique em INSTALAR.");return;}
-      if(st.PatchVersion<latest){Update(r);return;}
-      Report(100,st.PatchVersion<latest?"Atualização disponível.":"Cliente atualizado. Pronto para jogar.");return;
+      if(!Installed() || RequiresUpdate(LoadState(),r)){Update(r);return;}
+      Report(100,"Cliente atualizado. Pronto para jogar.");return;
     }
     if(task=="verify"){VerifyInstalled(r);Report(100,"Arquivos principais verificados.");return;}
     if(task=="update"){Update(r);return;}
@@ -504,8 +505,7 @@ namespace StormPT {
       }catch(Exception err){result=err;}
     }
     install.Enabled=true;verify.Enabled=true;choose.Enabled=true;graphics.Enabled=true;
-    State installed=LoadState();int newest=release==null||release.Patches.Count==0?0:release.Patches.Max(x=>x.Version);
-    play.Enabled=Installed() && checkedManifest && installed!=null && installed.PatchVersion>=newest && !(result is Exception);
+    play.Enabled=Installed() && checkedManifest && release!=null && !RequiresUpdate(LoadState(),release) && !(result is Exception);
     if(result is Exception){status.Text="Não foi possível concluir.";details.Text=((Exception)result).Message;details.ForeColor=Color.FromArgb(255,145,126);progress.Value=0;}
     else{details.Text="Arquivos oficiais, assinados e conferidos. Não executa como administrador.";details.ForeColor=muted;}
     State st=LoadState();int latest=release==null||release.Patches.Count==0?0:release.Patches.Max(x=>x.Version);
@@ -626,6 +626,7 @@ namespace StormPT {
         string dest=Path.GetFullPath(Path.Combine(root,relative));
         if(!dest.StartsWith(prefix,StringComparison.OrdinalIgnoreCase))throw new InvalidDataException("Caminho fora da pasta de instalação.");
         if(String.IsNullOrEmpty(entry.Name)){Directory.CreateDirectory(dest);continue;}
+        if(baseGame && UserWritableGamePreferences(relative) && File.Exists(dest)){++count;continue;}
         Directory.CreateDirectory(Path.GetDirectoryName(dest));using(var input=entry.Open())using(var output=new FileStream(dest,FileMode.Create,FileAccess.Write,FileShare.None)){input.CopyTo(output);}
         ++count;
         if(count%100==0 || count==total){
@@ -763,8 +764,7 @@ namespace StormPT {
       MessageBox.Show(this,"Instale o cliente antes de jogar.","StormPT Launcher",MessageBoxButtons.OK,MessageBoxIcon.Information);return;
     }
     if(!checkedManifest || release==null){StartTask("check");return;}
-    State local=LoadState();int latest=release.Patches.Count==0?0:release.Patches.Max(x=>x.Version);
-    if(local==null || local.PatchVersion<latest){StartTask("update");return;}
+    if(RequiresUpdate(LoadState(),release)){StartTask("update");return;}
     play.Enabled=false;
     progress.Style=ProgressBarStyle.Marquee;progress.MarqueeAnimationSpeed=25;
     status.Text="Testando StormPT e iniciando o jogo...";
@@ -1011,9 +1011,15 @@ namespace StormPT {
           using(var writer=new StreamWriter(zip.CreateEntry("Files/Game/game.ini").Open()))writer.Write("[Screen]");
           using(var writer=new StreamWriter(zip.CreateEntry("Files/Game/char/test.txt").Open()))writer.Write("asset");
         }
+        var target=new Release{Base=new Package{Sha256="new-base"},Patches=new List<Patch>{new Patch{Version=2}}};
+        if(!RequiresUpdate(null,target) || !RequiresUpdate(new State{BaseSha256="old-base",PatchVersion=2},target) ||
+           RequiresUpdate(new State{BaseSha256="new-base",PatchVersion=2},target))throw new Exception("Base update detection failed");
         string install=Path.Combine(root,"flat");
         Extract(package,install,(pct,m)=>{},true);
         if(!File.Exists(Path.Combine(install,"Game.exe")) || !File.Exists(Path.Combine(install,"char","test.txt")) || Directory.Exists(Path.Combine(install,"Files")))throw new Exception("Flat ZIP layout failed");
+        File.WriteAllText(Path.Combine(install,"game.ini"),"user configuration");
+        Extract(package,install,(pct,m)=>{},true);
+        if(File.ReadAllText(Path.Combine(install,"game.ini"))!="user configuration")throw new Exception("Base update replaced user settings");
         string migration=Path.Combine(root,"migration");
         string old=Path.Combine(migration,"StormPT","Files","Game");Directory.CreateDirectory(old);
         File.WriteAllText(Path.Combine(old,"Game.exe"),"dummy");File.WriteAllText(Path.Combine(old,"game.ini"),"dummy");
