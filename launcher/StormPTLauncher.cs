@@ -119,8 +119,8 @@ namespace StormPT {
  }
 
  public sealed class Launcher : Form {
-  const int NativeBuildVersion=6;
-  const string Origin="https://stormpt.hoststorm.com.br";
+  const int NativeBuildVersion=7;
+  const string Origin="https://stormpt.hoststorm.cloud";
   const string PublicKey="<RSAKeyValue><Modulus>4TaKBu6jfbDgC7GnFmkMzBlM6Htb+LLzLmEBnKYFOOitK7CU2KYg4V8T6M07fqNwqt5g1YlFdDqqjwfQR8+s5PtQPABySISnWrrcZZcMXO/s/CxAfcLUASfrkS6lXPo3WxtAMT+V5MJo1Z/wqrOMRBrLNRdp3Wzuiu3orJAoqAvm8fHljAYQgeMBXqNqsu7EaA3njMCm+8lnR+EEJVpJpwym8ZvZY8vMxhICb1o1bqFMME9HqGm74hq2rQBTzIzwX9O3Jpu7CoIYQ3D/RjdtsFYixQ63bQlkO/0QcI7iDL8KBogHWc619YeUk6RNu5wEpCX8NUEH3b6QcRHLTDc6A98J2iK/7S72WzM89G+gAb8gAsphhZKQI2NvfBFocdzdGYLLqR0EKLsUpt2B5Db5I3tKUQsTziIwdwnYbTI3ACjFP0r6pjVqOdnJitfZKXiLNaeMIFtQmbZFlriwdkz60esX6tsO+6GXDhi6vjpK6nWIuD/ATOd2e/C900Mr9bWl</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
   readonly JavaScriptSerializer json=new JavaScriptSerializer();
   readonly BackgroundWorker worker=new BackgroundWorker();
@@ -250,11 +250,7 @@ namespace StormPT {
   public Launcher() {
    Text="StormPT Launcher v11";StartPosition=FormStartPosition.CenterScreen;ClientSize=new Size(865,544);MinimumSize=new Size(760,510);
    BackColor=background;ForeColor=white;Font=new Font("Segoe UI",10);Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath);MaximizeBox=false;
-   string executableDir=Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
-   string saved=PropertiesPath();if(File.Exists(saved)) { try{var p=json.Deserialize<Dictionary<string,string>>(File.ReadAllText(saved));if(p.ContainsKey("Directory") && !String.IsNullOrWhiteSpace(p["Directory"]))directory=p["Directory"]; }catch{} }
-   // Portable layout: if the launcher sits in E:\StormPT, install beside it.
-   if(Path.GetFileName(executableDir).Equals("StormPT",StringComparison.OrdinalIgnoreCase))directory=executableDir;
-   if(Directory.Exists(Path.Combine(executableDir,"Files","Game")) || Directory.Exists(Path.Combine(executableDir,"StormPT","Files","Game")))directory=executableDir;
+   directory=Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
    InitClassicUI();
    worker.WorkerReportsProgress=true;worker.DoWork+=Work;worker.ProgressChanged+=(s,e)=>{progress.Value=Math.Max(0,Math.Min(100,e.ProgressPercentage));if(e.UserState!=null){status.Text=e.UserState.ToString();}};
    worker.RunWorkerCompleted+=Done;
@@ -375,7 +371,6 @@ namespace StormPT {
     hudMenu.Items.Add("Configurações",null,(s,e)=>OpenGraphicsSettings());
     hudMenu.Items.Add("Verificar arquivos",null,(s,e)=>StartTask("verify"));
     hudMenu.Items.Add("Atualizar cliente",null,(s,e)=>StartTask("update"));
-    hudMenu.Items.Add("Escolher pasta do jogo",null,(s,e)=>Choose());
     hudMenu.Items.Add("Abrir pasta do jogo",null,(s,e)=>{Directory.CreateDirectory(directory);Process.Start("explorer.exe",directory);});
     hudMenu.Items.Add(new ToolStripSeparator());
     hudMenu.Items.Add("Minimizar",null,(s,e)=>WindowState=FormWindowState.Minimized);
@@ -431,8 +426,6 @@ namespace StormPT {
     if(!File.Exists(ini)){MessageBox.Show(this,"Instale o cliente primeiro para configurar os gráficos.","StormPT",MessageBoxButtons.OK,MessageBoxIcon.Information);return;}
     using(var dialog=new GraphicsSettingsForm(ini)){dialog.ShowDialog(this);}
   }
-  string PropertiesPath(){return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"StormPTLauncher.ini.json");}
-  void Choose(){using(var d=new FolderBrowserDialog()){d.Description="Escolha a pasta onde o cliente StormPT será instalado";d.SelectedPath=Directory.Exists(directory)?directory:Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);if(d.ShowDialog(this)==DialogResult.OK){directory=d.SelectedPath;location.Text="Pasta: "+directory;File.WriteAllText(PropertiesPath(),json.Serialize(new Dictionary<string,string>{{"Directory",directory}}));StartTask("check");}}}
   void MigrateLegacyLayout(){
     if(File.Exists(Path.Combine(game,"Game.exe")))return;
     // Previous versions installed into Files/Game, sometimes adding StormPT twice.
@@ -791,8 +784,8 @@ namespace StormPT {
            !File.Exists(target))throw new InvalidDataException("Destino de atualização inválido.");
         byte[] manifestBytes,sigBytes;
         using(var wc=new WebClient()){
-          manifestBytes=wc.DownloadData("https://stormpt.hoststorm.com.br/client-files/manifest.json");
-          sigBytes=wc.DownloadData("https://stormpt.hoststorm.com.br/client-files/manifest.sig");
+          manifestBytes=wc.DownloadData(Origin+"/client-files/manifest.json");
+          sigBytes=wc.DownloadData(Origin+"/client-files/manifest.sig");
         }
         using(var rsa=new RSACryptoServiceProvider()){
           rsa.PersistKeyInCsp=false;rsa.FromXmlString(PublicKey);

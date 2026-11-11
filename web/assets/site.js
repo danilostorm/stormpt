@@ -1,1 +1,0 @@
-document.querySelectorAll('.menu a').forEach(link=>link.addEventListener('click',()=>document.querySelector('.menu').classList.remove('open')));
