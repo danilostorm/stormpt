@@ -23,8 +23,8 @@ The public client endpoint remains the existing Oracle address `163.176.128.81`;
 ## Release blockers
 
 - The x64 server process is stopped; no real-client login against the rebuilt executable has been verified.
-- The launcher accepts only RSA-signed manifests. Its matching private signing key was not found in the available operational files, so the new package and launcher have not been published to the update feed.
-- The LAB website copy is staged on the StormPT VM, but the public admin/API source and database have not been recovered. The public site/admin route has not been moved.
+- The launcher accepts only RSA-signed manifests. Searches of the operational client, source backup, launcher worktree, AEROCOOL files, and Drive located only the public `manifest-public.pem`; no private signing key/certificate was found. The new package and launcher have not been published to the update feed.
+- The LAB website copy is staged on the StormPT VM, but searches of the GitHub repository and Drive did not locate the public admin/API source or database. The public site/admin route has not been moved.
 - Existing x86 production and the public route remain untouched.
 
 See the local/AEROCOOL operational report for detailed paths, hashes, and the ordered cutover procedure. Do not use the unsigned candidate as the public update.
