@@ -1,6 +1,6 @@
-# StormPT Launcher Clássico — C# / .NET Framework
+# StormPT Launcher — Windows Forms / .NET Framework
 
-Código-fonte do **launcher clássico do StormPT 1.2.0**, migrado do Python/Tkinter para **C# com Windows Forms**, com base no atualizador original do StormPK.
+Código-fonte do launcher desktop do StormPT, em **C# com Windows Forms**. O launcher permanece 32-bit para compatibilidade com o Windows e inicia o cliente de jogo **x64**.
 
 O programa compilado é um **único arquivo `launcher.exe`**, sem instalação de Python e sem pasta `_internal`. As imagens originais do launcher estão incorporadas como recursos do executável.
 
@@ -26,8 +26,9 @@ Não use PyInstaller, empacotadores ou UPX. O launcher é Windows Forms nativo d
 - Interface clássica 480 × 400 com botões animados **Começar**, **Registrar**, **Configurações** e **Sair**.
 - Clique com botão direito para acessar funções adicionais (verificação, instalação, pasta do jogo).
 - Instalador e atualizador com manifesto `/client-files/manifest.json` assinado por RSA e arquivos verificados por SHA-256.
-- Download em segmentos com retomada, verificação de patches e conexão com servidor público.
-- Instalação em `%LOCALAPPDATA%\StormPT` por padrão.
+- Em uma pasta sem cliente, baixa e instala o pacote-base completo. Em uma instalação existente, verifica a versão e aplica a atualização assinada disponível.
+- Download em segmentos com retomada, verificação de patches e conexão com o servidor público.
+- Instala o cliente na mesma pasta do launcher. Coloque o launcher em uma pasta gravável pelo usuário, como `C:\Games\StormPT`; evite `Program Files` se não for executar com permissões de administrador.
 - Atualização automática do próprio launcher conforme manifesto.
 - Manutenção das preferências gráficas do jogador.
 - Sem `wscript.exe`, VBScript ou pasta `_internal`.
@@ -55,7 +56,8 @@ Alguns testes acessam a internet e necessitam que o site oficial esteja acessív
 
 ## Downloads oficiais
 
-- Site: https://stormpt.hoststorm.com.br/download
-- Binário: https://stormpt.hoststorm.com.br/releases/launcher.exe
+- Site: https://stormpt.hoststorm.cloud/download
+- Binário: https://stormpt.hoststorm.cloud/releases/launcher.exe
 
 Este diretório contém apenas o **launcher cliente**, não o código-fonte do servidor nem chaves privadas.
+
