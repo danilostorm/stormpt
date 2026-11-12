@@ -124,6 +124,16 @@ namespace StormPT {
   const string LegacyFeed="https://raw.githubusercontent.com/danilostorm/pristonweb/stormpt-launcher-v0.1.0/launcher/feed/";
   const string LegacyPublicKey="<RSAKeyValue><Modulus>r/W2LGrYfvVEzWSXMHJLYxNHmA9NA7S0cu0tYYwQGCJ3zdJYZnFUwHYCwUJOosS8F9GHi7kpCg7PTgeTdAyrewnE/BmjB/j6fITSXrj5v1Yh+l+zeeXOMNhyM3o0VngPBTAyzN+u7vcWUX6Spv/msSLnw7KiOC0ZVR6XMskKlAtjRihhLAueo6leHhC3ZUoAtgXyWB1JdKiIGV9amg8KL2eYyls4wWzyaEDg8Lmr4BlUYW3cNszGNonvPE5jUXLqP+VZoRgnFSlrwSSW2X8TKugUKthJZ7FbDOkxUY9pK7/DW2ViYk3PqwFNL0OaPR3b06mTqncqz1gYWNAH8MHCAQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
   const string PublicKey="<RSAKeyValue><Modulus>wUhFpsYrYHak4QrrIKPrbnDJAcmL1F9RWSPAStmYYxIJ6f27KjWJbTXQ7nW95cuLlX9XzIKKb0D5Gqxg8udW0V5Xko8jLqiKC57XeXOHMA+kO1RMPcN3YUhv/jhAVxn8EFJ3M2RLpEPipvCeGCHsLcdlJUOiFuCh9FiFoWczOA9dU8ooLTevFbTLSYtLk97vNk5a/fuhL5a7dQudKgenMoII5kkmyO5wu1UBCA7RYY51QO12guA3gkHlrM5FcSqRDsPBRyG6axnSjwkDRMEbmmj/9Asmkbp0G+iSiK9GtjmcXkom7x0cUSsEa8KHrA+aoy7BelCVF7lTNiewu5iBY0VuoatkQjHl637/E+QIAhgu1daEy9YQK3/NDptspNsXyzdmIOgjbCoAvE9zc6h/8XwsVTrCYdHrQTvEITTBCqaS5Fm6GTMb8l0zoZfDNfKzUv+z8LS3RZRbKrOA/XPgTls6czVHcvcy+MDwt8CppjdHF303kX/BztvxG6iVxevt</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+  const string PreviousManifestPublicKey="<RSAKeyValue><Modulus>4TaKBu6jfbDgC7GnFmkMzBlM6Htb+LLzLmEBnKYFOOitK7CU2KYg4V8T6M07fqNwqt5g1YlFdDqqjwfQR8+s5PtQPABySISnWrrcZZcMXO/s/CxAfcLUASfrkS6lXPo3WxtAMT+V5MJo1Z/wqrOMRBrLNRdp3Wzuiu3orJAoqAvm8fHljAYQgeMBXqNqsu7EaA3njMCm+8lnR+EEJVpJpwym8ZvZY8vMxhICb1o1bqFMME9HqGm74hq2rQBTzIzwX9O3Jpu7CoIYQ3D/RjdtsFYixQ63bQlkO/0QcI7iDL8KBogHWc619YeUk6RNu5wEpCX8NUEH3b6QcRHLTDc6A98J2iK/7S72WzM89G+gAb8gAsphhZKQI2NvfBFocdzdGYLLqR0EKLsUpt2B5Db5I3tKUQsTziIwdwnYbTI3ACjFP0r6pjVqOdnJitfZKXiLNaeMIFtQmbZFlriwdkz60esX6tsO+6GXDhi6vjpK6nWIuD/ATOd2e/C900Mr9bWl</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+  static bool VerifyManifestSignature(byte[] data,byte[] signature){
+    foreach(string key in new[]{PublicKey,PreviousManifestPublicKey}){
+      using(var rsa=new RSACryptoServiceProvider()){
+        rsa.PersistKeyInCsp=false;rsa.FromXmlString(key);
+        if(rsa.VerifyData(data,CryptoConfig.MapNameToOID("SHA256"),signature))return true;
+      }
+    }
+    return false;
+  }
   readonly JavaScriptSerializer json=new JavaScriptSerializer();
   readonly BackgroundWorker worker=new BackgroundWorker();
   readonly BackgroundWorker launchWorker=new BackgroundWorker();
@@ -463,7 +473,7 @@ namespace StormPT {
   byte[] WebGet(string url){using(var client=new WebClient()){client.Headers.Add("Cache-Control","no-cache");return client.DownloadData(url);}}
   Release FetchRelease(){
     byte[] data=WebGet(GetUrl("/client-files/manifest.json"));byte[] sig=WebGet(GetUrl("/client-files/manifest.sig"));
-    using(var rsa=new RSACryptoServiceProvider()){rsa.PersistKeyInCsp=false;rsa.FromXmlString(PublicKey);if(!rsa.VerifyData(data,CryptoConfig.MapNameToOID("SHA256"),sig))throw new CryptographicException("Manifesto sem assinatura válida. Nenhum arquivo será alterado.");}
+    if(!VerifyManifestSignature(data,sig))throw new CryptographicException("Manifesto sem assinatura válida. Nenhum arquivo será alterado.");
     var r=json.Deserialize<Release>(Encoding.UTF8.GetString(data));if(r==null||r.SchemaVersion!=1||r.Base==null||r.Patches==null||r.Base.Bytes<=0)throw new InvalidDataException("Manifesto incompatível.");
     if(r.Patches.GroupBy(x=>x.Version).Any(x=>x.Count()>1))throw new InvalidDataException("Versões duplicadas no manifesto.");
     return r;
@@ -844,10 +854,7 @@ namespace StormPT {
           manifestBytes=wc.DownloadData(Origin+"/client-files/manifest.json");
           sigBytes=wc.DownloadData(Origin+"/client-files/manifest.sig");
         }
-        using(var rsa=new RSACryptoServiceProvider()){
-          rsa.PersistKeyInCsp=false;rsa.FromXmlString(PublicKey);
-          if(!rsa.VerifyData(manifestBytes,CryptoConfig.MapNameToOID("SHA256"),sigBytes))throw new CryptographicException("Assinatura inválida");
-        }
+        if(!VerifyManifestSignature(manifestBytes,sigBytes))throw new CryptographicException("Assinatura inválida");
         var manifest=new JavaScriptSerializer().Deserialize<Release>(Encoding.UTF8.GetString(manifestBytes));
         if(manifest==null || manifest.Launcher==null ||
           !FileHash(Application.ExecutablePath).Equals(manifest.Launcher.Sha256,StringComparison.OrdinalIgnoreCase))
@@ -1095,11 +1102,7 @@ namespace StormPT {
           data=wc.DownloadData(Origin+"/client-files/manifest.json");
           sig=wc.DownloadData(Origin+"/client-files/manifest.sig");
         }
-        using(var rsa=new RSACryptoServiceProvider()){
-          rsa.PersistKeyInCsp=false;
-          rsa.FromXmlString(PublicKey);
-          if(!rsa.VerifyData(data,CryptoConfig.MapNameToOID("SHA256"),sig))throw new CryptographicException("Assinatura invalida");
-        }
+        if(!VerifyManifestSignature(data,sig))throw new CryptographicException("Assinatura invalida");
         var r=new JavaScriptSerializer().Deserialize<Release>(Encoding.UTF8.GetString(data));
         if(r==null || r.SchemaVersion!=1 || r.Patches==null || r.Base==null || r.Base.Bytes<=0)throw new InvalidDataException("Manifesto inesperado");
         Console.WriteLine("STORMPT_MANIFEST_OK patches="+r.Patches.Count+" client_bytes="+r.Base.Bytes);

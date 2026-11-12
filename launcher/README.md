@@ -35,7 +35,7 @@ Não use PyInstaller, empacotadores ou UPX. O launcher é Windows Forms nativo d
 
 ### Segurança
 
-O código contém somente a **chave pública de verificação** do manifesto; **a chave privada de assinatura não faz parte desta publicação**. Esta branch de staging usa uma nova chave de manifesto; o material privado fica cifrado localmente por DPAPI e fora do repositório. O arquivo público anterior foi preservado como `manifest-public-legacy-20261111.txt`. Não inclua suas credenciais, senha de banco de dados, chaves privadas, configurações internas ou conteúdo do servidor no repositório.
+O código contém somente chaves públicas de verificação; **nenhuma chave privada faz parte desta publicação**. Durante a rotação, esta branch de staging aceita manifestos assinados tanto pela chave nova quanto pela chave pública anterior. O segredo da chave nova fica cifrado localmente por DPAPI e fora do repositório. O arquivo público anterior foi preservado como `manifest-public-legacy-20261111.txt`. Remova o fallback antigo somente depois que a migração dos launchers estiver confirmada. Não inclua credenciais, senhas, chaves privadas, configurações internas ou conteúdo do servidor no repositório.
 
 O `launcher.exe` **não é assinado por um certificado Authenticode de editor**. Uma compilação .NET pequena pode reduzir detecções heurísticas, mas não garante ausência de falsos positivos. Não desative o antivírus para executá-lo; submeta detecções à Microsoft para análise.
 
