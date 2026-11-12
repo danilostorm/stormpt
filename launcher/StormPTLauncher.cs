@@ -268,7 +268,7 @@ namespace StormPT {
      StartupLog("Integrity-ok",null);
      string gameExe=Path.Combine(game,"Game.exe");
      // Verify the public Login and Game Server paths before opening the client.
-     // The StormPT server-selection screen requires the second TCP port (10007).
+     // The public Oracle relay remains the stable client endpoint during x64 migration.
      StartupLog("StormPT-check-start",null);
      VerifyStormPTConnection();
      StartupLog("StormPT-ok",null);
@@ -917,7 +917,7 @@ namespace StormPT {
       return;
     }
     if(args.Length==1 && args[0]=="--selftest-babel-network"){
-      try{Launcher.VerifyStormPTConnection();Console.WriteLine("STORMPT_TCP_10009_AND_10007_ACCESSIBLE");}
+      try{Launcher.VerifyStormPTConnection();Console.WriteLine("STORMPT_TCP_1997_ACCESSIBLE");}
       catch(Exception ex){Console.Error.WriteLine(ex.Message);Environment.ExitCode=1;}
       return;
     }
