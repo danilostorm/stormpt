@@ -20,22 +20,24 @@ Para retomar, confira a conectividade da VM SuperFrame e o binding de staging em
 
 Espelho operacional AEROCOOL Disk 3: `/mnt/disk3/StormPT-Operations/X64-Staging-20261112/`.
 
-Data: 11/11/2026 (horário local; 12/11 UTC).
+## Registro histórico anterior ao staging atual de 12/11/2026
 
-## Atualização da chave do manifesto — 11/11/2026
+Data do registro original: 11/11/2026 (horário local; 12/11 UTC).
 
-- A chave privada anterior não foi encontrada nos diretórios acessíveis da VM Games AEROCOOL. A VM Games Ziel está ligada, mas o QEMU Guest Agent não responde, então o disco dela não foi inspecionado.
+### Estado inicial da chave — 11/11/2026 (histórico)
+
+- Na verificação de 11/11, a chave privada anterior não foi encontrada nos diretórios operacionais acessíveis da VM Games AEROCOOL.
 - Chave RSA-3072 nova gerada para staging, ID público `35194eb33fd86b739cb5419ee7d7fb88e5c80e1b8553e1f9b6d3e0a581579608`. A privada está cifrada por DPAPI `CurrentUser`, somente no NEXUS (`C:\Users\Administrator\Documents\StormPT-Secrets\ManifestSigner`) e numa cópia local idêntica no Disco E: (`E:\StormPT-Secrets\ManifestSigner`). ACL restrita ao Administrator. O autoteste de assinatura/validação passou.
 - Launcher x86 recompilado, SHA-256 `8AB096528D66D7B45EA81F0BC7E14DE1A496C325F65B51449CA59B81E48D5271`. O verificador aceita a chave pública nova e a anterior. Commits de staging: `da47b87` (chave), `0a70414` (fallback), `4e239ae` (documentação).
-- O feed não foi alterado. A transição dos launchers existentes pelo feed legado ainda não foi verificada; não assinar/publicar manifesto novo até comprovar essa cadeia. Nenhum segredo foi enviado a GitHub, Drive, AEROCOOL ou Ziel.
+- Em 11/11, o feed ainda não havia sido alterado e a transição de launchers existentes não estava validada. Esse estado foi substituído pela ativação privada de 12/11 descrita no início deste documento. Nenhum segredo foi enviado a GitHub, Drive ou AEROCOOL.
 
-## Verificação da troca de chave — 11/11/2026
+### Verificação anterior à ativação — 11/11/2026 (histórico)
 
 - O launcher staging suporta assinaturas RSA feitas pela chave pública nova e pela chave pública anterior durante a migração. Build x86 compilado: SHA-256 `8AB096528D66D7B45EA81F0BC7E14DE1A496C325F65B51449CA59B81E48D5271`; compatibilidade em commit `0a70414`, documentação em `4e239ae`.
-- A VM Games do AEROCOOL não continha a chave privada anterior nos diretórios acessíveis. Games do Ziel continua sem QEMU Guest Agent funcional; disco não inspecionado.
-- O manifesto do feed IIS de staging foi lido sem alterar arquivos: assinatura valida com a chave anterior; a chave nova não valida esse manifesto antigo. O site público `/client-files/manifest.json` retorna 404.
+- A chave anterior não foi encontrada nos diretórios acessíveis da VM Games do AEROCOOL.
+- Naquela data, o manifesto existente validava apenas com a chave anterior; essa observação precede e não descreve o manifesto novo assinado e instalado no staging em 12/11.
 - A assinatura do feed legado no GitHub é válida, mas só autoriza um helper antigo de 33.280 bytes. Não confirmei uma atualização completa do launcher já instalado. Feed, site público, relay Oracle e produção permaneceram inalterados.
-## O que foi atualizado
+### Build candidata registrada em 11/11
 
 - Recompilei a candidata x64 de produção em `E:\StormPT-x64-Production-Candidate-20261111`, explicitando `StormPTLaboratory=false`. A configuração anterior ativava o endereço do LAB por padrão quando a propriedade não era informada.
 - O `Game.exe` resultante é AMD64, 8.748.544 bytes, SHA-256 `74782F10B7C9752E9BBCBFB41BD46C584E5C4BE3B3F38EDF5CCFA874BE84BBF4`. A inspeção estática encontrou o endereço público do Oracle `163.176.128.81`, não encontrou o endereço do LAB `100.99.136.79`, nem os marcadores da rotina antiga de consulta/conexão direta ao banco. A função dormente foi removida da cópia candidata e o original ficou em backup.
@@ -45,28 +47,28 @@ Data: 11/11/2026 (horário local; 12/11 UTC).
 - Compilei o launcher Windows Forms como processo x86, 352.768 bytes, versão `1.2.0.0`, SHA-256 `8AB096528D66D7B45EA81F0BC7E14DE1A496C325F65B51449CA59B81E48D5271`. Ele continua apto a iniciar um `Game.exe` x64 e inclui instalação limpa e atualização do cliente. O teste de conexão usa TCP 1997. Nesta revisão, a verificação de manifesto aceita a chave pública nova e a anterior.
 - O branch GitHub `staging/stormpt-x64` contém a fonte atualizada: commits de chave `da47b875e159cfbf908c304dae473b027263834b` e documentação `4d7a493`. Não inclui a chave privada.
 
-## Endereços e roteamento
+### Endereços e roteamento no registro de 11/11
 
 - O IP público do Oracle, `163.176.128.81`, permanece como endpoint dos clientes e do launcher. Não precisa ser trocado apenas porque o host de jogo mudou.
 - O relay do Oracle ainda encaminha para o servidor x86 antigo no AEROCOOL (`100.99.136.79:1997`). Só depois do servidor x64 iniciar e passar login, entrada no mapa, salvamento e reconexão é que o destino interno do relay poderá ser trocado para a VM StormPT no SuperFrame (`100.101.156.69:1997`, LAN `192.168.30.208`). Essa alteração ainda não foi feita.
 - `stormpt.hoststorm.cloud` continua servindo o domínio atual. A cópia IIS de staging no Windows Server do SuperFrame está isolada na porta 3825 e não recebeu a rota pública. O domínio administrativo ainda redireciona para o host antigo; a API administrativa não respondeu e o código/configuração e banco do painel não foram encontrados na VM, Drive ou repositório analisados.
 
-## O que permanece pendente
+### Pendências registradas em 11/11 — reavaliar com o checkpoint atual
 
 - O Server33 x64 não está em execução e não escuta na porta 1997 da VM. O SQL Express contém bases de ensaio; os dados reais de produção não foram migrados. Não existe teste de login real com o `Game.exe` reconstruído.
-- O manifesto do feed IIS de staging segue assinado pela chave pública anterior, aceita pelo launcher atualizado; o domínio público `/client-files/manifest.json` responde 404. O feed legado atual valida, mas a sequência completa para atualizar launchers existentes não foi comprovada. Portanto, o ZIP novo e o launcher recompilado **não foram publicados no feed** e não alterei `manifest.json`/`.sig`.
-- Não encontrei a chave privada anterior em AEROCOOL. A VM Games do Ziel não pôde ser pesquisada porque seu QEMU Guest Agent não responde. A chave privada nova permanece em armazenamento DPAPI local; seu README explica que essa cópia não recupera a chave num PC/perfil Windows diferente.
+- Em 11/11, o feed ainda não usava a chave nova. Em 12/11, o feed privado de staging foi atualizado e validado; consulte a seção inicial para hashes e verificações atuais. A migração de launchers antigos pelo feed legado continua sem validação ponta a ponta.
+- A chave privada nova permanece em armazenamento DPAPI local no NEXUS; não foi enviada para nenhum servidor. A chave anterior não é necessária para o feed de staging atual.
 - O Google Drive da pasta `X64-Candidato-20261111` ainda tem o launcher v9 antigo; não enviei um cliente ou manifesto que não possa ser verificado. O novo relatório e os dois documentos de retomada já foram espelhados no Drive, em `StormPT-x64-Staging-20261112`, e no Disco 3 do AEROCOOL.
 - O site público e `/admin` ainda não foram movidos. Falta recuperar o código-fonte e a base do admin/API, configurar o serviço no host novo e verificar autenticação/autorização antes de alterar a rota.
 - Busca no repositório `danilostorm/stormpt` e no Drive não encontrou arquivos/código do painel administrativo; a busca de código no branch atual também não retornou implementação de admin/API. Não foi criada uma substituição improvisada sem o contrato e a base reais.
 - Produção x86 no AEROCOOL e o destino atual do relay continuam intactos. Nenhum corte público ocorreu.
 
-## Como retomar
+### Plano histórico de retomada — não é autorização para mudança pública
 
 1. Iniciar Server33 x64 na VM com os bancos reais restaurados e a configuração local do SQL conferida, mantendo firewall fechado para ingress público.
 2. Validar o cliente x64 corrigido contra esse servidor em acesso controlado; confirmar login, mapa, save e reconexão.
-3. Inspecionar a VM Games Ziel quando houver acesso ao disco; validar a atualização completa de um launcher instalado através do feed legado antes de publicar manifests ou binários novos.
-4. Publicar ZIP e launcher no feed privado de staging; validar instalação limpa e atualização de uma pasta de cliente existente.
+3. Não acessar a VM Ziel. Validar instalação limpa e atualização iniciada por launcher antigo somente no staging privado antes de qualquer mudança pública.
+4. O feed privado já foi atualizado em 12/11. A próxima validação é completar instalação limpa e atualização de cliente existente pelo launcher, somente no staging.
 5. Recuperar/instalar o portal e admin/API na VM com o banco correto e só então revisar a rota pública do site.
 6. Com janela de manutenção e checks aprovados, alterar somente o destino interno do relay Oracle para `100.101.156.69:1997`; manter o endpoint público `163.176.128.81` estável. Desativar o x86 apenas depois de validar o x64 e ter rollback disponível.
 
