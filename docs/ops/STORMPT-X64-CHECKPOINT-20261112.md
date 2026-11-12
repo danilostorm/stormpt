@@ -10,6 +10,7 @@
 - The temporary hosts override was removed and its file hash matches the pre-test backup. The transfer process and port 18785 are stopped. Recursive deletion of D:/StormPT-Launcher-Install-Test-20261112 was blocked by automatic review; there are no processes under that path. The transfer helper's small __pycache__ file also remains because automatic review blocked deletion.
 
 Detailed evidence: docs/StormPT-X64-Launcher-Site-Staging-20261112.md and docs/ops/StormPT-Manifest-Signing-Key-Rotation-20261111.md. The local operational report is outputs/StormPT-X64-Launcher-Site-Staging-20261112.md.
+The four current reports/checkpoints were mirrored to AEROCOOL Disk 3 and the matching Google Drive folder; remote SHA-256 values were checked against the local files.
 
 ## Historical signing-key/feed baseline — 2026-11-11
 
