@@ -119,7 +119,7 @@ namespace StormPT {
  }
 
  public sealed class Launcher : Form {
-  const int NativeBuildVersion=9;
+  const int NativeBuildVersion=10;
   const string Origin="https://stormpt.hoststorm.cloud";
   const string LegacyFeed="https://raw.githubusercontent.com/danilostorm/pristonweb/stormpt-launcher-v0.1.0/launcher/feed/";
   const string LegacyPublicKey="<RSAKeyValue><Modulus>r/W2LGrYfvVEzWSXMHJLYxNHmA9NA7S0cu0tYYwQGCJ3zdJYZnFUwHYCwUJOosS8F9GHi7kpCg7PTgeTdAyrewnE/BmjB/j6fITSXrj5v1Yh+l+zeeXOMNhyM3o0VngPBTAyzN+u7vcWUX6Spv/msSLnw7KiOC0ZVR6XMskKlAtjRihhLAueo6leHhC3ZUoAtgXyWB1JdKiIGV9amg8KL2eYyls4wWzyaEDg8Lmr4BlUYW3cNszGNonvPE5jUXLqP+VZoRgnFSlrwSSW2X8TKugUKthJZ7FbDOkxUY9pK7/DW2ViYk3PqwFNL0OaPR3b06mTqncqz1gYWNAH8MHCAQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
