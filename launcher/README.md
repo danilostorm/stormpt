@@ -25,7 +25,7 @@ Não use PyInstaller, empacotadores ou UPX. O launcher é Windows Forms nativo d
 
 - Interface clássica 480 × 400 com botões animados **Começar**, **Registrar**, **Configurações** e **Sair**.
 - Clique com botão direito para acessar funções adicionais (verificação, instalação, pasta do jogo).
-- Instalador e atualizador com manifesto `/client-files/manifest.json` assinado por RSA e arquivos verificados por SHA-256.
+- Instalador e atualizador com manifesto `/client-files/manifest.json` assinado por RSA e arquivos verificados por SHA-256. O identificador da chave pública de staging atual é `35194eb33fd86b739cb5419ee7d7fb88e5c80e1b8553e1f9b6d3e0a581579608`.
 - Em uma pasta sem cliente, baixa e instala o pacote-base completo. Em uma instalação existente, verifica a versão e aplica a atualização assinada disponível.
 - Download em segmentos com retomada, verificação de patches e conexão com o servidor público.
 - Instala o cliente na mesma pasta do launcher. Coloque o launcher em uma pasta gravável pelo usuário, como `C:\Games\StormPT`; evite `Program Files` se não for executar com permissões de administrador.
@@ -35,7 +35,7 @@ Não use PyInstaller, empacotadores ou UPX. O launcher é Windows Forms nativo d
 
 ### Segurança
 
-O código contém somente a **chave pública de verificação** do manifesto; **a chave privada de assinatura não faz parte desta publicação**. Não inclua suas credenciais, senha de banco de dados, chaves privadas, configurações internas ou conteúdo do servidor no repositório.
+O código contém somente a **chave pública de verificação** do manifesto; **a chave privada de assinatura não faz parte desta publicação**. Esta branch de staging usa uma nova chave de manifesto; o material privado fica cifrado localmente por DPAPI e fora do repositório. O arquivo público anterior foi preservado como `manifest-public-legacy-20261111.txt`. Não inclua suas credenciais, senha de banco de dados, chaves privadas, configurações internas ou conteúdo do servidor no repositório.
 
 O `launcher.exe` **não é assinado por um certificado Authenticode de editor**. Uma compilação .NET pequena pode reduzir detecções heurísticas, mas não garante ausência de falsos positivos. Não desative o antivírus para executá-lo; submeta detecções à Microsoft para análise.
 
