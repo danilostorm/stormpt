@@ -9,6 +9,7 @@
 - Patch `StormPT-Game-x64-Patch-20261112.zip` (somente `Game.exe`): 8.748.658 bytes, SHA-256 `c0bbb4a98bb20654aecb530020ec9cc5363c03502295d8921f9625fe18bf5198`. O executável dentro tem 8.748.544 bytes e SHA-256 `74782f10b7c9752e9bbcbfb41bd46c584e5c4be3b3f38edf5ccfa874be84bbf4`.
 - Launcher v10: 354.816 bytes, SHA-256 `a7b9048f8acd264a18fc77ec15e01169119c09ae0535b291c6c39f1c9ad2f055`. O `NativeBuildVersion` foi atualizado a 10 e já foi compilado. Source enviada para `staging/stormpt-x64`, commit `3c678b6`.
 - O guest conferiu os hashes de base, patch, launcher, manifesto e assinatura. A assinatura foi validada antes e depois da troca. HTTP HEAD com Host `stormpt.hoststorm.cloud` retornou 200 para manifesto, assinatura, pacote base, patch e launcher, pelas rotas da porta privada 3825.
+- Um GET real pela porta de staging baixou manifesto, assinatura, patch (8,7 MB) e launcher e comparou cada corpo aos hashes esperados; todos passaram. Os temporários de verificação foram removidos. Reproduzir com `work/release-x64-20261111/verify-staging-http-20261112.ps1`.
 - O serviço temporário de transferência do NEXUS foi encerrado; não há listener local na porta 18784. Logs de acesso estão em `work/release-x64-20261111/staging-transfer-v2.log`. Rascunho gerado incorretamente durante a preparação foi removido depois de validar seus hashes e conteúdo.
 
 ## Limites e próxima validação
