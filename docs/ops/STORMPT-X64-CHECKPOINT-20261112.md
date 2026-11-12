@@ -1,6 +1,17 @@
 # StormPT x64 client/launcher staging checkpoint — 2026-11-12
 
-## Signing-key follow-up — 2026-11-11
+## Current launcher/feed validation — 2026-11-12
+
+- The v10 signature-format failure is now understood: its verifier accepts raw RSA bytes only, while the prior manifest signature was Base64 text. Launcher v11 accepts either representation. Source commit 6b3627b has been pushed to GitHub branch staging/stormpt-x64; no public release was made.
+- Private staging IIS on the SuperFrame StormPT VM now serves the v11 manifest, 384-byte raw signature, and 355,328-byte v11 launcher. Manifest SHA-256 f9f3ca2e76427e4da05383376172dab09989b6ef02ba5a9eb15a9e8342134613; signature SHA-256 d695bb989791a7eb156de4b9147b66a3e4b72d037393781291a242acb2d5914f; launcher SHA-256 75f796cbdb700f007e927487b6b457c11c47c4e61af014f3b350a32e3874ce3b. Backup is outside the served root at C:/StormPTSiteStaging/20261111/backup-feed-20261112-v3.
+- v10 and v11 verifiers both accepted the active raw signature. v10 validated the patch; v11 validated the HTTP range endpoint. A staging v10 executable auto-updated itself to v11. Clean install and incremental client patch both succeeded in a temporary local test directory; 32,720 files were extracted and the final Game.exe hash matched. No Game.exe was launched.
+- NEXUS verified HTTP 200 and exact hashes for the manifest, signature, and launcher through the IIS binding at 100.101.156.69:3825 with Host stormpt.hoststorm.cloud. An earlier post-activation check used localhost and failed because it did not match the explicit IIS binding; the correct route was then verified and the installer script was corrected.
+- No public feed, production x86 service, Oracle/relay, public website/admin, or game-server route changed. x64 gameplay/login/save are not homologated. Do not access the VM Ziel.
+- The temporary hosts override was removed and its file hash matches the pre-test backup. The transfer process and port 18785 are stopped. Recursive deletion of D:/StormPT-Launcher-Install-Test-20261112 was blocked by automatic review; there are no processes under that path. The transfer helper's small __pycache__ file also remains because automatic review blocked deletion.
+
+Detailed evidence: docs/StormPT-X64-Launcher-Site-Staging-20261112.md and docs/ops/StormPT-Manifest-Signing-Key-Rotation-20261111.md. The local operational report is outputs/StormPT-X64-Launcher-Site-Staging-20261112.md.
+
+## Historical signing-key/feed baseline — 2026-11-11
 
 - No previous manifest private key was found in the accessible Games VM on AEROCOOL. The Games VM on Ziel is running, but its QEMU guest agent does not respond, so that guest disk remains uninspected; do not infer the old key is absent there.
 - A new RSA-3072 key is prepared for staging only. Public key ID: `35194eb33fd86b739cb5419ee7d7fb88e5c80e1b8553e1f9b6d3e0a581579608`. The DPAPI `CurrentUser` encrypted private blob is stored only on the NEXUS at `C:\Users\Administrator\Documents\StormPT-Secrets\ManifestSigner\` and an identical encrypted local copy at `E:\StormPT-Secrets\ManifestSigner\`; do not upload either private blob.
@@ -11,7 +22,7 @@
 
 This is a staging-only checkpoint. No production cutover was performed.
 
-## Candidate artifacts
+## Historical candidate artifacts and blockers before v11 validation
 
 - Game.exe: AMD64, 8,748,544 bytes, SHA-256 `74782F10B7C9752E9BBCBFB41BD46C584E5C4BE3B3F38EDF5CCFA874BE84BBF4`.
 - The candidate was rebuilt with the laboratory build flag explicitly disabled. Static inspection found the configured public Oracle address and no laboratory address or dormant legacy direct-database routine markers.

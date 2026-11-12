@@ -1,6 +1,22 @@
 # StormPT x64, launcher e site — checkpoint de staging
 
-## Feed isolado assinado e instalado — 12/11/2026
+## Validação atual — launcher v11 no staging privado, 12/11/2026
+
+- Reproduzi o erro do v10: o launcher esperava os bytes RSA raw, mas o manifesto existente era acompanhado por assinatura Base64. Corrigi VerifyManifestSignature para aceitar ambos os formatos e NativeBuildVersion passou a 11. Commit 6b3627b enviado ao branch staging/stormpt-x64 no GitHub; o push atualiza somente a branch de staging.
+- Atualizei somente o feed privado no IIS da VM StormPT do SuperFrame, C:/StormPTSiteStaging/20261111/public (binding 100.101.156.69:3825 com Host stormpt.hoststorm.cloud). Backup do estado anterior fora da raiz pública: C:/StormPTSiteStaging/20261111/backup-feed-20261112-v3.
+- Manifesto ativo: 1.015 bytes, SHA-256 f9f3ca2e76427e4da05383376172dab09989b6ef02ba5a9eb15a9e8342134613. Assinatura RSA raw: 384 bytes, SHA-256 d695bb989791a7eb156de4b9147b66a3e4b72d037393781291a242acb2d5914f. Launcher de staging v11: 355.328 bytes, SHA-256 75f796cbdb700f007e927487b6b457c11c47c4e61af014f3b350a32e3874ce3b.
+- Pacote base referenciado: 2.251.973.075 bytes, SHA-256 b64287314a52f2ca3e377c1a174871b3705ae942028a482fa9814d01d7a82a2e. Patch de Game.exe: 8.748.658 bytes, SHA-256 c0bbb4a98bb20654aecb530020ec9cc5363c03502295d8921f9625fe18bf5198. Game.exe final: 8.748.544 bytes, SHA-256 74782f10b7c9752e9bbcbfb41bd46c584e5c4be3b3f38edf5ccfa874be84bbf4.
+- Testei os verificadores v10 e v11 contra o manifesto ativo; ambos aceitaram a assinatura raw. O v10 validou o pacote de patch de 8.748.658 bytes; o v11 validou HTTP Range bytes 0-1023/2251973075 no pacote base.
+- Executei v10 em uma instalação de teste isolada. Ele aceitou o manifesto, atualizou-se automaticamente para o executável v11 esperado e reiniciou sem iniciar Game.exe. A instalação permaneceu com PatchVersion=1 e Game.exe SHA-256 74782f10b7c9752e9bbcbfb41bd46c584e5c4be3b3f38edf5ccfa874be84bbf4.
+- A instalação limpa e a aplicação incremental do patch também passaram na cópia temporária local: base de 2.251.973.075 bytes, 32.720 arquivos extraídos, patch aplicado e estado final em PatchVersion=1. O executável do jogo não foi iniciado.
+- A prova de bootstrap cobre somente o v10 de staging que já continha a chave pública nova. Launchers anteriores a essa versão e o feed legado distribuído aos jogadores ainda não foram testados; não assumir compatibilidade retroativa.
+- Do NEXUS, manifesto, assinatura e launcher baixaram do binding IIS correto com HTTP 200 e os hashes acima. A primeira verificação pós-ativação falhou somente porque usava 127.0.0.1, endereço que não corresponde ao binding explícito da VM. Corrigi o script de instalação para usar 100.101.156.69 e confirmei em seguida os três downloads e hashes pelo IIS. A cópia corrigida do script está em work/release-x64-20261111/install-staging-feed-v11.ps1.
+- A fonte v11 está no branch de staging. Nenhum arquivo foi publicado na rota pública, produção x86, Oracle/relay ou admin; o servidor x64 de jogo não foi homologado. O ambiente web continua restrito ao LAB.
+- O processo auxiliar foi encerrado, a porta local 18785 não está ouvindo e a entrada temporária de hosts foi removida; o hash de hosts voltou ao backup original. A pasta D:/StormPT-Launcher-Install-Test-20261112 permanece, sem processos ativos, porque a revisão automática bloqueou a exclusão recursiva. Um pequeno arquivo __pycache__/serve-staging-transfer-v11.cpython-313.pyc também não pôde ser removido pela revisão automática.
+
+## Histórico — estado do feed v10 antes da correção
+
+O registro abaixo foi escrito antes de localizar a incompatibilidade de assinatura e está superado nas partes sobre validação de assinatura, atualização do launcher e instalação/patch. Consulte a seção de validação v11 no início; os limites do servidor, da produção e do feed público continuam válidos.
 
 - O usuário confirmou a chave nova e pediu para esquecer a VM Ziel. Não houve acesso nem busca na VM Ziel. A chave de staging permanece protegida por DPAPI no NEXUS; ID público `35194eb33fd86b739cb5419ee7d7fb88e5c80e1b8553e1f9b6d3e0a581579608`.
 - O IIS de staging na VM StormPT do SuperFrame foi atualizado somente em `C:\StormPTSiteStaging\20261111\public`, porta 3825, binding `stormpt.hoststorm.cloud`. Os arquivos anteriores de manifesto e assinatura foram guardados em `C:\StormPTSiteStaging\20261111\backup-feed-20261112-v2`, fora do conteúdo servido.
@@ -12,7 +28,7 @@
 - Um GET real pela porta de staging baixou manifesto, assinatura, patch (8,7 MB) e launcher e comparou cada corpo aos hashes esperados; todos passaram. Os temporários de verificação foram removidos. Reproduzir com `work/release-x64-20261111/verify-staging-http-20261112.ps1`.
 - O serviço temporário de transferência do NEXUS foi encerrado; não há listener local na porta 18784. Logs de acesso estão em `work/release-x64-20261111/staging-transfer-v2.log`. Rascunho gerado incorretamente durante a preparação foi removido depois de validar seus hashes e conteúdo.
 
-## Limites e próxima validação
+## Limites registrados no checkpoint v10 (histórico; conferir validação v11 acima)
 
 Isso é somente feed de staging isolado; a rota pública, site/admin, Oracle/relay, servidor público e produção x86 não foram alterados. Ainda não foi testada instalação limpa a partir do launcher, atualização iniciada por launcher antigo, execução do `Game.exe` novo nem login real no servidor x64. O feed legado e a atualização de launchers já distribuídos continuam pendentes; não prometer atualização automática para jogadores até validar o caminho de bootstrap.
 
